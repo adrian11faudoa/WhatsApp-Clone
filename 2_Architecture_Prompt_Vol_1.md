@@ -1815,6 +1815,1821 @@ The resulting architecture must be detailed enough for independent backend, fron
 
 You are operating in Senior Engineering Team Mode.
 
+You are simultaneously acting as:
+
+- Principal Software Architect
+- Staff Backend Engineer
+- Staff Frontend Engineer
+- Staff Mobile Engineer
+- DevOps Engineer
+- Cloud Architect
+- Database Architect
+- Security Engineer
+- QA Engineer
+- UI/UX Designer
+- Technical Writer
+
+Design the complete foundational architecture for an enterprise-scale real-time messaging and communication platform comparable in architectural scope to WhatsApp.
+
+The platform must be an original implementation and must not copy proprietary source code, internal architecture, branding, or confidential implementation details from WhatsApp.
+
+This prompt is an independent architecture prompt.
+
+Do not implement backend code.
+
+Do not implement frontend code.
+
+Do not implement mobile code.
+
+Do not generate infrastructure implementation files.
+
+Do not generate Dockerfiles.
+
+Do not generate Kubernetes manifests.
+
+Do not generate Terraform files.
+
+Do not generate application source code.
+
+Produce architecture, specifications, contracts, diagrams, data models, engineering decisions, and implementation guidance only.
+
+────────────────────────────────────────
+
+PROJECT
+
+Build a production-ready global real-time communication platform supporting:
+
+• Hundreds of millions of registered users
+• Tens of millions of daily active users
+• Billions of messages
+• One-to-one messaging
+• Group messaging
+• Communities
+• Channels where appropriate
+• Voice calls
+• Video calls
+• Group calls
+• Media sharing
+• Voice messages
+• Documents
+• Stories/status updates
+• Push notifications
+• Multi-device synchronization
+• Offline messaging
+• Message delivery
+• Read receipts
+• Typing indicators
+• Presence
+• Contact management
+• Blocking
+• Reporting
+• Moderation
+• Business accounts
+• Administration
+• Analytics
+• Audit logging
+• End-to-end encryption architecture
+• High availability
+• Horizontal scaling
+• Multi-region deployment
+• Disaster recovery
+
+Design the system for:
+
+• Global operation
+• Low latency
+• High availability
+• Fault tolerance
+• Strong security
+• Privacy
+• Long-term maintainability
+• Future extensibility
+
+────────────────────────────────────────
+
+PRIMARY TECHNOLOGY STACK
+
+Web:
+
+• Next.js
+• React
+• TypeScript
+• Tailwind CSS
+• shadcn/ui
+
+Mobile:
+
+• React Native
+• Expo
+• TypeScript
+
+Backend:
+
+• Node.js
+• NestJS
+• TypeScript
+
+Database:
+
+• PostgreSQL
+• Prisma ORM
+
+Caching:
+
+• Redis
+
+Real-Time Communication:
+
+• WebSockets
+• Socket.IO where appropriate
+
+Event Streaming:
+
+• Kafka or Redpanda
+
+Background Processing:
+
+• BullMQ
+
+Search:
+
+• Elasticsearch or OpenSearch
+
+Object Storage:
+
+• AWS S3-compatible object storage
+
+CDN:
+
+• CloudFront or equivalent CDN
+
+Push Notifications:
+
+• Firebase Cloud Messaging
+• Apple Push Notification Service
+
+Voice/Video:
+
+• WebRTC
+• STUN/TURN infrastructure
+
+Infrastructure:
+
+• Docker
+• Kubernetes
+• Helm
+• Terraform
+• GitHub Actions
+
+Observability:
+
+• OpenTelemetry
+• Prometheus
+• Grafana
+• Loki
+• Tempo
+
+Secrets:
+
+• HashiCorp Vault or approved cloud-native secret management
+
+────────────────────────────────────────
+
+ARCHITECTURAL APPROACH
+
+Determine whether the platform should initially use:
+
+• Modular Monolith
+• Service-Oriented Architecture
+• Microservices
+
+Do not blindly create a service for every table or feature.
+
+Evaluate:
+
+• Transactional consistency
+• Scalability
+• Latency
+• Operational complexity
+• Deployment independence
+• Team ownership
+• Failure isolation
+• Cost
+• Developer productivity
+• Long-term maintainability
+
+Clearly identify:
+
+• Independently deployable services
+• Shared transactional boundaries
+• Authoritative data ownership
+• Synchronous communication
+• Asynchronous communication
+• Event-driven communication
+• Read models
+• CQRS requirements
+• Eventual consistency
+• Strong consistency
+
+Provide a migration strategy for future service extraction where appropriate.
+
+────────────────────────────────────────
+
+CORE PLATFORM DOMAINS
+
+Define bounded contexts and ownership for:
+
+Identity
+
+Accounts
+
+Users
+
+Profiles
+
+Authentication
+
+Authorization
+
+Sessions
+
+Devices
+
+Contacts
+
+Privacy
+
+Presence
+
+Conversations
+
+Messaging
+
+Messages
+
+Message Delivery
+
+Message Reactions
+
+Message Replies
+
+Message Forwarding
+
+Message Editing
+
+Message Deletion
+
+Groups
+
+Communities
+
+Channels
+
+Media
+
+Media Processing
+
+Voice Messages
+
+Documents
+
+Stories
+
+Notifications
+
+Search
+
+Calls
+
+Voice Calls
+
+Video Calls
+
+Group Calls
+
+Call Signaling
+
+End-to-End Encryption
+
+Key Management
+
+Offline Synchronization
+
+Multi-Device Synchronization
+
+Blocking
+
+Reporting
+
+Moderation
+
+Business Accounts
+
+Administration
+
+Analytics
+
+Audit
+
+Feature Flags
+
+System Configuration
+
+For each domain define:
+
+• Responsibility
+• Aggregate roots
+• Entities
+• Value objects
+• Repositories
+• Application services
+• Domain services
+• Domain events
+• Data ownership
+• Consistency requirements
+
+────────────────────────────────────────
+
+SYSTEM ARCHITECTURE
+
+Design a complete high-level architecture.
+
+CLIENT LAYER
+
+Include:
+
+• Web application
+• iOS application
+• Android application
+• Desktop architecture boundaries
+• Tablet architecture boundaries
+• Future device integrations
+
+EDGE LAYER
+
+Include:
+
+• DNS
+• CDN
+• WAF
+• Load balancers
+• API Gateway
+• WebSocket Gateway
+• Rate limiting
+• Authentication boundaries
+
+APPLICATION LAYER
+
+Include:
+
+• API services
+• Domain services
+• Real-time services
+• Messaging services
+• Call signaling
+• Background workers
+• Event consumers
+• Scheduled jobs
+
+DATA LAYER
+
+Include:
+
+• PostgreSQL
+• Read replicas
+• Redis
+• Kafka/Redpanda
+• Elasticsearch/OpenSearch
+• Object storage
+
+COMMUNICATION LAYER
+
+Include:
+
+• REST APIs
+• WebSockets
+• WebRTC
+• Push notifications
+• Event streaming
+
+OBSERVABILITY LAYER
+
+Include:
+
+• Metrics
+• Logs
+• Traces
+• Alerts
+
+SECURITY LAYER
+
+Include:
+
+• Authentication
+• Authorization
+• Encryption
+• Key management
+• Secrets management
+• Audit logging
+• Network segmentation
+
+Represent the architecture using clear text-based diagrams.
+
+Do not use images.
+
+────────────────────────────────────────
+
+C4 ARCHITECTURE
+
+Generate:
+
+• System Context Diagram
+• Container Diagram
+• Component Diagram
+• Deployment Diagram
+
+For every major component define:
+
+• Responsibility
+• Inputs
+• Outputs
+• Dependencies
+• Scaling behavior
+• Failure behavior
+• Security boundary
+
+────────────────────────────────────────
+
+SERVICE DECOMPOSITION
+
+Evaluate and define service boundaries for:
+
+API Gateway
+
+Authentication Service
+
+Identity Service
+
+Account Service
+
+Profile Service
+
+Session Service
+
+Device Service
+
+Contact Service
+
+Privacy Service
+
+Presence Service
+
+Conversation Service
+
+Messaging Service
+
+Message Delivery Service
+
+Message Synchronization Service
+
+Group Service
+
+Community Service
+
+Media Service
+
+Media Processing Service
+
+Notification Service
+
+Search Service
+
+Story Service
+
+Call Signaling Service
+
+Call Session Service
+
+Encryption/Key Management boundaries
+
+Moderation Service
+
+Reporting Service
+
+Business Account Service
+
+Administration Service
+
+Analytics Service
+
+Audit Service
+
+Feature Flag Service
+
+Configuration Service
+
+Do not automatically make every item an independently deployable microservice.
+
+Combine cohesive responsibilities where appropriate.
+
+For every final service boundary define:
+
+• Responsibility
+• Authoritative data
+• APIs
+• Events produced
+• Events consumed
+• Synchronous dependencies
+• Asynchronous dependencies
+• Scaling requirements
+• Availability requirements
+• Security boundaries
+
+────────────────────────────────────────
+
+SERVICE OWNERSHIP MATRIX
+
+Create a complete ownership matrix.
+
+For each domain identify:
+
+• Authoritative service
+• Database ownership
+• API ownership
+• Event ownership
+• Cache ownership
+• Search/read-model ownership
+• Administrative ownership
+
+Explicitly define prohibited cross-service database writes.
+
+────────────────────────────────────────
+
+COMMUNICATION MATRIX
+
+Define communication between major services.
+
+For each interaction specify:
+
+• Producer
+• Consumer
+• Protocol
+• Synchronous/asynchronous
+• Purpose
+• Consistency requirement
+• Timeout
+• Retry
+• Idempotency
+• Failure behavior
+
+Evaluate:
+
+• REST/HTTP
+• WebSockets
+• Kafka/Redpanda
+• BullMQ
+• Redis
+• WebRTC signaling
+
+Avoid unnecessary synchronous dependencies.
+
+────────────────────────────────────────
+
+MONOREPO ARCHITECTURE
+
+Design a production-ready monorepo.
+
+Applications:
+
+• Web
+• Mobile
+• Desktop where appropriate
+• Administration Dashboard
+• Moderation Dashboard where appropriate
+
+Backend:
+
+• API Gateway
+• Backend services
+• Real-time services
+• WebSocket services
+• Call signaling services
+• Background workers
+
+Shared packages:
+
+• API contracts
+• Event contracts
+• Shared types
+• Validation
+• Configuration
+• Authentication interfaces
+• Observability
+• Encryption interfaces
+• Testing utilities
+• UI components where appropriate
+
+Infrastructure:
+
+• Docker
+• Kubernetes
+• Helm
+• Terraform
+• CI/CD
+
+Documentation:
+
+• Architecture
+• API
+• Events
+• Database
+• Security
+• Operations
+• ADRs
+• Runbooks
+
+Do not create shared packages merely to reduce duplication.
+
+Shared packages must have clear ownership and dependency rules.
+
+────────────────────────────────────────
+
+FOLDER HIERARCHY
+
+Generate a detailed folder hierarchy for:
+
+• Monorepo root
+• Applications
+• Backend services
+• Workers
+• Shared packages
+• Database
+• Infrastructure
+• Tests
+• Documentation
+• Configuration
+• Database migrations
+
+Include important directories and representative files.
+
+Do not generate source code.
+
+────────────────────────────────────────
+
+CORE DOMAIN MODEL
+
+Evaluate the following entities:
+
+User
+
+Account
+
+Profile
+
+ProfileSettings
+
+PrivacySettings
+
+Session
+
+Device
+
+DeviceCapability
+
+Contact
+
+ContactRequest
+
+BlockedUser
+
+Conversation
+
+ConversationParticipant
+
+ConversationSettings
+
+Message
+
+MessageAttachment
+
+MessageReaction
+
+MessageReply
+
+MessageForward
+
+MessageMention
+
+MessageReceipt
+
+MessageEdit
+
+MessageDeletion
+
+Group
+
+GroupMember
+
+GroupRole
+
+Community
+
+CommunityMember
+
+Channel
+
+MediaAsset
+
+MediaProcessingJob
+
+VoiceMessage
+
+Document
+
+Story
+
+StoryViewer
+
+Notification
+
+NotificationPreference
+
+PushToken
+
+Call
+
+CallParticipant
+
+CallSession
+
+CallDevice
+
+EncryptionIdentity
+
+DeviceKey
+
+PreKey
+
+SessionKey
+
+Report
+
+ModerationCase
+
+BusinessAccount
+
+BusinessProfile
+
+AuditLog
+
+FeatureFlag
+
+Do not assume one database table per conceptual entity.
+
+Define:
+
+• Aggregate roots
+• Aggregate boundaries
+• Lifecycle
+• Invariants
+• Ownership
+• Transaction boundaries
+
+────────────────────────────────────────
+
+DATABASE ARCHITECTURE
+
+Design PostgreSQL for:
+
+• Hundreds of millions of users
+• Billions of messages
+• Large conversation histories
+• Large groups
+• High-volume message receipts
+• Large device/session datasets
+• Large audit datasets
+
+Define:
+
+• Database ownership
+• Schema boundaries
+• Primary keys
+• Foreign keys
+• Indexes
+• Unique constraints
+• Check constraints
+• Partitioning
+• Replication
+• Read replicas
+• Connection pooling
+• Archival
+• Retention
+• Backup
+• Recovery
+
+Identify high-growth tables.
+
+Evaluate partitioning candidates for:
+
+• Messages
+• Message receipts
+• Audit logs
+• Call events
+• Analytics data
+
+Do not store large binary media inside PostgreSQL.
+
+Do not use PostgreSQL as the primary source for high-volume ephemeral presence data.
+
+────────────────────────────────────────
+
+DATABASE OWNERSHIP
+
+Define:
+
+• Which service owns each database/schema
+• Which services may directly read it
+• Which services must use APIs
+• Which services use read models
+• How cross-domain queries are implemented
+• How database migrations are owned
+
+Prevent uncontrolled cross-service database access.
+
+────────────────────────────────────────
+
+ERD
+
+Generate a complete text-based ERD.
+
+Include:
+
+• Primary keys
+• Foreign keys
+• Cardinality
+• Ownership
+• Important indexes
+• High-growth tables
+• Partitioning candidates
+
+Clearly show relationships between:
+
+• Users
+• Accounts
+• Profiles
+• Devices
+• Contacts
+• Conversations
+• Participants
+• Messages
+• Attachments
+• Groups
+• Communities
+• Stories
+• Calls
+• Encryption metadata
+• Reports
+• Business accounts
+• Sessions
+• Notifications
+
+────────────────────────────────────────
+
+PRISMA STRATEGY
+
+Define:
+
+• Schema ownership
+• Prisma schema organization
+• Service-specific Prisma clients where appropriate
+• Migration ownership
+• Transaction boundaries
+• Read replica strategy
+• Connection pooling
+• Query optimization
+• Indexing rules
+• Migration deployment strategy
+
+Avoid a single uncontrolled shared database model.
+
+────────────────────────────────────────
+
+REDIS ARCHITECTURE
+
+Design Redis usage for:
+
+• Presence
+• Session coordination
+• WebSocket coordination
+• Typing indicators
+• Rate limiting
+• Distributed locks
+• Temporary synchronization state
+• Notification deduplication
+• Cache
+• Queue infrastructure
+
+For each use case define:
+
+• Key pattern
+• TTL
+• Invalidation
+• Consistency
+• Failure behavior
+• Memory considerations
+
+Redis must never be the authoritative source for critical persistent data.
+
+────────────────────────────────────────
+
+REAL-TIME ARCHITECTURE
+
+Design the complete WebSocket architecture.
+
+Support:
+
+• Connection establishment
+• Authentication
+• Authorization
+• Heartbeats
+• Reconnection
+• Presence
+• Typing indicators
+• Message delivery
+• Delivery acknowledgements
+• Read receipts
+• Reactions
+• Group events
+• Call signaling
+• Multi-device synchronization
+
+Define:
+
+• Gateway architecture
+• Connection routing
+• Horizontal scaling
+• Redis coordination
+• Connection affinity
+• Backpressure
+• Rate limiting
+• Connection recovery
+• Regional routing
+• Failure handling
+
+Design for tens of millions of concurrent connections.
+
+────────────────────────────────────────
+
+MESSAGING ARCHITECTURE
+
+Design one-to-one and group messaging.
+
+Support:
+
+• Text messages
+• Replies
+• Reactions
+• Forwarding
+• Mentions
+• Editing
+• Deletion
+• Attachments
+• Voice messages
+• Documents
+• Delivery state
+• Read state
+• Message ordering
+• Offline delivery
+• Multi-device delivery
+
+Define:
+
+• Client-generated message IDs
+• Server-generated IDs
+• Conversation sequence numbers
+• Idempotency keys
+• Ordering guarantees
+• Deduplication
+• Retry behavior
+• Delivery semantics
+• Persistence semantics
+
+Do not rely on client timestamps for authoritative ordering.
+
+────────────────────────────────────────
+
+MESSAGE DELIVERY
+
+Define delivery states:
+
+• Pending
+• Accepted
+• Sent
+• Delivered
+• Read
+• Failed
+
+Define how states propagate across:
+
+• Sender devices
+• Recipient devices
+• Web
+• Mobile
+• Desktop
+
+Define how retries and duplicate events are handled.
+
+────────────────────────────────────────
+
+OFFLINE SYNCHRONIZATION
+
+Design:
+
+• Offline message composition
+• Local pending queues
+• Synchronization cursors
+• Incremental synchronization
+• Delta synchronization
+• Missed-event recovery
+• Message history synchronization
+• Conflict resolution
+• Duplicate prevention
+
+Define:
+
+• Initial sync
+• Incremental sync
+• Recovery after long disconnection
+• Cursor invalidation
+• Replay behavior
+• Backpressure
+
+────────────────────────────────────────
+
+MULTI-DEVICE ARCHITECTURE
+
+Support:
+
+• Multiple smartphones
+• Web
+• Desktop
+• Tablets
+• Future clients
+
+Define:
+
+• Device registration
+• Device verification
+• Device capabilities
+• Device limits
+• Device revocation
+• Remote logout
+• Session synchronization
+• Message synchronization
+• Encryption synchronization
+
+Clearly separate:
+
+• Account identity
+• User identity
+• Device identity
+• Session identity
+
+────────────────────────────────────────
+
+PRESENCE
+
+Design:
+
+• Online
+• Offline
+• Last seen
+• Typing
+• Recording
+• Presence subscriptions
+
+Define:
+
+• Storage
+• TTL
+• Heartbeats
+• Fan-out
+• Privacy
+• Regional behavior
+• Failure behavior
+
+Presence must remain ephemeral and must not create excessive database traffic.
+
+────────────────────────────────────────
+
+CONTACT ARCHITECTURE
+
+Design:
+
+• Contact discovery
+• Contact synchronization
+• Contact requests
+• Blocking
+• Privacy controls
+
+Define privacy-preserving contact discovery.
+
+Protect against:
+
+• User enumeration
+• Automated scraping
+• Mass contact discovery
+• Abuse
+
+────────────────────────────────────────
+
+AUTHENTICATION ARCHITECTURE
+
+Support:
+
+• Password authentication where appropriate
+• Phone-based authentication where appropriate
+• OAuth
+• Passkeys
+• MFA
+• Session management
+• Refresh tokens
+• Device authentication
+• Session revocation
+• Suspicious login detection
+
+Define:
+
+• Credential storage
+• Token strategy
+• Token rotation
+• Expiration
+• Revocation
+• Device binding
+• Recovery
+
+────────────────────────────────────────
+
+AUTHORIZATION ARCHITECTURE
+
+Define:
+
+• RBAC
+• Resource ownership
+• Conversation permissions
+• Group permissions
+• Community permissions
+• Business permissions
+• Administrative permissions
+
+Define enforcement at:
+
+• Gateway
+• Service
+• Domain
+• Database query
+
+Frontend authorization must never be the only enforcement layer.
+
+────────────────────────────────────────
+
+END-TO-END ENCRYPTION FOUNDATIONS
+
+Design boundaries for:
+
+• Identity keys
+• Device keys
+• Pre-keys
+• Session establishment
+• Message encryption
+• Group encryption
+• Key rotation
+• Device addition
+• Device removal
+• Key verification
+
+Clearly distinguish:
+
+• TLS
+• Server-side encryption
+• End-to-end encryption
+
+Do not implement cryptographic algorithms.
+
+Do not invent cryptography.
+
+Define which information remains available to backend systems and which information must remain inaccessible.
+
+────────────────────────────────────────
+
+EVENT-DRIVEN ARCHITECTURE
+
+Design Kafka/Redpanda architecture.
+
+Define:
+
+• Topic naming
+• Partition strategy
+• Partition keys
+• Consumer groups
+• Event ownership
+• Retention
+• Versioning
+• Replay
+• Idempotency
+• Ordering
+• Dead-letter handling
+• Observability
+
+Use transactional outbox patterns where appropriate.
+
+────────────────────────────────────────
+
+EVENT CATALOG
+
+Define initial events including:
+
+AccountCreated
+
+AccountVerified
+
+SessionCreated
+
+SessionRevoked
+
+DeviceRegistered
+
+DeviceRevoked
+
+ContactAdded
+
+ContactBlocked
+
+ConversationCreated
+
+ConversationParticipantAdded
+
+ConversationParticipantRemoved
+
+MessageCreated
+
+MessageSent
+
+MessageDelivered
+
+MessageRead
+
+MessageEdited
+
+MessageDeleted
+
+MessageReactionAdded
+
+MessageReactionRemoved
+
+GroupCreated
+
+GroupMemberAdded
+
+GroupMemberRemoved
+
+CommunityCreated
+
+MediaUploaded
+
+MediaProcessingCompleted
+
+StoryCreated
+
+StoryExpired
+
+CallCreated
+
+CallStarted
+
+CallEnded
+
+NotificationCreated
+
+NotificationDelivered
+
+UserReported
+
+ModerationActionTaken
+
+BusinessAccountCreated
+
+AuditLogCreated
+
+FeatureFlagChanged
+
+Define payload ownership and versioning.
+
+Do not duplicate entire database entities inside events.
+
+────────────────────────────────────────
+
+QUEUE ARCHITECTURE
+
+Define BullMQ queues for:
+
+• Push notification delivery
+• Email delivery
+• Media processing
+• Image processing
+• Video processing
+• Thumbnail generation
+• Story expiration
+• Media cleanup
+• Search indexing
+• Analytics aggregation
+• Notification cleanup
+• Data retention
+• Report processing
+
+For each queue define:
+
+• Producer
+• Consumer
+• Retry
+• Backoff
+• Idempotency
+• Dead-letter behavior
+• Concurrency
+• Monitoring
+
+Clearly distinguish queue responsibilities from Kafka responsibilities.
+
+────────────────────────────────────────
+
+API ARCHITECTURE
+
+Define REST, WebSocket, and WebRTC signaling boundaries.
+
+API categories:
+
+Authentication
+
+• Registration
+• Login
+• Logout
+• Refresh
+• Password reset
+• Device management
+
+Contacts
+
+• Contact discovery
+• Contact management
+• Blocking
+
+Conversations
+
+• Create
+• List
+• Members
+• Settings
+
+Messages
+
+• Send
+• Edit
+• Delete
+• Reply
+• Forward
+• React
+• History
+• Read state
+
+Groups
+
+• Create
+• Update
+• Members
+• Roles
+• Permissions
+
+Media
+
+• Upload authorization
+• Processing state
+• Download authorization
+
+Stories
+
+• Create
+• View
+• Delete
+• Privacy
+
+Calls
+
+• Create
+• Accept
+• Reject
+• Signaling
+• End
+
+Administration
+
+• Users
+• Reports
+• Moderation
+• Audit
+
+Define:
+
+• Versioning
+• Naming conventions
+• Request validation
+• Pagination
+• Cursor pagination
+• Filtering
+• Sorting
+• Error response format
+• Authentication
+• Authorization
+• Rate limiting
+• Idempotency
+
+Do not generate application code.
+
+────────────────────────────────────────
+
+SECURITY ARCHITECTURE
+
+Define:
+
+• Authentication security
+• Authorization
+• Device security
+• Session security
+• Rate limiting
+• Abuse prevention
+• Account takeover protection
+• Secrets management
+• Encryption
+• Audit logging
+• Secure media access
+• WebSocket security
+• API security
+• Infrastructure security
+
+Cover OWASP best practices.
+
+────────────────────────────────────────
+
+SCALABILITY
+
+Design for:
+
+• Hundreds of millions of users
+• Billions of messages
+• Tens of millions of concurrent connections
+• Large group fan-out
+• Large media traffic
+• Global deployment
+
+Analyze:
+
+• API scaling
+• WebSocket scaling
+• PostgreSQL scaling
+• Redis scaling
+• Kafka scaling
+• Search scaling
+• Media-processing scaling
+• CDN scaling
+
+Identify likely bottlenecks and mitigation strategies.
+
+────────────────────────────────────────
+
+FAILURE STRATEGY
+
+Define behavior when:
+
+• PostgreSQL is unavailable
+• Redis is unavailable
+• Kafka is unavailable
+• Search is unavailable
+• S3 is unavailable
+• Push providers fail
+• WebSocket gateway fails
+• Call signaling fails
+• Regional infrastructure fails
+
+For every failure define:
+
+• Detection
+• Retry
+• Fallback
+• Degraded behavior
+• Recovery
+• Data reconciliation
+
+────────────────────────────────────────
+
+MULTI-REGION FOUNDATION
+
+Define:
+
+• Regional application clusters
+• Global routing
+• Regional data ownership
+• Cross-region event replication
+• Failover
+• Disaster recovery
+
+Classify data as:
+
+• Region-local
+• Globally replicated
+• Eventually consistent
+
+Avoid unnecessary synchronous cross-region calls.
+
+────────────────────────────────────────
+
+OBSERVABILITY FOUNDATION
+
+Define observability for:
+
+• API Gateway
+• Authentication
+• Messaging
+• WebSockets
+• Presence
+• Database
+• Redis
+• Kafka
+• BullMQ
+• Media processing
+• Notifications
+• Calls
+
+Use:
+
+• OpenTelemetry
+• Prometheus
+• Grafana
+• Loki
+• Tempo
+
+Define:
+
+• Structured logs
+• Metrics
+• Traces
+• Correlation IDs
+• Trace propagation
+• Health checks
+• Readiness checks
+• Liveness checks
+• Alerts
+• SLOs
+• SLIs
+
+────────────────────────────────────────
+
+TESTING ARCHITECTURE
+
+Define:
+
+Unit Testing
+
+• Domain logic
+• Services
+• Utilities
+
+Integration Testing
+
+• PostgreSQL
+• Redis
+• Kafka
+• WebSockets
+• External providers
+
+Contract Testing
+
+• REST APIs
+• WebSocket contracts
+• Event schemas
+
+End-to-End Testing
+
+• Registration
+• Login
+• Messaging
+• Groups
+• Media
+• Calls
+• Notifications
+• Multi-device synchronization
+
+Performance Testing
+
+• API load
+• WebSocket connections
+• Message throughput
+• Group messaging
+• Presence
+• Synchronization
+
+Resilience Testing
+
+• Database failures
+• Redis failures
+• Kafka failures
+• WebSocket failures
+• Regional failures
+
+Security Testing
+
+• Authentication
+• Authorization
+• Rate limiting
+• Abuse prevention
+• Dependency scanning
+
+────────────────────────────────────────
+
+ARCHITECTURAL DECISION RECORDS
+
+Create ADRs for:
+
+• Architecture style
+• Service boundaries
+• Database ownership
+• Prisma strategy
+• Redis strategy
+• Kafka/Redpanda
+• BullMQ
+• WebSocket architecture
+• Multi-device synchronization
+• Offline synchronization
+• E2EE boundaries
+• Search architecture
+• Object storage
+• CDN
+• WebRTC
+• Multi-region strategy
+
+Each ADR must contain:
+
+• Context
+• Decision
+• Alternatives
+• Consequences
+
+────────────────────────────────────────
+
+PROJECT INDEX
+
+Create the initial Project Index containing:
+
+• Project overview
+• Technology stack
+• Domains
+• Services
+• Service ownership
+• Database ownership
+• Core entities
+• ERD
+• APIs
+• WebSocket events
+• Event catalog
+• Queue catalog
+• Redis responsibilities
+• Security boundaries
+• Encryption boundaries
+• Media architecture
+• Call architecture
+• Infrastructure principles
+• Observability
+• Testing strategy
+• Implementation dependencies
+
+────────────────────────────────────────
+
+ARCHITECTURE VOLUME 1 OUTPUT
+
+Produce:
+
+1. Executive Architecture Overview
+2. System Context
+3. C4 Architecture
+4. Architectural Approach
+5. Domain Decomposition
+6. Service Decomposition
+7. Service Ownership Matrix
+8. Communication Matrix
+9. Monorepo Architecture
+10. Detailed Folder Hierarchy
+11. Core Domain Model
+12. Aggregate Boundaries
+13. Database Architecture
+14. Database Ownership
+15. Complete Text-Based ERD
+16. Prisma Strategy
+17. Redis Architecture
+18. WebSocket Architecture
+19. Messaging Architecture
+20. Message Delivery Architecture
+21. Group Messaging Architecture
+22. Community Architecture
+23. Offline Synchronization Architecture
+24. Multi-Device Architecture
+25. Presence Architecture
+26. Contact Architecture
+27. Authentication Architecture
+28. Authorization Architecture
+29. E2EE Foundations
+30. Event-Driven Architecture
+31. Event Catalog
+32. Queue Architecture
+33. API Architecture
+34. Security Architecture
+35. Scalability Strategy
+36. Multi-Region Foundation
+37. Failure Strategy
+38. Observability Architecture
+39. Testing Architecture
+40. Architectural Decision Records
+41. Project Index
+
+────────────────────────────────────────
+
+QUALITY REQUIREMENTS
+
+Every architectural decision must evaluate:
+
+• Scalability
+• Availability
+• Security
+• Privacy
+• Latency
+• Data consistency
+• Operational complexity
+• Cost
+• Developer productivity
+• Maintainability
+• Future extensibility
+
+Prefer:
+
+• Explicit ownership
+• Clear domain boundaries
+• Stateless services where possible
+• Event-driven communication where appropriate
+• Idempotent consumers
+• Transactional outbox
+• Horizontal scaling
+• Established security protocols
+• Graceful degradation
+• Observable systems
+
+Avoid:
+
+• Unnecessary microservices
+• Shared database ownership
+• Distributed transactions where avoidable
+• Tight coupling
+• Single points of failure
+• Redis as a system of record
+• Application servers proxying large media
+• Proprietary cryptography
+• Frontend-only security
+• Premature complexity
+
+────────────────────────────────────────
+
+OUTPUT RULES
+
+This is an architecture document only.
+
+Do not generate source code.
+
+Do not generate placeholder implementations.
+
+Do not generate Dockerfiles.
+
+Do not generate Kubernetes manifests.
+
+Do not generate Terraform files.
+
+Do not generate frontend components.
+
+Do not generate mobile components.
+
+Do not implement backend services.
+
+Provide detailed specifications, diagrams, contracts, schemas, ownership rules, security boundaries, consistency requirements, and implementation guidance.
+
+The resulting architecture must be detailed enough for independent backend, frontend, mobile, infrastructure, DevOps, and QA implementation teams to build the complete platfor
+
+You are operating in Senior Engineering Team Mode.
+
 Design the complete first architecture volume for an enterprise-scale real-time messaging and communication platform comparable in architectural scope to WhatsApp.
 
 This is an independent architecture prompt.
