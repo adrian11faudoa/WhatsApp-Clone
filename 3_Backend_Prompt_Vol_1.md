@@ -1,3 +1,1646 @@
+# BACKEND IMPLEMENTATION PROMPT — VOLUME 1
+
+## Production-Grade Real-Time Communication Platform
+
+### Backend Foundation, Identity, Authentication, Users, Devices, Sessions, Security, and Core Infrastructure
+
+You are implementing **Volume 1 of the backend** for a production-grade, globally scalable, WhatsApp-like real-time communication platform.
+
+This is an original communication platform inspired by the capabilities users expect from modern messaging applications. It is not an implementation of proprietary WhatsApp source code, internal infrastructure, private protocols, or undocumented behavior.
+
+This prompt is **fully standalone**. It must contain everything required to execute this implementation task without requiring another prompt, architecture document, previous conversation, or previously generated prompt to be present.
+
+The actual repository is the source of truth for existing implementation. This backend volume is one implementation unit of a single coherent system. It must integrate cleanly with functionality that already exists or will be implemented later in the same repository.
+
+---
+
+# 1. PRIMARY OBJECTIVE
+
+Implement the production-grade backend foundation and identity layer of the platform.
+
+The implementation must establish a reliable foundation for:
+
+* application bootstrap;
+* configuration management;
+* environment validation;
+* PostgreSQL;
+* Prisma;
+* Redis;
+* NestJS modular architecture;
+* authentication;
+* accounts;
+* users;
+* profiles;
+* devices;
+* sessions;
+* refresh-token/session lifecycle;
+* password/security credential handling where applicable;
+* authentication rate limiting;
+* authorization foundations;
+* request validation;
+* API error contracts;
+* structured logging;
+* tracing;
+* health/readiness checks;
+* security middleware;
+* audit/security events;
+* database migrations;
+* automated backend tests.
+
+The implementation must be production-ready.
+
+Do not merely create a NestJS skeleton.
+
+Do not create placeholder modules.
+
+Do not generate TODO/FIXME implementations.
+
+Every implemented feature must contain its real business logic, persistence behavior, validation, security controls, error handling, observability, and tests appropriate to its scope.
+
+---
+
+# 2. PRODUCT CONTEXT
+
+The overall platform is a globally scalable real-time communication system supporting:
+
+* user accounts;
+* profiles;
+* multiple devices per account;
+* authentication and sessions;
+* contacts;
+* direct conversations;
+* group conversations;
+* text messaging;
+* media messages;
+* replies;
+* forwarding;
+* editing;
+* deletion;
+* reactions;
+* delivery receipts;
+* read receipts;
+* typing indicators;
+* online/offline presence;
+* push notifications;
+* real-time synchronization;
+* multi-device synchronization;
+* media uploads and processing;
+* search;
+* privacy controls;
+* blocking;
+* reporting;
+* abuse prevention;
+* voice/video calling;
+* WebRTC;
+* background processing.
+
+This backend volume does **not** attempt to implement all of those domains.
+
+It establishes the foundational backend capabilities upon which the remaining domains can safely build.
+
+---
+
+# 3. REQUIRED TECHNOLOGY STACK
+
+Use the following technologies unless the existing repository contains a compatible implementation that should be preserved and extended:
+
+## Backend
+
+* Node.js
+* NestJS
+* TypeScript
+
+## Database
+
+* PostgreSQL
+* Prisma ORM
+
+## Distributed infrastructure
+
+* Redis
+* Kafka or Redpanda
+* BullMQ
+
+## Real-time
+
+* WebSockets
+* Socket.IO where appropriate
+
+## Storage and media
+
+* AWS S3
+* CloudFront
+* FFmpeg
+* image-processing tooling where required
+
+## Notifications
+
+* Firebase Cloud Messaging
+* Apple Push Notification service
+
+## Calling
+
+* WebRTC
+* STUN/TURN
+
+## Search
+
+* Elasticsearch or OpenSearch
+
+## Frontend ecosystem
+
+The backend must expose stable contracts suitable for:
+
+* Next.js;
+* React;
+* TypeScript;
+* TanStack Query;
+* Zustand.
+
+## Mobile ecosystem
+
+The backend must expose stable contracts suitable for:
+
+* React Native;
+* Expo;
+* TypeScript;
+* React Navigation.
+
+## Infrastructure
+
+The backend must remain deployable through:
+
+* Docker;
+* Kubernetes;
+* Helm;
+* Terraform;
+* GitHub Actions.
+
+## Observability
+
+Use appropriate support for:
+
+* OpenTelemetry;
+* Prometheus;
+* Grafana;
+* Loki;
+* Tempo.
+
+Do not invent provider capabilities.
+
+---
+
+# 4. FIRST ACTION — INSPECT THE REPOSITORY
+
+Before changing anything:
+
+1. Inspect the complete repository structure relevant to the backend.
+2. Determine whether a backend already exists.
+3. Identify:
+
+   * package manager;
+   * Node version;
+   * NestJS version;
+   * TypeScript configuration;
+   * existing modules;
+   * Prisma configuration;
+   * existing database schema;
+   * migrations;
+   * environment configuration;
+   * Redis integration;
+   * Kafka/Redpanda integration;
+   * BullMQ integration;
+   * logging;
+   * testing;
+   * Docker configuration;
+   * CI configuration.
+4. Identify existing conventions.
+5. Identify existing API conventions.
+6. Identify existing error structures.
+7. Identify existing authentication code.
+8. Identify existing database models.
+9. Identify existing observability infrastructure.
+10. Identify incompatible or duplicated implementations.
+
+Do not blindly replace existing infrastructure.
+
+If compatible functionality already exists, extend it.
+
+If the repository differs from the requirements, make the smallest safe architectural change necessary to bring it into alignment.
+
+Do not create competing implementations of the same responsibility.
+
+---
+
+# 5. IMPLEMENTATION PRINCIPLES
+
+The backend must follow:
+
+* Clean Architecture;
+* Domain-Driven Design;
+* SOLID;
+* separation of concerns;
+* modular design;
+* repository pattern where appropriate;
+* service/application layer;
+* explicit domain/business rules;
+* strong typing;
+* dependency inversion;
+* transactional integrity;
+* secure-by-default behavior;
+* observable operations;
+* deterministic error handling;
+* idempotent operations where required;
+* backward-compatible evolution.
+
+Do not over-engineer abstractions that provide no practical value.
+
+Do not create generic frameworks inside the application merely for architectural appearance.
+
+---
+
+# 6. BACKEND MODULE STRUCTURE
+
+Establish a coherent modular structure capable of growing into the complete platform.
+
+At minimum, establish appropriate modules for:
+
+* Application/Core
+* Configuration
+* Database
+* Redis
+* Health
+* Observability
+* Security
+* Identity
+* Users
+* Devices
+* Sessions
+
+The exact folder structure must follow the repository's existing conventions when reasonable.
+
+Future modules will include domains such as:
+
+* Contacts
+* Conversations
+* Messaging
+* Message State
+* Presence
+* Media
+* Notifications
+* Search
+* Privacy/Safety
+* Calling
+* Administration
+
+Do not implement fake versions of these future modules merely to create empty scaffolding.
+
+Only create integration interfaces when they are genuinely required by implemented functionality.
+
+---
+
+# 7. APPLICATION BOOTSTRAP
+
+Implement production-grade NestJS bootstrap behavior.
+
+Include appropriate handling for:
+
+* environment configuration;
+* startup validation;
+* graceful shutdown;
+* uncaught errors;
+* unhandled promise rejections;
+* HTTP server configuration;
+* request IDs;
+* correlation IDs;
+* security headers;
+* body limits;
+* CORS;
+* API versioning;
+* global validation;
+* global exception handling;
+* structured logging;
+* OpenTelemetry initialization where appropriate.
+
+The application must fail fast when required configuration is invalid.
+
+Do not allow silently missing critical environment variables.
+
+---
+
+# 8. CONFIGURATION SYSTEM
+
+Implement strongly typed configuration.
+
+Separate configuration into logical domains such as:
+
+* application;
+* HTTP;
+* database;
+* Redis;
+* authentication;
+* security;
+* rate limiting;
+* observability;
+* messaging;
+* storage;
+* notifications;
+* external services.
+
+Validate configuration at startup.
+
+Never hardcode:
+
+* passwords;
+* JWT secrets;
+* encryption keys;
+* API credentials;
+* database credentials;
+* cloud credentials;
+* provider secrets.
+
+Provide safe development/test configuration mechanisms without introducing production secrets.
+
+Ensure configuration can be supplied through environment variables in Docker/Kubernetes deployments.
+
+---
+
+# 9. DATABASE FOUNDATION
+
+Implement the PostgreSQL + Prisma foundation.
+
+Requirements:
+
+* Prisma configured correctly;
+* connection lifecycle handled safely;
+* migrations tracked in the repository;
+* production migration workflow supported;
+* transactions supported;
+* database errors mapped appropriately;
+* graceful shutdown;
+* connection configuration suitable for production;
+* query logging controlled to avoid sensitive-data leakage.
+
+Do not use Prisma's development-only schema synchronization as the production migration strategy.
+
+Use explicit migrations.
+
+---
+
+# 10. CORE IDENTITY DATA MODEL
+
+Implement the foundational persistent models required for identity.
+
+At minimum support concepts equivalent to:
+
+## User
+
+Represents the platform identity.
+
+Possible fields include:
+
+* id;
+* username/handle where applicable;
+* display name;
+* profile information;
+* account status;
+* created timestamp;
+* updated timestamp;
+* deleted/deactivation state where required.
+
+Do not add fields merely because they are common in other applications. Every field must have a clear purpose.
+
+## Account/Auth Identity
+
+Represent authentication-related identity separately where useful.
+
+Support:
+
+* account state;
+* authentication credentials;
+* credential metadata;
+* security timestamps;
+* verification state where applicable.
+
+Never store raw passwords.
+
+## Device
+
+Represent individual authenticated client devices.
+
+Support:
+
+* device ID;
+* user ownership;
+* device type;
+* platform;
+* application version;
+* device metadata;
+* public/device keys where the broader protocol requires them;
+* last activity;
+* status;
+* creation/update timestamps.
+
+Do not store unnecessary device-identifying information.
+
+## Session
+
+Represent authenticated sessions.
+
+Support:
+
+* session ID;
+* user ID;
+* device ID;
+* session status;
+* creation time;
+* last-used time;
+* expiration;
+* revocation;
+* token/session rotation metadata where applicable.
+
+## Push Token
+
+Where required by the identity/device foundation, support device push-token registration without exposing tokens through inappropriate API responses or logs.
+
+---
+
+# 11. DATABASE INTEGRITY
+
+Implement:
+
+* foreign keys;
+* uniqueness constraints;
+* appropriate indexes;
+* nullability rules;
+* cascading behavior only where safe;
+* deletion semantics;
+* timestamps;
+* optimistic/concurrency considerations where applicable.
+
+Design indexes according to actual query patterns.
+
+Do not create indexes indiscriminately.
+
+Ensure account deletion/deactivation does not accidentally orphan security-sensitive records.
+
+---
+
+# 12. IDENTIFIER STRATEGY
+
+Use a consistent identifier strategy throughout the backend.
+
+Identifiers must be:
+
+* globally unique;
+* non-sequential where enumeration risk matters;
+* safe to expose through APIs;
+* consistently serialized.
+
+Use one canonical representation.
+
+Do not mix incompatible ID strategies without an explicit reason.
+
+The same identity strategy must remain compatible with:
+
+* users;
+* devices;
+* sessions;
+* conversations;
+* messages;
+* events;
+* media;
+* notifications;
+* calls.
+
+---
+
+# 13. TIME HANDLING
+
+Use UTC for persisted timestamps.
+
+Use a consistent timestamp representation throughout:
+
+* database;
+* API;
+* events;
+* logs;
+* Redis values where relevant.
+
+Never depend on local server time zones for business logic.
+
+Use server-generated authoritative timestamps for security-sensitive and ordering-sensitive operations.
+
+---
+
+# 14. AUTHENTICATION
+
+Implement secure authentication appropriate for the application.
+
+Support the authentication mechanism selected by the repository and implementation constraints, including where appropriate:
+
+* credential authentication;
+* access tokens;
+* refresh/session tokens;
+* token rotation;
+* logout;
+* session revocation;
+* device-specific sessions.
+
+Do not implement insecure token handling simply because it is easier.
+
+Authentication must distinguish:
+
+* unauthenticated;
+* authenticated;
+* disabled/suspended;
+* revoked;
+* expired sessions.
+
+---
+
+# 15. PASSWORD SECURITY
+
+If password authentication is supported:
+
+* use a modern password hashing algorithm such as Argon2id;
+* never store plaintext passwords;
+* never log passwords;
+* never return password hashes through APIs;
+* enforce appropriate password requirements;
+* protect authentication endpoints against brute-force attacks;
+* avoid user enumeration where appropriate.
+
+Credential verification failures must return safe errors without exposing sensitive account state.
+
+---
+
+# 16. TOKEN AND SESSION SECURITY
+
+Implement:
+
+* short-lived access credentials where applicable;
+* refresh/session token rotation;
+* token revocation;
+* replay detection where applicable;
+* session expiration;
+* device-specific session management;
+* logout from one device;
+* logout from all devices;
+* invalidation after security-sensitive account changes where appropriate.
+
+Refresh/session secrets must not be stored in plaintext if the architecture allows secure hashing.
+
+Never place long-lived credentials into logs.
+
+Avoid exposing refresh tokens to browser-accessible JavaScript when a safer architecture is applicable.
+
+---
+
+# 17. DEVICE MANAGEMENT
+
+Implement APIs and services for:
+
+* registering a device;
+* authenticating a device;
+* listing a user's devices;
+* viewing appropriate device metadata;
+* updating device metadata;
+* revoking a device;
+* revoking sessions associated with a device;
+* registering push notification tokens;
+* removing invalid push tokens.
+
+Authorization must ensure users can only manage their own devices unless an explicit administrative capability exists.
+
+Do not expose sensitive device secrets.
+
+---
+
+# 18. USER MANAGEMENT
+
+Implement foundational user operations required by the platform.
+
+At minimum:
+
+* retrieve authenticated user's profile;
+* update editable profile fields;
+* enforce field validation;
+* enforce ownership;
+* support account state;
+* support account deactivation/deletion workflows appropriate to this phase.
+
+Do not expose internal security fields.
+
+Do not permit arbitrary users to modify privileged fields.
+
+Fields such as:
+
+* account status;
+* security state;
+* roles;
+* verification state;
+
+must never be client-controlled unless an explicit authorized administrative workflow exists.
+
+---
+
+# 19. USERNAME / PHONE / EMAIL IDENTIFIERS
+
+If the product requires phone-number, email, username, or equivalent account identifiers, implement them with:
+
+* normalization;
+* canonical storage;
+* uniqueness rules;
+* privacy-aware lookup;
+* anti-enumeration protections;
+* appropriate indexing.
+
+Do not assume that a user identifier should always be publicly searchable.
+
+If phone-number authentication is implemented, treat phone numbers as sensitive account identifiers and design storage/API behavior accordingly.
+
+---
+
+# 20. AUTHORIZATION FOUNDATION
+
+Implement a reusable authorization foundation.
+
+It must distinguish:
+
+* authenticated user;
+* authenticated device;
+* session;
+* ownership;
+* roles;
+* administrative privileges.
+
+Authorization must be enforced server-side.
+
+Never rely on:
+
+* hidden frontend controls;
+* client-provided user IDs;
+* client-provided roles;
+* client-provided ownership claims.
+
+Prepare authorization primitives that later conversation, message, media, call, and moderation modules can reuse.
+
+---
+
+# 21. API CONTRACT
+
+Implement a consistent REST API foundation.
+
+Use:
+
+* versioned API routes;
+* DTOs;
+* validation;
+* typed responses;
+* consistent errors;
+* authentication guards;
+* authorization guards;
+* pagination conventions where applicable.
+
+Use OpenAPI/Swagger documentation.
+
+Document implemented endpoints accurately.
+
+Do not document endpoints that do not exist.
+
+---
+
+# 22. VALIDATION
+
+Implement global request validation.
+
+Validate:
+
+* body;
+* query parameters;
+* route parameters;
+* headers where appropriate.
+
+Reject malformed input before business logic executes.
+
+Validation must protect against:
+
+* invalid IDs;
+* oversized strings;
+* invalid enum values;
+* malformed timestamps;
+* invalid pagination;
+* unexpected structures;
+* malicious payloads.
+
+Do not trust client-provided types merely because TypeScript exists on the frontend.
+
+---
+
+# 23. ERROR CONTRACT
+
+Create a stable error model.
+
+Errors should provide enough information for clients to behave correctly without leaking sensitive internal details.
+
+Support categories such as:
+
+* validation error;
+* authentication failure;
+* authorization failure;
+* resource not found;
+* conflict;
+* rate limit;
+* expired session;
+* revoked session;
+* dependency failure;
+* internal error.
+
+Use stable machine-readable error codes.
+
+Do not expose:
+
+* stack traces;
+* SQL statements;
+* secrets;
+* internal infrastructure details;
+* credentials;
+* sensitive account information.
+
+Ensure the frontend and mobile clients can reliably interpret errors.
+
+---
+
+# 24. REDIS FOUNDATION
+
+Implement a production-safe Redis integration.
+
+Redis may be used for:
+
+* rate limiting;
+* ephemeral authentication/session state where justified;
+* temporary security state;
+* counters;
+* distributed coordination;
+* short-lived caches.
+
+Redis must not become the authoritative durable source for user/account/session data when PostgreSQL is the source of truth.
+
+Every Redis key introduced must have:
+
+* naming convention;
+* purpose;
+* TTL where appropriate;
+* serialization format;
+* invalidation behavior;
+* failure behavior.
+
+Redis outages must not silently corrupt PostgreSQL state.
+
+---
+
+# 25. RATE LIMITING
+
+Implement foundational rate limiting.
+
+At minimum protect:
+
+* login/authentication;
+* refresh/session operations;
+* account creation;
+* credential changes;
+* device registration;
+* security-sensitive account actions.
+
+Use Redis-backed distributed rate limiting where appropriate.
+
+Rate limits must account for:
+
+* IP;
+* account/user where available;
+* device/session;
+* endpoint;
+* authentication state.
+
+Prevent trivial bypasses through alternate identifiers.
+
+Return an appropriate rate-limit error.
+
+Do not reveal sensitive information through rate-limit behavior.
+
+---
+
+# 26. SECURITY CONTROLS
+
+Harden the backend against:
+
+* SQL injection;
+* command injection;
+* XSS through stored content;
+* CSRF where applicable;
+* SSRF;
+* brute force;
+* credential stuffing;
+* session theft;
+* token replay;
+* privilege escalation;
+* IDOR;
+* user enumeration;
+* mass assignment;
+* malicious headers;
+* oversized payloads;
+* denial-of-service through expensive requests.
+
+Validate all authorization server-side.
+
+Use least privilege.
+
+---
+
+# 27. SECURITY AND AUDIT EVENTS
+
+Implement a foundational security/audit mechanism for security-sensitive operations.
+
+At minimum consider events for:
+
+* successful authentication;
+* failed authentication;
+* session creation;
+* session revocation;
+* logout;
+* logout-all;
+* device registration;
+* device revocation;
+* credential changes;
+* account state changes;
+* suspicious authentication activity.
+
+Audit records/events must not contain:
+
+* passwords;
+* access tokens;
+* refresh tokens;
+* private keys;
+* secrets.
+
+Include useful metadata such as:
+
+* event ID;
+* user ID when known;
+* device/session ID where appropriate;
+* event type;
+* timestamp;
+* correlation ID;
+* request ID;
+* safe network/security metadata where justified.
+
+Respect privacy and retention requirements.
+
+---
+
+# 28. EVENT ARCHITECTURE FOUNDATION
+
+The larger system uses Kafka/Redpanda for durable asynchronous domain events.
+
+Establish the foundational event infrastructure only where it is genuinely needed by this volume.
+
+Events must support a consistent envelope containing concepts such as:
+
+* event ID;
+* event type;
+* event version;
+* aggregate/entity ID;
+* producer;
+* occurred-at timestamp;
+* correlation ID;
+* causation ID where applicable;
+* trace context;
+* versioned payload.
+
+Design for:
+
+* at-least-once delivery;
+* duplicate events;
+* idempotent consumers;
+* retries;
+* ordering requirements;
+* schema evolution.
+
+Do not introduce Kafka merely for CRUD operations that do not require asynchronous distribution.
+
+---
+
+# 29. OUTBOX CONSIDERATIONS
+
+For database state changes that must reliably result in durable domain events, implement an appropriate transactional outbox pattern where required.
+
+The authoritative database transaction must not succeed while silently losing the corresponding event.
+
+Do not publish an event first and assume the database transaction will always succeed.
+
+Do not implement a fake outbox that is never processed.
+
+If an outbox worker is introduced in this volume, implement its real:
+
+* polling;
+* locking;
+* publishing;
+* retry;
+* failure handling;
+* idempotency;
+* observability;
+* shutdown behavior.
+
+---
+
+# 30. OBSERVABILITY
+
+Implement production-grade observability foundations.
+
+Include:
+
+* structured logs;
+* request IDs;
+* correlation IDs;
+* distributed tracing;
+* metrics;
+* health checks;
+* readiness checks;
+* dependency status where appropriate.
+
+Instrument:
+
+* HTTP requests;
+* database operations where practical;
+* Redis operations where practical;
+* authentication operations;
+* security-sensitive actions;
+* significant errors.
+
+Do not log:
+
+* passwords;
+* access tokens;
+* refresh tokens;
+* API secrets;
+* private keys;
+* payment credentials;
+* unnecessary private message content;
+* sensitive personal data unless explicitly justified.
+
+---
+
+# 31. HEALTH AND READINESS
+
+Implement health endpoints suitable for Kubernetes.
+
+Distinguish:
+
+## Liveness
+
+Indicates whether the process is alive.
+
+## Readiness
+
+Indicates whether the service can safely receive traffic.
+
+Readiness should evaluate required dependencies appropriate to the deployment architecture, including PostgreSQL and Redis when they are mandatory.
+
+Do not make liveness fail merely because a temporary external dependency is unavailable.
+
+Avoid creating health checks that generate excessive database or Redis traffic.
+
+---
+
+# 32. GRACEFUL SHUTDOWN
+
+Implement graceful shutdown.
+
+The service must:
+
+1. stop accepting new work;
+2. allow active requests to complete within a bounded timeout;
+3. close WebSocket infrastructure when applicable;
+4. stop background workers;
+5. close Redis connections;
+6. close database connections;
+7. flush telemetry/logging where appropriate;
+8. exit cleanly.
+
+Do not terminate abruptly while processing security-sensitive state transitions.
+
+---
+
+# 33. TESTING
+
+Create meaningful automated tests.
+
+At minimum include:
+
+## Unit tests
+
+Test:
+
+* authentication services;
+* password verification;
+* token/session logic;
+* device management;
+* user profile rules;
+* authorization;
+* validation;
+* rate limiting behavior;
+* security-sensitive business rules.
+
+## Integration tests
+
+Test against real or appropriately isolated infrastructure for:
+
+* PostgreSQL;
+* Prisma;
+* Redis;
+* authentication persistence;
+* session lifecycle;
+* device lifecycle;
+* transactions.
+
+## API/E2E tests
+
+Test:
+
+* registration/authentication;
+* login;
+* refresh;
+* logout;
+* logout-all;
+* user profile retrieval/update;
+* device registration;
+* device listing;
+* device revocation;
+* push token lifecycle;
+* unauthorized access;
+* forbidden access;
+* malformed requests;
+* rate limits.
+
+Tests must cover both successful and failure paths.
+
+Do not write tests that merely assert that a mocked function was called while leaving the actual business behavior unverified.
+
+---
+
+# 34. FAILURE HANDLING
+
+Explicitly handle:
+
+* database unavailable;
+* Redis unavailable;
+* invalid credentials;
+* expired sessions;
+* revoked sessions;
+* duplicate account identifiers;
+* duplicate devices;
+* malformed tokens;
+* token replay;
+* transaction conflicts;
+* rate-limit exhaustion;
+* dependency timeouts;
+* unexpected internal exceptions.
+
+The backend must return deterministic safe errors.
+
+Do not leak infrastructure details.
+
+---
+
+# 35. TRANSACTIONAL REQUIREMENTS
+
+Use database transactions when operations require atomicity.
+
+Examples:
+
+* account creation;
+* security credential changes;
+* session rotation;
+* device revocation with related state changes;
+* account deletion/deactivation state transitions;
+* security audit persistence where atomicity is required.
+
+Avoid unnecessarily long transactions.
+
+Do not perform slow external network operations inside database transactions unless there is a compelling and safe reason.
+
+---
+
+# 36. CONCURRENCY
+
+Design authentication and session logic against race conditions.
+
+Specifically consider:
+
+* simultaneous refresh requests;
+* concurrent logout;
+* simultaneous device revocation;
+* repeated registration;
+* duplicate requests;
+* concurrent credential changes.
+
+Use:
+
+* unique constraints;
+* transactions;
+* locking;
+* atomic Redis operations;
+* idempotency mechanisms;
+
+where appropriate.
+
+Do not depend solely on application-level checks such as:
+
+```text
+if (!exists) create
+```
+
+when concurrent requests can violate the assumption.
+
+---
+
+# 37. PRIVACY
+
+Implement privacy-aware behavior throughout the identity layer.
+
+Do not unnecessarily expose:
+
+* email addresses;
+* phone numbers;
+* IP addresses;
+* device identifiers;
+* push tokens;
+* session metadata;
+* authentication history.
+
+Implement appropriate data minimization.
+
+Ensure deleted/deactivated accounts follow deterministic data-handling rules.
+
+Prepare the identity system for later privacy controls without exposing private information through default APIs.
+
+---
+
+# 38. API ENDPOINTS
+
+Implement the endpoints genuinely required by the functionality in this volume.
+
+Depending on the chosen authentication model, this should include appropriate equivalents of:
+
+### Authentication
+
+* account registration;
+* login;
+* refresh;
+* logout;
+* logout all sessions;
+* current authenticated session/user;
+* credential/security changes where applicable.
+
+### Users
+
+* retrieve current user;
+* update current user;
+* account state operations appropriate to this phase.
+
+### Devices
+
+* register device;
+* list devices;
+* update permitted device metadata;
+* revoke device;
+* register/remove push token.
+
+Do not blindly implement every endpoint listed if the actual authentication model makes one redundant.
+
+Do not implement endpoint shells with fake responses.
+
+---
+
+# 39. API DOCUMENTATION
+
+Generate accurate OpenAPI documentation for all implemented endpoints.
+
+Document:
+
+* authentication;
+* request schemas;
+* response schemas;
+* validation constraints;
+* error responses;
+* authentication requirements;
+* authorization requirements;
+* pagination where used.
+
+Keep OpenAPI definitions synchronized with actual implementation.
+
+---
+
+# 40. SECURITY-SENSITIVE API BEHAVIOR
+
+Authentication endpoints must be designed to prevent account enumeration where appropriate.
+
+For example, do not expose unnecessary distinctions between:
+
+* unknown account;
+* disabled account;
+* incorrect password;
+
+when such distinctions would enable attackers to enumerate accounts.
+
+Security decisions belong on the server.
+
+Never accept client-provided:
+
+* user ownership;
+* privilege;
+* account status;
+* role;
+* security state.
+
+---
+
+# 41. BACKWARD COMPATIBILITY
+
+If the repository already has:
+
+* API endpoints;
+* database models;
+* environment variables;
+* authentication behavior;
+* shared libraries;
+
+preserve compatible behavior unless a migration is required.
+
+If a breaking change is necessary:
+
+1. identify the existing behavior;
+2. determine migration requirements;
+3. implement the safest transition;
+4. document the compatibility impact;
+5. avoid silently breaking existing clients.
+
+Do not delete existing functionality merely because a cleaner implementation is possible.
+
+---
+
+# 42. FUTURE DOMAIN COMPATIBILITY
+
+The implementation must be prepared for later integration with:
+
+* contacts;
+* conversations;
+* messaging;
+* presence;
+* media;
+* notifications;
+* search;
+* calling;
+* moderation.
+
+Identity objects must therefore provide stable references for:
+
+* user;
+* device;
+* session;
+* account.
+
+Do not couple identity to future domains unnecessarily.
+
+For example:
+
+* messaging must be able to reference users/devices;
+* WebSocket connections must be able to authenticate devices;
+* push notifications must be associated with devices;
+* conversation authorization must be able to resolve the authenticated user;
+* calling must be able to identify authenticated devices.
+
+---
+
+# 43. MULTI-DEVICE COMPATIBILITY
+
+The platform supports multiple active devices per user.
+
+Do not model a user as having only one active session/device.
+
+The identity layer must support:
+
+* multiple devices;
+* multiple sessions;
+* independent device revocation;
+* global logout;
+* per-device push tokens;
+* device-specific authentication state.
+
+Do not destroy every device/session merely because one device logs out unless the operation explicitly means global logout.
+
+---
+
+# 44. SECURITY TOKEN STORAGE
+
+Where browser clients are supported, choose token storage and transport mechanisms that minimize XSS/session theft risk.
+
+Where mobile clients are supported, the eventual mobile implementation must be compatible with secure platform storage.
+
+Do not require the frontend to store highly sensitive long-lived credentials in unsafe persistent storage.
+
+Keep token handling consistent with the chosen authentication architecture.
+
+---
+
+# 45. PERFORMANCE
+
+The identity system must support high request volume.
+
+Optimize:
+
+* authentication lookups;
+* session validation;
+* device lookups;
+* user retrieval;
+* token/session rotation;
+* rate limiting.
+
+Use appropriate indexes.
+
+Avoid unnecessary joins.
+
+Avoid loading entire user/device/session records when only a subset is required.
+
+Do not prematurely introduce distributed complexity without measurable need.
+
+---
+
+# 46. DATABASE MIGRATION QUALITY
+
+Every schema change must be represented through Prisma migrations.
+
+Verify migrations for:
+
+* clean database;
+* existing database;
+* rollback/recovery strategy where appropriate;
+* production deployment ordering;
+* index creation;
+* unique constraint conflicts;
+* nullable-to-required transitions;
+* large-table implications.
+
+Do not make destructive migrations without a safe migration strategy.
+
+---
+
+# 47. DEVELOPMENT EXPERIENCE
+
+Provide enough project tooling for developers to reliably:
+
+* install dependencies;
+* validate environment configuration;
+* run the backend;
+* run migrations;
+* generate Prisma client;
+* execute tests;
+* run linting;
+* run formatting;
+* perform type checking.
+
+Do not add unnecessary tooling.
+
+All scripts must actually work.
+
+---
+
+# 48. DOCKER COMPATIBILITY
+
+If Docker infrastructure already exists, integrate with it.
+
+If backend containerization is part of the repository's current implementation, ensure the backend image:
+
+* uses an appropriate production Node image;
+* installs only required production dependencies where appropriate;
+* does not contain secrets;
+* runs as a non-root user where practical;
+* handles signals correctly;
+* exposes the correct port;
+* supports health/readiness checks.
+
+Do not create duplicate Docker architectures.
+
+---
+
+# 49. CODE QUALITY
+
+All implementation must:
+
+* compile;
+* type-check;
+* follow project lint rules;
+* use strict TypeScript where practical;
+* avoid unsafe `any`;
+* avoid duplicated business logic;
+* use meaningful names;
+* contain appropriate comments only where they clarify non-obvious decisions;
+* avoid speculative abstractions.
+
+Do not leave:
+
+* TODO;
+* FIXME;
+* placeholder;
+* fake repository methods;
+* empty services;
+* mock production behavior;
+
+in implemented production paths.
+
+---
+
+# 50. REQUIRED VALIDATION BEFORE COMPLETION
+
+Before declaring this backend volume complete, actually execute the repository's applicable validation commands.
+
+At minimum verify:
+
+* dependency installation where required;
+* TypeScript compilation/type checking;
+* linting;
+* formatting checks where configured;
+* Prisma generation;
+* Prisma migration validation;
+* unit tests;
+* integration tests;
+* API/E2E tests where configured;
+* application startup;
+* health endpoint;
+* readiness endpoint.
+
+Fix failures instead of merely reporting them.
+
+Do not claim tests passed unless they actually passed.
+
+---
+
+# 51. IMPLEMENTATION ORDER
+
+Use this practical order while implementing:
+
+1. inspect repository;
+2. preserve existing compatible architecture;
+3. establish configuration;
+4. establish database/Prisma;
+5. implement core identity schema;
+6. create migrations;
+7. establish Redis integration;
+8. establish security primitives;
+9. implement authentication;
+10. implement sessions;
+11. implement devices;
+12. implement user/profile operations;
+13. implement push-token lifecycle;
+14. implement authorization;
+15. implement rate limiting;
+16. implement error handling;
+17. implement observability;
+18. implement health/readiness;
+19. implement graceful shutdown;
+20. implement security/audit behavior;
+21. implement OpenAPI;
+22. implement tests;
+23. run complete validation;
+24. fix all discovered issues.
+
+The order may be adjusted when the repository's existing architecture requires it.
+
+---
+
+# 52. REPOSITORY INTEGRATION CONTRACT
+
+This implementation is one part of a single production system.
+
+Therefore:
+
+* use the actual repository as the source of truth;
+* reuse existing compatible contracts;
+* preserve existing working functionality;
+* integrate with existing database models;
+* integrate with existing configuration;
+* integrate with existing logging;
+* integrate with existing authentication if present;
+* avoid duplicate modules;
+* avoid duplicate database models;
+* avoid duplicate API contracts;
+* avoid competing error systems;
+* avoid incompatible identifier systems.
+
+If an existing implementation conflicts with this specification, inspect its actual behavior and make the smallest safe change necessary.
+
+Do not assume an earlier prompt, architecture document, or conversation exists in the current context.
+
+---
+
+# 53. CROSS-SYSTEM CONTRACTS THAT MUST REMAIN STABLE
+
+The implementation must establish or preserve canonical conventions for:
+
+* IDs;
+* timestamps;
+* API errors;
+* authentication context;
+* user identity;
+* device identity;
+* session identity;
+* validation;
+* pagination;
+* authorization;
+* request IDs;
+* correlation IDs;
+* tracing;
+* database transactions;
+* Redis key naming;
+* security events.
+
+These conventions will be consumed by future backend modules and by web/mobile clients.
+
+Do not introduce one-off conventions that future modules would have to translate.
+
+---
+
+# 54. DO NOT IMPLEMENT OUTSIDE SCOPE
+
+Do not use this volume as an excuse to partially implement:
+
+* conversations;
+* messaging;
+* message delivery;
+* read receipts;
+* typing;
+* presence;
+* media processing;
+* search;
+* push delivery workers;
+* WebRTC calls;
+* group management;
+* reactions;
+* replies;
+* forwarding.
+
+Only implement foundational interfaces required by the identity system.
+
+Those domains should later integrate with the actual identity contracts established here.
+
+---
+
+# 55. NO PLACEHOLDERS
+
+Do not generate:
+
+* pseudocode;
+* TODOs;
+* FIXME markers;
+* fake APIs;
+* fake authentication;
+* fake database persistence;
+* mocked production services;
+* hardcoded credentials;
+* invented provider APIs;
+* empty implementation classes;
+* pretend migrations;
+* incomplete error handlers.
+
+If a requirement cannot be safely implemented in this repository, inspect the repository and resolve the issue through a real implementation or make a clearly justified architectural adjustment.
+
+---
+
+# 56. FINAL ENGINEERING REQUIREMENT
+
+The resulting backend must be a real implementation, not a demonstration.
+
+A successful implementation of this volume must leave the repository with a production-quality foundation capable of supporting the next backend domains without requiring the identity system to be rewritten.
+
+The implementation must be:
+
+* secure;
+* testable;
+* observable;
+* transactional;
+* scalable;
+* maintainable;
+* deployable;
+* backward-compatible where possible;
+* ready for multi-device operation;
+* ready for real-time authentication;
+* ready for future messaging and conversation domains.
+
+Do not merely tell me what should be implemented.
+
+**Inspect the repository and implement it**
+
 You are operating in Senior Engineering Team Mode.
 
 Build the production-ready backend foundation for an enterprise-scale global real-time messaging and communication platform comparable in architectural scope to WhatsApp.

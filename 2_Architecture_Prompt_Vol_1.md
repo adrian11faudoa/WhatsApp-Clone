@@ -1,3 +1,1481 @@
+# ARCHITECTURE PROMPT — VOLUME 1
+
+# PRODUCTION-GRADE REAL-TIME COMMUNICATION PLATFORM
+
+# SYSTEM, DOMAIN, DATA, SECURITY, AND API ARCHITECTURE
+
+You are the principal architecture team responsible for defining the production architecture of an original, enterprise-grade real-time communication platform.
+
+This platform is an original product inspired by the capabilities users expect from modern messaging applications. Do not copy proprietary source code, private APIs, undocumented protocols, or proprietary internal implementation details from WhatsApp or any other proprietary platform.
+
+This architecture specification must be complete for the scope defined in this prompt.
+
+Do not generate application source code.
+
+Do not generate pseudo-code.
+
+Do not create implementation scaffolding.
+
+Produce architecture, specifications, contracts, engineering decisions, data models, interfaces, constraints, and operational requirements only.
+
+The architecture defined here must be usable independently by an engineering team while also being designed to integrate into the actual repository with later implementation work.
+
+---
+
+# 1. PROJECT CONTEXT
+
+The product is a globally scalable real-time communication platform serving web and mobile clients.
+
+The platform must support:
+
+* user accounts
+* authentication
+* user profiles
+* devices
+* contacts
+* one-to-one conversations
+* group conversations
+* messaging
+* message states
+* reactions
+* replies
+* editing
+* deletion
+* presence
+* typing indicators
+* multi-device synchronization
+* media
+* push notifications
+* search
+* blocking
+* reporting
+* privacy controls
+* voice calls
+* video calls
+* background processing
+
+The system must be designed for production workloads rather than tutorial or prototype workloads.
+
+---
+
+# 2. TECHNOLOGY BASELINE
+
+The architecture must be designed around:
+
+## Backend
+
+* Node.js
+* NestJS
+* TypeScript
+
+## Primary database
+
+* PostgreSQL
+* Prisma ORM
+
+## Distributed infrastructure
+
+* Redis
+* Kafka or Redpanda
+* BullMQ
+
+## Real-time
+
+* WebSockets
+* Socket.IO where appropriate
+
+## Object storage
+
+* AWS S3
+
+## CDN
+
+* AWS CloudFront
+
+## Media processing
+
+* FFmpeg
+* appropriate image-processing tooling
+
+## Push notifications
+
+* Firebase Cloud Messaging
+* Apple Push Notification service
+
+## Voice/video
+
+* WebRTC
+* STUN
+* TURN
+
+## Search
+
+* Elasticsearch or OpenSearch
+
+## Web
+
+* Next.js
+* React
+* TypeScript
+* Tailwind CSS
+* shadcn/ui
+* TanStack Query
+* Zustand where appropriate
+
+## Mobile
+
+* React Native
+* Expo
+* TypeScript
+* React Navigation
+* TanStack Query
+* Zustand where appropriate
+
+## Infrastructure
+
+* Docker
+* Kubernetes
+* Helm
+* Terraform
+* GitHub Actions
+
+## Observability
+
+* OpenTelemetry
+* Prometheus
+* Grafana
+* Loki
+* Tempo
+
+---
+
+# 3. ARCHITECTURAL OBJECTIVE
+
+Design a system that can scale from an initial deployment to a large global communication platform without requiring a fundamental rewrite of the core domain model.
+
+The architecture must optimize for:
+
+* correctness
+* privacy
+* security
+* availability
+* consistency where required
+* eventual consistency where acceptable
+* horizontal scalability
+* operational simplicity
+* failure isolation
+* observability
+* maintainability
+
+Do not introduce microservices merely for appearance.
+
+Prefer modular boundaries and extract independently deployable services only when there is a concrete architectural reason.
+
+---
+
+# 4. SYSTEM CONTEXT
+
+Define the complete high-level system context.
+
+Identify:
+
+* web clients
+* mobile clients
+* API layer
+* authentication
+* core backend modules/services
+* PostgreSQL
+* Redis
+* Kafka/Redpanda
+* BullMQ
+* object storage
+* CDN
+* search
+* push notification providers
+* WebRTC signaling
+* STUN
+* TURN
+* observability infrastructure
+* administrative/moderation interfaces
+* external dependencies
+
+For every external dependency define:
+
+* responsibility
+* data exchanged
+* trust boundary
+* failure modes
+* timeout expectations
+* retry expectations
+* security requirements
+
+Clearly identify authoritative systems versus derived systems.
+
+---
+
+# 5. ARCHITECTURAL STYLE
+
+Define the recommended initial architecture.
+
+Evaluate whether the platform should begin as:
+
+* a modular monolith
+* a service-oriented architecture
+* a hybrid architecture
+
+The recommendation must be based on:
+
+* team complexity
+* operational burden
+* domain boundaries
+* scaling characteristics
+* real-time requirements
+* messaging throughput
+* data ownership
+* deployment independence
+
+The architecture must permit later extraction of components where justified without creating unnecessary distributed-system complexity during initial development.
+
+Define explicit module/service boundaries.
+
+---
+
+# 6. BOUNDED CONTEXTS
+
+Define the major bounded contexts.
+
+At minimum evaluate:
+
+## Identity
+
+Responsibilities:
+
+* account identity
+* authentication
+* credentials
+* sessions
+* account lifecycle
+
+## User Profile
+
+Responsibilities:
+
+* display identity
+* profile information
+* profile media
+* privacy-related profile visibility
+
+## Device Management
+
+Responsibilities:
+
+* registered devices
+* device sessions
+* push tokens
+* device capabilities
+* revocation
+
+## Contacts
+
+Responsibilities:
+
+* contacts
+* discovery
+* contact relationships where applicable
+
+## Conversations
+
+Responsibilities:
+
+* direct conversations
+* group conversations
+* membership
+* conversation settings
+* lifecycle
+
+## Messaging
+
+Responsibilities:
+
+* messages
+* message content
+* message metadata
+* message lifecycle
+* edits
+* deletion
+
+## Message State
+
+Responsibilities:
+
+* sent
+* delivered
+* read
+* failed
+* synchronization state
+
+## Presence
+
+Responsibilities:
+
+* online state
+* last-seen information
+* typing state
+
+## Media
+
+Responsibilities:
+
+* uploads
+* processing
+* metadata
+* variants
+* access
+
+## Notifications
+
+Responsibilities:
+
+* push notifications
+* notification preferences
+* delivery
+
+## Search
+
+Responsibilities:
+
+* indexing
+* querying
+* privacy filtering
+* reindexing
+
+## Privacy and Safety
+
+Responsibilities:
+
+* privacy settings
+* blocking
+* reporting
+* abuse controls
+
+## Calling
+
+Responsibilities:
+
+* call sessions
+* participants
+* signaling
+* call state
+
+## Administration
+
+Responsibilities:
+
+* moderation
+* operational administration
+* security audit access
+
+For every bounded context define:
+
+* ownership
+* responsibilities
+* owned entities
+* inbound dependencies
+* outbound dependencies
+* synchronous interfaces
+* asynchronous interfaces
+* consistency model
+
+---
+
+# 7. DOMAIN MODEL
+
+Define the conceptual domain model.
+
+At minimum specify the relationships between:
+
+* User
+* Account
+* Session
+* Device
+* PushToken
+* Contact
+* Conversation
+* ConversationMember
+* Group
+* GroupRole
+* Message
+* MessageAttachment
+* MessageReaction
+* MessageReceipt
+* MessageEdit
+* MessageDeletion
+* Presence
+* Block
+* Report
+* MediaAsset
+* Notification
+* Call
+* CallParticipant
+
+Do not prematurely dictate implementation-specific classes.
+
+Define:
+
+* identity
+* ownership
+* lifecycle
+* invariants
+* relationships
+* cardinality
+* deletion behavior
+
+Clearly distinguish entities from value objects and derived state.
+
+---
+
+# 8. ID STRATEGY
+
+Define the identifier strategy.
+
+Consider:
+
+* UUID
+* UUIDv7
+* ULID
+* database-generated identifiers
+
+The chosen strategy must account for:
+
+* distributed generation
+* index locality
+* ordering
+* privacy
+* collision resistance
+* client-generated IDs
+* idempotency
+
+Define which IDs may be generated by clients and which must be server authoritative.
+
+Do not expose internal sequential database identifiers where that could create enumeration or privacy problems.
+
+---
+
+# 9. TIME AND ORDERING
+
+Define authoritative time semantics.
+
+Specify:
+
+* server timestamps
+* client timestamps
+* message creation time
+* event time
+* ordering semantics
+* clock skew handling
+* timezone handling
+* last-seen timestamps
+* expiration timestamps
+
+Do not rely on client clocks for authoritative ordering.
+
+Define how concurrent messages are ordered.
+
+Define how ordering behaves across:
+
+* devices
+* reconnects
+* retries
+* offline sends
+* server nodes
+
+---
+
+# 10. DATABASE ARCHITECTURE
+
+Design the PostgreSQL architecture.
+
+Define:
+
+* schema organization
+* ownership boundaries
+* transactional boundaries
+* indexes
+* foreign keys
+* uniqueness constraints
+* check constraints
+* deletion semantics
+* retention
+* partitioning strategy where justified
+
+The message system must be designed for potentially extremely large message volumes.
+
+Define strategies for:
+
+* message pagination
+* conversation pagination
+* unread counts
+* message receipts
+* group membership
+* concurrent writes
+* large groups
+* high-frequency state updates
+
+Do not recommend database partitioning merely because it sounds scalable. Explain the conditions under which it becomes necessary.
+
+---
+
+# 11. TRANSACTIONAL CONSISTENCY
+
+Define where strong transactional consistency is required.
+
+Examples to analyze:
+
+* account creation
+* authentication state
+* conversation membership
+* message creation
+* group membership changes
+* blocking
+* deletion
+* device revocation
+
+Define where eventual consistency is acceptable.
+
+Examples may include:
+
+* search indexes
+* notification delivery
+* presence
+* analytics
+* derived counters
+* secondary indexes
+
+For every important workflow, identify:
+
+* authoritative transaction
+* derived operations
+* failure recovery
+* consistency expectations
+
+---
+
+# 12. MESSAGE CREATION ARCHITECTURE
+
+Define the complete logical message-creation workflow.
+
+It must account for:
+
+1. client submission
+2. authentication
+3. authorization
+4. validation
+5. idempotency
+6. persistence
+7. message ordering
+8. event publication
+9. recipient fan-out
+10. delivery state
+11. push notification
+12. multi-device synchronization
+
+Define what must happen synchronously before acknowledging the message.
+
+Define what may happen asynchronously.
+
+Define behavior when:
+
+* Kafka/Redpanda is unavailable
+* Redis is unavailable
+* push notifications fail
+* recipient is offline
+* recipient has multiple devices
+* duplicate requests arrive
+* the client reconnects after sending
+
+Use the outbox pattern where appropriate.
+
+---
+
+# 13. MESSAGE IDEMPOTENCY
+
+Define an idempotency strategy for message submission.
+
+The architecture must prevent duplicate messages when:
+
+* the client retries
+* network responses are lost
+* the connection drops after server persistence
+* multiple requests arrive concurrently
+
+Define:
+
+* client submission identifier
+* uniqueness constraints
+* deduplication window
+* server response behavior
+* retry behavior
+
+Idempotency must be enforced server-side.
+
+---
+
+# 14. MESSAGE DELIVERY MODEL
+
+Define the delivery-state model.
+
+At minimum consider:
+
+* pending
+* accepted
+* sent
+* delivered
+* read
+* failed
+
+Define whether states are:
+
+* per message
+* per recipient
+* per device
+
+The architecture must support multi-device recipients without corrupting delivery semantics.
+
+Define how delivery state is recovered after reconnect.
+
+---
+
+# 15. CONVERSATION ARCHITECTURE
+
+Define direct and group conversations.
+
+For direct conversations specify:
+
+* identity
+* uniqueness
+* membership
+* lifecycle
+
+For groups specify:
+
+* owner
+* administrators
+* members
+* permissions
+* membership changes
+* invitations
+* removals
+* leaving
+* group metadata
+* moderation
+
+Define authorization rules for every membership-changing operation.
+
+---
+
+# 16. GROUP MESSAGE FAN-OUT
+
+Design the architecture for group message delivery.
+
+Account for:
+
+* small groups
+* large groups
+* very large groups
+* online recipients
+* offline recipients
+* multiple devices
+* push notifications
+* high fan-out
+* backpressure
+
+Define when fan-out should be:
+
+* synchronous
+* asynchronous
+* batched
+
+Avoid architectures that require a single request to synchronously perform an unbounded number of downstream operations.
+
+---
+
+# 17. PRESENCE ARCHITECTURE
+
+Design presence as ephemeral state.
+
+Define:
+
+* online
+* offline
+* last seen
+* typing
+* connection heartbeat
+* expiration
+* multiple devices
+
+Presence should tolerate:
+
+* server failures
+* dropped connections
+* network partitions
+* stale state
+* reconnects
+
+Define how Redis is used and what happens when Redis is unavailable.
+
+Presence must never be treated as durable identity data.
+
+---
+
+# 18. WEBSOCKET ARCHITECTURE
+
+Define:
+
+* connection authentication
+* connection authorization
+* namespaces/rooms where appropriate
+* event naming
+* event payload structure
+* correlation IDs
+* acknowledgements
+* reconnect behavior
+* synchronization
+* connection limits
+* rate limits
+* heartbeat
+* disconnect handling
+
+Define how WebSocket servers scale horizontally.
+
+Specify whether and where Redis adapters or equivalent coordination are required.
+
+Define how a client determines what events it missed after reconnecting.
+
+---
+
+# 19. REAL-TIME EVENT CONTRACT
+
+Define a common real-time event envelope.
+
+It should support appropriate fields such as:
+
+* event ID
+* event type
+* version
+* timestamp
+* aggregate ID
+* correlation ID
+* trace ID
+* payload
+
+Define:
+
+* versioning
+* backward compatibility
+* duplicate handling
+* ordering
+* replay/recovery
+
+Do not require clients to trust event arrival order unless the architecture guarantees it.
+
+---
+
+# 20. KAFKA/REDPANDA EVENT ARCHITECTURE
+
+Define appropriate event categories.
+
+Potential events include:
+
+* user events
+* device events
+* conversation events
+* message events
+* message-state events
+* media events
+* notification events
+* privacy events
+* moderation events
+* call events
+
+For each important event define:
+
+* producer
+* consumer
+* topic
+* key
+* ordering requirements
+* retention
+* retry behavior
+* dead-letter strategy
+* idempotency requirements
+
+Use partition keys that preserve required ordering without creating unnecessary hot partitions.
+
+---
+
+# 21. OUTBOX ARCHITECTURE
+
+Define when the transactional outbox pattern is required.
+
+Specify:
+
+* outbox ownership
+* transaction boundaries
+* event status
+* publishing behavior
+* retry behavior
+* duplicate handling
+* cleanup
+* monitoring
+
+The architecture must avoid the dual-write problem where database state succeeds but event publication fails.
+
+---
+
+# 22. REDIS ARCHITECTURE
+
+Define Redis responsibilities separately from PostgreSQL.
+
+Potential uses:
+
+* presence
+* rate limiting
+* ephemeral connection state
+* caching
+* distributed coordination
+* counters
+
+For every important Redis use define:
+
+* key namespace
+* value semantics
+* TTL
+* invalidation
+* ownership
+* failure behavior
+
+Do not store irreplaceable durable business data solely in Redis.
+
+---
+
+# 23. CACHE ARCHITECTURE
+
+Define what should and should not be cached.
+
+Potential candidates:
+
+* user profiles
+* conversation summaries
+* membership data
+* authorization-related derived state where safe
+* unread counts
+* configuration
+
+For every cache define:
+
+* cache key
+* TTL
+* invalidation trigger
+* stale-data policy
+* cache stampede protection
+* failure behavior
+
+Do not cache private data without explicitly considering authorization and tenant/user isolation.
+
+---
+
+# 24. PRIVACY ARCHITECTURE
+
+Define privacy boundaries across the entire system.
+
+Privacy must be enforced consistently across:
+
+* PostgreSQL
+* Redis
+* APIs
+* WebSockets
+* search
+* notifications
+* media
+* Kafka/Redpanda
+* background workers
+
+Define how the architecture handles:
+
+* blocked users
+* private profiles
+* deleted messages
+* deleted accounts
+* restricted content
+* removed group members
+* revoked devices
+
+Derived systems must not continue exposing information after authorization changes.
+
+---
+
+# 25. BLOCKING ARCHITECTURE
+
+Define blocking semantics.
+
+Specify how blocking affects:
+
+* direct messaging
+* group interactions where applicable
+* calls
+* presence
+* profile visibility
+* search
+* notifications
+* media
+* WebSockets
+
+Blocking must be enforced server-side.
+
+Do not rely on clients to hide blocked entities.
+
+---
+
+# 26. SECURITY BOUNDARIES
+
+Identify security trust boundaries between:
+
+* clients
+* API
+* WebSocket infrastructure
+* backend
+* databases
+* Redis
+* Kafka/Redpanda
+* queues
+* S3
+* CDN
+* search
+* notification providers
+* WebRTC infrastructure
+
+For each boundary define:
+
+* authentication
+* authorization
+* encryption
+* validation
+* rate limiting
+* abuse prevention
+* audit requirements
+
+---
+
+# 27. AUTHENTICATION ARCHITECTURE
+
+Define the authentication model.
+
+Consider:
+
+* account registration
+* login
+* session management
+* access tokens
+* refresh tokens
+* token rotation
+* revocation
+* device sessions
+* suspicious login detection
+* credential protection
+* brute-force protection
+
+Define the difference between:
+
+* user identity
+* device identity
+* session identity
+
+Do not design authentication around insecure long-lived bearer credentials without appropriate protection.
+
+---
+
+# 28. AUTHORIZATION MODEL
+
+Define server-side authorization.
+
+Authorization must cover:
+
+* conversations
+* messages
+* groups
+* group roles
+* media
+* devices
+* calls
+* privacy settings
+* moderation
+* administration
+
+Explicitly defend against:
+
+* IDOR
+* privilege escalation
+* unauthorized membership access
+* cross-user data access
+* revoked-device access
+
+---
+
+# 29. MEDIA ARCHITECTURE
+
+Define the media lifecycle:
+
+1. upload authorization
+2. upload
+3. validation
+4. processing
+5. malware/security checks where appropriate
+6. metadata extraction
+7. variant generation
+8. storage
+9. database registration
+10. access authorization
+11. CDN delivery
+12. lifecycle cleanup
+
+Define S3 object-key strategy.
+
+Define how private media is protected.
+
+Define signed URL/token strategy.
+
+Define retention and deletion behavior.
+
+---
+
+# 30. SEARCH ARCHITECTURE
+
+Define the relationship between PostgreSQL and Elasticsearch/OpenSearch.
+
+PostgreSQL remains authoritative.
+
+Search indexes are derived.
+
+Define:
+
+* indexed entities
+* indexing events
+* update behavior
+* deletion behavior
+* reindexing
+* eventual consistency
+* authorization filtering
+* privacy changes
+* failure recovery
+
+Search must never become a bypass around application authorization.
+
+---
+
+# 31. NOTIFICATION ARCHITECTURE
+
+Define the notification pipeline:
+
+* domain event
+* notification decision
+* preference evaluation
+* device selection
+* provider routing
+* FCM/APNs
+* delivery result
+* token cleanup
+
+Account for:
+
+* muted conversations
+* multiple devices
+* offline recipients
+* provider failures
+* duplicate events
+* privacy
+
+---
+
+# 32. CALLING ARCHITECTURE
+
+Define the signaling architecture separately from WebRTC media transport.
+
+Specify:
+
+* call creation
+* authorization
+* invitation
+* acceptance
+* rejection
+* cancellation
+* signaling
+* ICE candidates
+* participant state
+* timeout
+* termination
+* failure
+* call history
+
+Define the role of:
+
+* application servers
+* WebSockets
+* STUN
+* TURN
+* WebRTC
+
+Do not route all real-time media through the application server unless specifically justified.
+
+---
+
+# 33. DATA RETENTION
+
+Define retention policies for:
+
+* messages
+* deleted messages
+* media
+* sessions
+* devices
+* audit logs
+* notification records
+* events
+* search indexes
+* temporary processing data
+
+Distinguish between:
+
+* active data
+* soft-deleted data
+* permanently deleted data
+* derived data
+* legally retained data where applicable
+
+Deletion semantics must be explicit.
+
+---
+
+# 34. FAILURE ARCHITECTURE
+
+Define behavior for failure of:
+
+* PostgreSQL
+* Redis
+* Kafka/Redpanda
+* BullMQ
+* S3
+* CloudFront
+* search
+* FCM
+* APNs
+* WebSocket nodes
+* TURN infrastructure
+
+For each failure define:
+
+* user-visible behavior
+* retry behavior
+* timeout
+* fallback
+* degradation
+* recovery
+* observability
+
+Critical messaging operations must not silently lose data.
+
+---
+
+# 35. SCALABILITY ARCHITECTURE
+
+Define scaling strategies for:
+
+* API servers
+* WebSocket servers
+* PostgreSQL
+* Redis
+* Kafka/Redpanda
+* BullMQ workers
+* search
+* media processing
+* notification workers
+* TURN
+
+Identify potential bottlenecks including:
+
+* hot conversation partitions
+* group fan-out
+* unread counters
+* presence
+* connection concentration
+* database indexes
+* event partitions
+* queue backlogs
+
+Define horizontal-scaling strategies.
+
+---
+
+# 36. API ARCHITECTURE
+
+Define the API style.
+
+Prefer REST for conventional resource operations.
+
+Define:
+
+* resource naming
+* HTTP semantics
+* versioning
+* pagination
+* filtering
+* sorting
+* error format
+* validation errors
+* idempotency
+* authentication
+* authorization
+* rate limiting
+
+Use cursor pagination for high-volume resources where appropriate.
+
+Define a consistent error contract.
+
+The API contract must be usable by both web and mobile clients.
+
+---
+
+# 37. API SECURITY
+
+Every API endpoint must have an explicit security classification:
+
+* public
+* authenticated
+* user-authorized
+* privileged
+* administrative
+
+Define:
+
+* authentication requirements
+* authorization requirements
+* input validation
+* rate limits
+* abuse controls
+* audit requirements
+
+Never assume that hiding an endpoint from the frontend provides security.
+
+---
+
+# 38. OBSERVABILITY ARCHITECTURE
+
+Define observability across:
+
+* HTTP
+* WebSockets
+* PostgreSQL
+* Prisma
+* Redis
+* Kafka/Redpanda
+* BullMQ
+* S3
+* search
+* push notifications
+* media processing
+* WebRTC signaling
+
+Define:
+
+* metrics
+* logs
+* traces
+* correlation IDs
+* health checks
+* readiness
+* liveness
+* alerts
+
+Ensure telemetry does not leak private communication content.
+
+---
+
+# 39. ARCHITECTURAL TRADEOFFS
+
+Explicitly document major decisions and alternatives considered.
+
+At minimum evaluate:
+
+* modular monolith vs microservices
+* REST vs GraphQL
+* Socket.IO vs raw WebSockets
+* Kafka vs Redpanda
+* Redis usage boundaries
+* synchronous vs asynchronous message fan-out
+* PostgreSQL partitioning
+* Elasticsearch/OpenSearch
+* S3 direct uploads
+* WebRTC topology
+* notification architecture
+* event-driven architecture
+* outbox pattern
+
+For every major decision explain:
+
+* selected approach
+* reason
+* advantages
+* disadvantages
+* operational cost
+* scaling implications
+* migration implications
+
+---
+
+# 40. ARCHITECTURE ARTIFACTS
+
+Produce complete architecture artifacts for this scope, including:
+
+* system context
+* component architecture
+* bounded-context map
+* domain model
+* data ownership model
+* database architecture
+* event architecture
+* real-time architecture
+* API architecture
+* security boundaries
+* privacy boundaries
+* media architecture
+* notification architecture
+* failure model
+* scalability model
+* observability model
+* deployment assumptions
+* architectural decision records
+
+Use clear diagrams in text/structured form where useful.
+
+Do not produce application source code.
+
+---
+
+# 41. REPOSITORY INTEGRATION REQUIREMENT
+
+If a repository is available, inspect it before making repository-specific architectural claims.
+
+Determine:
+
+* existing project structure
+* existing technology choices
+* existing modules
+* existing database structure
+* existing APIs
+* existing infrastructure
+* existing conventions
+
+Do not falsely claim that any component already exists.
+
+Architecture documentation must distinguish:
+
+* proposed architecture
+* actual repository implementation
+
+If the repository already contains compatible architecture, preserve it where reasonable.
+
+If architectural correction is required, document the migration strategy.
+
+---
+
+# 42. FUTURE IMPLEMENTATION COMPATIBILITY
+
+The architecture must be detailed enough that future backend, frontend, mobile, infrastructure, and QA implementation can use it without inventing contradictory contracts.
+
+Define stable contracts for:
+
+* IDs
+* entities
+* API responses
+* errors
+* pagination
+* authentication
+* authorization
+* WebSocket events
+* asynchronous events
+* queues
+* media
+* notifications
+* search
+* observability
+
+Avoid ambiguous statements such as:
+
+* "handle messages appropriately"
+* "use a scalable database"
+* "implement real-time communication"
+* "add security"
+* "support notifications"
+
+Replace vague requirements with concrete architectural decisions and constraints.
+
+---
+
+# 43. COMPLETENESS REQUIREMENT
+
+Do not produce an outline pretending to be an architecture.
+
+Do not leave:
+
+* undefined critical boundaries
+* unspecified ownership
+* unspecified consistency rules
+* unspecified failure behavior
+* unspecified security boundaries
+* unspecified data lifecycle
+* unspecified integration contracts
+
+If a capability is intentionally deferred from this architecture volume, explicitly identify its boundary and ensure that the current architecture leaves a compatible extension point.
+
+Do not invent future implementation results.
+
+---
+
+# 44. FINAL ARCHITECTURAL QUALITY BAR
+
+The resulting architecture must describe one coherent production-grade communication platform.
+
+It must be possible for an engineering organization to use this architecture to implement:
+
+* backend systems
+* web application
+* mobile applications
+* real-time communication
+* media processing
+* notifications
+* search
+* voice/video calling
+* infrastructure
+* testing
+* observability
+
+without creating contradictory designs.
+
+The architecture must prioritize:
+
+* secure defaults
+* explicit contracts
+* authoritative data
+* idempotent distributed operations
+* privacy enforcement
+* graceful failure
+* horizontal scalability
+* operational visibility
+* maintainable boundaries
+
+Do not generate source code.
+
+Produce the complete architecture specification for the scope of this volum
+
 You are operating in Senior Engineering Team Mode.
 
 You are simultaneously acting as:

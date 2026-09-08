@@ -1,2329 +1,1474 @@
-You are operating in Senior Engineering Team Mode.
+# BACKEND IMPLEMENTATION PROMPT — VOLUME 2
 
-Build the production-ready identity, authentication, account, profile, device, authorization, contact, privacy, and session backend domains for an enterprise-scale global real-time messaging and communication platform comparable in architectural scope to WhatsApp.
+## Production-Grade Real-Time Communication Platform
 
-The platform is an original implementation.
+### Contacts, Conversations, Direct Chats, Groups, Membership, Permissions, and Conversation Lifecycle
 
-Do not copy proprietary source code, internal architecture, branding, or confidential implementation details from WhatsApp or any other proprietary platform.
+You are implementing **Volume 2 of the backend** for a production-grade, globally scalable, WhatsApp-like real-time communication platform.
 
-This prompt is completely independent and may be executed in a separate conversation.
+This is an original communication platform inspired by modern real-time messaging products. It is not an implementation of proprietary WhatsApp source code, private infrastructure, undocumented protocols, or proprietary algorithms.
 
-The backend foundation and shared infrastructure are assumed to follow the project's established architecture.
+This prompt is **fully standalone**. It must be executable without requiring another prompt, previous conversation, architecture document, or previously generated prompt to be present.
 
-Do not redesign the architecture.
+The actual repository is the source of truth for existing implementation.
 
-Do not generate frontend code.
+This volume is an implementation unit of **one coherent backend system**. It must integrate with the existing repository and must preserve the identity, authentication, user, device, session, security, error, configuration, database, Redis, observability, and testing conventions already implemented in the repository.
 
-Do not generate mobile code.
+Do not create a competing architecture.
 
-Do not generate Kubernetes manifests.
+Do not duplicate existing modules.
 
-Do not generate Terraform.
+Do not assume that a previous prompt exists.
 
-Do not generate infrastructure implementation code.
+---
 
-Do not generate CI/CD workflows.
+# 1. PRIMARY OBJECTIVE
 
-This volume focuses exclusively on identity and access-related backend domains.
+Implement the production-grade backend domain for:
 
-────────────────────────────────────────
+* contacts;
+* contact discovery;
+* direct conversations;
+* group conversations;
+* conversation membership;
+* group roles;
+* group permissions;
+* conversation metadata;
+* participant lifecycle;
+* conversation settings;
+* conversation deletion/archival behavior where appropriate;
+* conversation-level authorization;
+* blocking/privacy enforcement where required for conversation access;
+* conversation-related persistence;
+* conversation domain events.
 
-MISSION
+The result must provide a stable foundation for the messaging backend that will be implemented later.
 
-Implement the production-ready backend required for:
+Do not implement the actual message delivery system in this volume.
 
-• Identity
-• Accounts
-• Users
-• Profiles
-• Authentication
-• Authorization
-• Sessions
-• Devices
-• Device management
-• Contacts
-• Contact discovery
-• Blocking
-• Privacy settings
-• Security settings
-• Account recovery
-• Login security
-• Audit events related to identity
+Do not create fake message endpoints.
 
-The implementation must be:
+Do not create placeholder messaging services.
 
-• Secure
-• Horizontally scalable
-• Observable
-• Testable
-• Maintainable
-• Multi-device capable
-• Multi-region ready
+---
 
-────────────────────────────────────────
+# 2. PRODUCT CONTEXT
 
-TECHNOLOGY STACK
+The overall platform supports:
 
-Backend:
+* user accounts;
+* multiple authenticated devices;
+* contacts;
+* direct conversations;
+* group conversations;
+* messages;
+* message delivery;
+* read receipts;
+* typing indicators;
+* presence;
+* reactions;
+* replies;
+* forwarding;
+* editing;
+* deletion;
+* media;
+* push notifications;
+* search;
+* privacy;
+* blocking/reporting;
+* multi-device synchronization;
+* voice/video calls.
 
-• Node.js
-• NestJS
-• TypeScript
+This volume focuses specifically on the **relationship between users and conversations**.
 
-Database:
+The resulting conversation domain must be suitable for high-volume messaging and must provide authoritative authorization information for later message operations.
 
-• PostgreSQL
-• Prisma ORM
+---
 
-Cache:
+# 3. REQUIRED TECHNOLOGY STACK
 
-• Redis
+Use the repository's existing compatible implementation of:
 
-Events:
+* Node.js;
+* NestJS;
+* TypeScript;
+* PostgreSQL;
+* Prisma;
+* Redis;
+* Kafka or Redpanda;
+* BullMQ where genuinely required;
+* WebSockets/Socket.IO where integration requires it;
+* OpenTelemetry;
+* Prometheus;
+* structured logging.
 
-• Kafka or Redpanda
+Do not introduce a new framework or database abstraction when the repository already contains a compatible implementation.
 
-Background Jobs:
+---
 
-• BullMQ
+# 4. FIRST ACTION — INSPECT THE ACTUAL REPOSITORY
 
-Authentication:
+Before making changes:
 
-• JWT or secure session architecture according to the established design
+1. Inspect the complete relevant backend structure.
+2. Inspect the existing identity/user/device/session implementation.
+3. Inspect Prisma schema and migrations.
+4. Inspect existing API conventions.
+5. Inspect authentication and authorization guards.
+6. Inspect error handling.
+7. Inspect Redis conventions.
+8. Inspect event infrastructure.
+9. Inspect logging/tracing.
+10. Inspect existing tests.
+11. Identify any existing contact or conversation functionality.
+12. Identify any existing WebSocket infrastructure.
+13. Identify any existing privacy/blocking functionality.
 
-Password Security:
+Use existing implementations wherever compatible.
 
-• Industry-standard password hashing library
+If the repository already contains part of this functionality:
 
-Testing:
+* extend it;
+* repair it if necessary;
+* preserve compatible behavior;
+* migrate it safely where required.
 
-• Jest
-• Supertest
-• Integration testing tools where appropriate
+Do not create duplicate `Conversation`, `Contact`, or membership systems.
 
-────────────────────────────────────────
+---
 
-IMPLEMENTATION RULES
+# 5. DOMAIN BOUNDARIES
 
-Never generate pseudo-code.
+Keep these responsibilities clearly separated.
 
-Never generate placeholders.
+## Contacts
 
-Never generate TODO comments.
+Responsible for:
 
-Never omit implementations.
+* discovering users;
+* representing user relationships where applicable;
+* contact metadata;
+* contact visibility/privacy rules.
 
-Never say:
+## Conversations
 
-- "implement similarly"
-- "left as an exercise"
-- "for brevity"
-- "remaining code omitted"
+Responsible for:
 
-Generate complete production-ready files.
+* direct conversations;
+* groups;
+* conversation metadata;
+* membership;
+* roles;
+* permissions;
+* lifecycle.
 
-Every generated file must compile.
+## Messaging
 
-Never regenerate unchanged files.
+Not implemented here.
 
-Only modify existing files when required.
+Messaging will consume the conversation authorization and membership contracts established by this volume.
 
-Use strict TypeScript.
+## Identity
 
-Use dependency injection.
+Remains responsible for:
 
-Use centralized validation.
+* users;
+* devices;
+* sessions;
+* authentication.
 
-Use centralized error handling.
+Do not move authentication responsibility into conversations.
 
-Use structured logging.
+---
 
-Use the existing configuration and observability foundations.
+# 6. CONTACT MODEL
 
-────────────────────────────────────────
+Implement a production-grade contact model appropriate to the product.
 
-DOMAIN OWNERSHIP
+A contact relationship may contain concepts such as:
 
-Implement clear boundaries between:
+* owner user;
+* target user;
+* local nickname;
+* favorite/pinned state if product requirements justify it;
+* relationship state;
+* created timestamp;
+* updated timestamp.
 
-Identity
+Determine whether contacts should represent:
 
-Authentication
+1. a server-side relationship;
+2. locally imported contacts;
+3. both.
 
-Accounts
+Do not store unnecessary copies of a user's entire profile.
 
-Users
+The authoritative user identity remains in the identity domain.
 
-Profiles
+---
 
-Sessions
+# 7. CONTACT DISCOVERY
 
-Devices
+Implement secure user discovery mechanisms appropriate to the product.
 
-Authorization
+Potential discovery identifiers include:
 
-Contacts
+* username/handle;
+* normalized phone number;
+* normalized email where applicable.
 
-Privacy
+Apply privacy controls.
 
-Security
+Do not allow unrestricted enumeration of the entire user database.
 
-Do not place all identity functionality into one uncontrolled service.
+Protect discovery endpoints against:
 
-Define clear application-service and repository boundaries.
+* brute force;
+* automated enumeration;
+* high-volume probing;
+* identifier harvesting.
 
-────────────────────────────────────────
+Use appropriate:
 
-IDENTITY DOMAIN
+* rate limits;
+* authorization;
+* normalization;
+* response minimization.
 
-Implement:
+Do not reveal whether a private identifier belongs to a user when product privacy rules prohibit that disclosure.
 
-• User identity creation
-• User identity retrieval
-• User identity status
-• Identity lifecycle
-• Account association
-• Identity lookup
-• Identity deactivation
-• Identity deletion workflows where appropriate
+---
 
-Use stable public identifiers.
+# 8. CONTACT OPERATIONS
 
-Do not expose internal database identifiers unnecessarily.
+Implement real functionality for appropriate operations such as:
 
-Define identity states where required, such as:
+* add contact;
+* update contact metadata;
+* remove contact;
+* list contacts;
+* retrieve contact;
+* search contacts;
+* discover eligible users.
 
-• Active
-• Suspended
-• Disabled
-• Pending verification
-• Deactivated
-• Deleted
+Only implement operations supported by the actual product model.
 
-────────────────────────────────────────
+Do not create meaningless endpoints.
 
-ACCOUNT DOMAIN
+Enforce ownership server-side.
 
-Implement:
+A user must never be able to modify another user's contact records by manipulating an ID.
 
-• Account creation
-• Account status
-• Account lifecycle
-• Account settings
-• Account security settings
-• Account recovery state
-• Account deletion initiation
-• Account deletion processing
-• Account suspension
-• Account reactivation where allowed
+---
 
-Separate:
+# 9. DIRECT CONVERSATION MODEL
 
-• Account-level data
-• User-level identity
-• Profile-level data
-• Device-level data
-• Session-level data
+Implement a canonical direct conversation model.
 
-Account operations must be audited where appropriate.
+A direct conversation represents communication between two users.
 
-────────────────────────────────────────
+The system must guarantee that the same pair of users cannot accidentally create multiple canonical direct conversations unless the product explicitly supports multiple independent threads.
 
-USER DOMAIN
+For a standard direct-message model:
 
-Implement:
+```text
+User A + User B = one canonical direct conversation
+```
 
-• User creation
-• User retrieval
-• User updates
-• Public user representation
-• Private user representation
-• User status
-• User metadata required by the domain
+This uniqueness must be enforced at the database level, not only through application checks.
 
-Prevent accidental exposure of:
+---
 
-• Private settings
-• Security information
-• Device details
-• Session information
-• Sensitive identifiers
+# 10. DIRECT CONVERSATION CREATION
 
-Define explicit DTOs for public and private user responses.
+Implement an idempotent direct-conversation creation/retrieval operation.
 
-────────────────────────────────────────
+When a user requests a direct conversation with another eligible user:
 
-PROFILE DOMAIN
+1. validate the target;
+2. verify privacy/blocking restrictions;
+3. normalize the participant pair;
+4. resolve an existing conversation;
+5. otherwise create it atomically;
+6. return the canonical conversation.
 
-Implement:
-
-• Profile creation
-• Profile updates
-• Display name
-• Username where applicable
-• Avatar metadata
-• About/status information
-• Profile visibility
-• Profile settings
-
-Do not store large binary profile media directly in PostgreSQL.
-
-Use object-storage references where appropriate.
-
-Define profile privacy boundaries.
-
-────────────────────────────────────────
-
-PRIVACY DOMAIN
-
-Implement privacy settings supporting:
-
-• Last seen visibility
-• Online status visibility
-• Profile photo visibility
-• About/status visibility
-• Read receipts
-• Contact discovery preferences
-• Group invitation controls
-• Blocking-related privacy behavior
-
-Define defaults.
-
-Define validation rules.
-
-Define how privacy rules are enforced by backend services.
-
-Do not rely on frontend filtering.
-
-────────────────────────────────────────
-
-AUTHENTICATION
-
-Implement production authentication foundations.
-
-Support:
-
-• Registration
-• Login
-• Logout
-• Refresh
-• Credential verification
-• Account verification
-• Session creation
-• Session revocation
-
-Prepare architecture for:
-
-• MFA
-• OAuth
-• Passkeys
-• Phone verification
-• Suspicious login detection
-
-Do not implement unsupported authentication methods merely as placeholders.
-
-For features that require external providers, establish real provider integration boundaries where appropriate.
-
-────────────────────────────────────────
-
-PASSWORD AUTHENTICATION
-
-Where password authentication is enabled, implement:
-
-• Password hashing
-• Password verification
-• Password change
-• Password reset
-• Password reset token generation
-• Password reset token expiration
-• Password reset token invalidation
-• Password history or reuse protection where appropriate
-• Login attempt protection
-
-Never store plaintext passwords.
-
-Never log passwords.
-
-Do not return password hashes through APIs.
-
-────────────────────────────────────────
-
-ACCOUNT VERIFICATION
-
-Implement appropriate verification architecture for:
-
-• Email verification
-• Phone verification where the project uses phone-based identity
-
-Define:
-
-• Verification tokens
-• Verification expiration
-• Single-use semantics
-• Resend limits
-• Rate limiting
-• Verification state
-• Replay prevention
-
-Verification tokens must be stored securely.
-
-────────────────────────────────────────
-
-SESSION MANAGEMENT
-
-Implement production session management.
-
-Support:
-
-• Session creation
-• Session lookup
-• Session refresh
-• Session expiration
-• Session revocation
-• Logout
-• Logout-all-devices
-• Session listing
-• Session metadata
-
-Track appropriate session metadata such as:
-
-• Device
-• Platform
-• Application version
-• Last activity
-• Created time
-• Expiration
-• Revocation state
-
-Do not store sensitive secrets unnecessarily.
-
-────────────────────────────────────────
-
-TOKEN ARCHITECTURE
-
-Implement the established authentication token strategy.
-
-Support as appropriate:
-
-• Access tokens
-• Refresh tokens
-• Token rotation
-• Token expiration
-• Token revocation
-• Token-family invalidation
-• Replay detection
-
-Refresh tokens must be protected against theft and replay.
-
-Define secure storage expectations for each client type.
-
-────────────────────────────────────────
-
-DEVICE DOMAIN
-
-Implement device management.
-
-Support:
-
-• Device registration
-• Device identification
-• Device metadata
-• Device capabilities
-• Device naming
-• Device status
-• Device revocation
-• Remote logout
-• Device listing
-• Last-seen information
-• Push token association
-
-Track:
-
-• Device ID
-• Platform
-• OS version
-• Application version
-• Device capabilities
-• Registration time
-• Last activity
-• Revocation status
-
-Do not collect unnecessary device information.
-
-────────────────────────────────────────
-
-DEVICE LIMITS
-
-Implement configurable device limits.
-
-Support:
-
-• Maximum registered devices
-• Maximum active sessions
-• Device replacement
-• Device revocation
-• Administrative device revocation where authorized
-
-Define behavior when the maximum device count is reached.
-
-Device limits must be enforced server-side.
-
-────────────────────────────────────────
-
-DEVICE SECURITY
-
-Implement architecture for:
-
-• Device verification
-• Device trust state
-• Device revocation
-• Suspicious-device detection
-• Security notifications
-• Remote logout
-
-Prepare integration boundaries for future E2EE device-key management.
-
-Do not implement cryptographic protocols in this volume.
-
-────────────────────────────────────────
-
-AUTHORIZATION
-
-Implement production RBAC and permission infrastructure.
-
-Support roles such as:
-
-• User
-• Group Member
-• Group Administrator
-• Community Administrator
-• Moderator
-• Support Agent
-• Administrator
-• Super Administrator
-• System Service
-
-Implement:
-
-• Permissions
-• Roles
-• Role assignment
-• Permission guards
-• Policy checks
-• Resource ownership checks
-• Administrative permission checks
-
-Do not rely solely on role names.
-
-Use explicit permissions for sensitive operations.
-
-────────────────────────────────────────
-
-PERMISSION MODEL
-
-Define permission categories for:
-
-• Account
-• Profile
-• Device
-• Conversation
-• Group
-• Community
-• Business
-• Moderation
-• Administration
-• Audit
-• System configuration
-
-Permissions must be enforceable by backend services.
-
-Do not encode permissions only in frontend navigation.
-
-────────────────────────────────────────
-
-POLICY ENGINE
-
-Implement a reusable authorization-policy foundation.
-
-Policies should support checks based on:
-
-• Actor
-• Resource
-• Action
-• Ownership
-• Role
-• Permission
-• Account status
-• Resource status
-• Privacy settings
-
-Keep policy logic separate from controllers.
-
-────────────────────────────────────────
-
-CONTACT DOMAIN
-
-Implement:
-
-• Contact creation
-• Contact removal
-• Contact listing
-• Contact state
-• Contact synchronization boundaries
-• Contact discovery boundaries
-
-Where the platform uses phone-based contact discovery, define secure matching behavior.
-
-Do not expose full contact information unnecessarily.
-
-────────────────────────────────────────
-
-CONTACT DISCOVERY
-
-Implement the backend architecture for privacy-preserving contact discovery.
-
-Support:
-
-• User discovery
-• Contact matching
-• Search by approved identifiers
-• Rate limiting
-• Enumeration protection
-
-Do not expose:
-
-• Private contact information
-• Unrelated account metadata
-• Internal identifiers
-
-Add appropriate abuse controls.
-
-────────────────────────────────────────
-
-BLOCKING
-
-Implement:
-
-• Block user
-• Unblock user
-• List blocked users
-• Block state lookup
-
-Blocking must affect:
-
-• Contact discovery
-• Messaging authorization
-• Presence visibility
-• Profile visibility where appropriate
-• Notifications
-• Group interactions where appropriate
-
-Enforce blocking server-side.
-
-────────────────────────────────────────
-
-SECURITY EVENTS
-
-Generate security-domain events such as:
-
-• UserLoggedIn
-• LoginFailed
-• SuspiciousLoginDetected
-• SessionCreated
-• SessionRevoked
-• DeviceRegistered
-• DeviceRevoked
-• PasswordChanged
-• PasswordResetRequested
-• PasswordResetCompleted
-• AccountVerified
-• AccountSuspended
-• UserBlocked
-
-Events must contain only required information.
-
-Never publish sensitive credentials or tokens.
-
-────────────────────────────────────────
-
-AUDIT LOGGING
-
-Implement audit logging for sensitive identity operations.
-
-Audit:
-
-• Login
-• Logout
-• Password changes
-• Password reset
-• Device registration
-• Device revocation
-• Session revocation
-• Role changes
-• Permission changes
-• Account suspension
-• Administrative account actions
-• Security setting changes
-
-Audit records should contain:
-
-• Actor
-• Action
-• Resource
-• Timestamp
-• Request ID
-• Correlation ID
-• Result
-• Relevant metadata
-
-Do not store secrets in audit logs.
-
-────────────────────────────────────────
-
-RATE LIMITING
-
-Implement rate limits for sensitive operations.
-
-At minimum cover:
-
-• Registration
-• Login
-• Password reset
-• Verification
-• Contact discovery
-• Device registration
-• Session refresh
-• Account recovery
-
-Support rate limiting by appropriate dimensions such as:
-
-• IP
-• Account
-• Device
-• Identifier
-• Operation
-
-Prevent distributed abuse without creating unnecessary false positives.
-
-────────────────────────────────────────
-
-ACCOUNT RECOVERY
-
-Implement secure recovery workflows.
-
-Support:
-
-• Password reset
-• Verification recovery where applicable
-• Session invalidation after credential recovery
-• Device/session review
-• Security notifications
-
-Recovery must invalidate compromised authentication state where appropriate.
-
-────────────────────────────────────────
-
-DATABASE
-
-Implement Prisma models and migrations for the domains covered by this volume.
-
-Include appropriate entities for:
-
-• User
-• Account
-• Profile
-• ProfileSettings
-• PrivacySettings
-• Session
-• Device
-• DeviceCapability
-• Contact
-• ContactRequest where required
-• BlockedUser
-• VerificationToken
-• PasswordResetToken
-• Role
-• Permission
-• RolePermission
-• UserRole or equivalent
-• AuditLog
-• SecurityEvent where appropriate
+Concurrent requests must not produce duplicate direct conversations.
 
 Use:
 
-• Primary keys
-• Foreign keys
-• Unique constraints
-• Check constraints
-• Appropriate indexes
-• Timestamps
-• Soft deletion where justified
+* database uniqueness constraints;
+* transactions;
+* conflict handling;
 
-Do not create tables for future domains unless required by the current implementation.
+as appropriate.
 
-────────────────────────────────────────
+Do not rely only on:
 
-API
+```text
+find → if absent → create
+```
 
-Implement production-ready APIs for:
+because concurrent requests can race.
 
-Authentication
+---
 
-• Registration
-• Login
-• Logout
-• Refresh
-• Verification
-• Password reset
-• Password change
+# 11. DIRECT CONVERSATION AUTHORIZATION
 
-Accounts
+Every direct conversation operation must verify that the authenticated user is one of the participants.
 
-• Account retrieval
-• Account settings
-• Account deletion initiation
-• Account security
+Never trust a client-provided:
 
-Profiles
+* user ID;
+* participant ID;
+* ownership flag;
+* membership flag.
 
-• Profile retrieval
-• Profile update
-• Privacy settings
+Resolve authorization from authoritative database state.
 
-Sessions
+Prepare reusable authorization services/guards for future messaging operations.
 
-• Session list
-• Session revoke
-• Revoke all sessions
+---
 
-Devices
+# 12. GROUP CONVERSATION MODEL
 
-• Device registration
-• Device listing
-• Device update
-• Device revoke
-• Remote logout
+Implement groups with persistent concepts equivalent to:
 
-Contacts
+## Group/Conversation
 
-• Contact list
-• Contact create
-• Contact remove
-• Contact discovery
+Contains:
 
-Blocking
+* conversation ID;
+* type;
+* title/name;
+* description where supported;
+* avatar/media reference where supported;
+* creator/owner;
+* status;
+* timestamps.
 
-• Block
-• Unblock
-• List blocked users
+## ConversationMember
 
-Administration
+Contains concepts such as:
 
-• Role management where authorized
-• Permission management where authorized
-• Audit access where authorized
+* conversation ID;
+* user ID;
+* role;
+* membership status;
+* joined timestamp;
+* left timestamp;
+* mute/settings state where appropriate;
+* permissions metadata where required.
 
-Every endpoint must include:
+The exact schema must follow repository conventions.
 
-• DTO validation
-• Authentication
-• Authorization
-• Rate limiting
-• OpenAPI documentation
-• Consistent errors
-• Structured logging
+---
 
-────────────────────────────────────────
+# 13. GROUP ROLES
 
-SECURITY REQUIREMENTS
+Implement a clear role model.
 
-Implement:
+At minimum support appropriate equivalents of:
 
-• Password hashing
-• Secure token handling
-• Refresh-token protection
-• Rate limiting
-• Brute-force protection
-• Secure headers
-• Input validation
-• Authorization guards
-• Permission checks
-• Audit logging
-• Secret protection
-• Session revocation
+* owner;
+* administrator;
+* member.
 
-Follow OWASP security principles.
+Do not use arbitrary strings throughout the application.
 
-Do not expose internal security implementation details through public APIs.
+Roles should be represented through a stable enum/domain type.
 
-────────────────────────────────────────
+Future group-management operations must be able to determine whether a member can:
 
-EVENTS
+* add members;
+* remove members;
+* change group metadata;
+* manage administrators;
+* change group settings;
+* delete/close the group where authorized.
 
-Publish appropriate events using the established event infrastructure.
+---
 
-At minimum consider:
+# 14. GROUP PERMISSIONS
 
-• AccountCreated
-• AccountVerified
-• UserLoggedIn
-• LoginFailed
-• SessionCreated
-• SessionRevoked
-• DeviceRegistered
-• DeviceRevoked
-• ContactAdded
-• ContactRemoved
-• UserBlocked
-• UserUnblocked
-• PasswordChanged
-• PasswordResetCompleted
-• PrivacySettingsChanged
-• RoleAssigned
-• RoleRevoked
-
-Use transactional outbox where events are associated with database transactions.
-
-────────────────────────────────────────
-
-BACKGROUND JOBS
+Authorization must be evaluated server-side.
 
-Implement background jobs where appropriate for:
+Create explicit permission rules for operations such as:
 
-• Verification cleanup
-• Password reset token cleanup
-• Session cleanup
-• Device cleanup
-• Security notification delivery
-• Audit retention processing
-• Account deletion processing
-
-Every job must define:
-
-• Retry
-• Backoff
-• Idempotency
-• Failure handling
-• Monitoring
-
-────────────────────────────────────────
-
-OBSERVABILITY
-
-Instrument:
-
-• Authentication attempts
-• Authentication failures
-• Registration
-• Token refresh
-• Session operations
-• Device operations
-• Contact discovery
-• Blocking
-• Permission checks
-• Administrative actions
-
-Measure:
-
-• Latency
-• Error rate
-• Authentication failure rate
-• Rate-limit events
-• Suspicious activity
-• Database performance
-
-Do not log passwords, tokens, encryption keys, or private message data.
-
-────────────────────────────────────────
-
-TESTING
-
-Generate:
-
-UNIT TESTS
-
-• Password hashing
-• Token services
-• Authentication services
-• Permission policies
-• Privacy policies
-• Device policies
-• Account policies
-
-INTEGRATION TESTS
+* view conversation;
+* update group metadata;
+* add members;
+* remove members;
+* promote member;
+* demote administrator;
+* leave group;
+* transfer ownership;
+* manage group settings.
 
-• Registration
-• Login
-• Refresh
-• Logout
-• Password reset
-• Session revocation
-• Device registration
-• Device revocation
-• Contact operations
-• Blocking
-• Role/permission operations
+Do not encode permission decisions only in controllers.
 
-API TESTS
+Keep business authorization reusable for:
 
-• Authentication endpoints
-• Account endpoints
-• Profile endpoints
-• Session endpoints
-• Device endpoints
-• Contact endpoints
-• Blocking endpoints
+* REST;
+* WebSocket;
+* background workers;
+* future message operations.
 
-SECURITY TESTS
+---
 
-• Brute-force protection
-• Token replay
-• Session revocation
-• Authorization bypass
-• Privilege escalation
-• User enumeration
-• Rate-limit bypass
+# 15. GROUP CREATION
 
-────────────────────────────────────────
+Implement real group creation.
 
-DOCUMENTATION
+Requirements:
 
-Document:
+* authenticated creator required;
+* valid group metadata;
+* valid initial members;
+* creator automatically becomes owner;
+* appropriate administrator state;
+* duplicate member elimination;
+* membership validation;
+* transactional creation.
 
-• Identity architecture
-• Authentication flow
-• Token lifecycle
-• Session lifecycle
-• Device lifecycle
-• Authorization model
-• Permission model
-• Privacy model
-• Contact discovery
-• Blocking behavior
-• Security events
-• Audit logging
-• API contracts
-• Database objects
-• Testing strategy
+Group creation must either fully succeed or leave no partially-created group state.
 
-────────────────────────────────────────
+---
 
-PROJECT INDEX
+# 16. GROUP MEMBER ADDITION
 
-Update the backend Project Index with:
+Implement authorized member addition.
 
-• Completed identity modules
-• Completed authentication modules
-• Completed account modules
-• Completed profile modules
-• Completed device modules
-• Completed session modules
-• Completed authorization modules
-• Completed contact modules
-• Completed privacy modules
-• Completed security modules
-• Database objects
-• Migrations
-• APIs
-• Events
-• Queues
-• Tests
-• Generated files
-• Remaining work
-• Dependencies
-• Current milestone
+Validate:
 
-────────────────────────────────────────
+* target user exists;
+* target is eligible;
+* target is not already an active member;
+* requester has permission;
+* group is active;
+* membership limits where applicable.
 
-IMPLEMENTATION MILESTONES
+Do not silently create duplicate memberships.
 
-Implement this volume incrementally.
+Use database constraints to reinforce uniqueness.
 
-MILESTONE 1
+---
 
-Identity, users, accounts, and database models.
+# 17. GROUP MEMBER REMOVAL
 
-MILESTONE 2
+Implement authorized removal.
 
-Authentication, password handling, verification, and sessions.
+Consider:
 
-MILESTONE 3
+* owner;
+* administrator;
+* ordinary member;
+* removing self;
+* removing another member;
+* removing an administrator;
+* removing the owner;
+* ownership transfer.
 
-Devices, device lifecycle, and device security.
+Do not permit privilege escalation through malformed requests.
 
-MILESTONE 4
+A user must not be able to remove a higher-privileged member unless the product's role rules explicitly allow it.
 
-Authorization, roles, permissions, and policies.
+---
 
-MILESTONE 5
+# 18. LEAVING GROUPS
 
-Profiles, privacy, contacts, discovery, and blocking.
+Implement self-service group leaving.
 
-MILESTONE 6
+When a member leaves:
 
-Security events, audit logging, recovery workflows, and cleanup jobs.
+* mark membership appropriately;
+* preserve historical membership where needed;
+* prevent future authorization as an active member;
+* preserve referential integrity;
+* generate the appropriate domain event.
 
-MILESTONE 7
+If the leaving user is the owner, enforce a deterministic ownership rule.
 
-API integration, observability, security testing, and integration testing.
+Do not leave a group with an invalid ownership state.
 
-Each milestone should contain approximately 20–40 files where practical.
+---
 
-Every milestone must compile before moving to the next.
+# 19. OWNERSHIP TRANSFER
 
-────────────────────────────────────────
+If group ownership transfer is supported, implement it transactionally.
 
-OUTPUT FORMAT
+The operation must:
 
-For every generated file provide:
+1. verify current owner;
+2. verify target is an eligible active member;
+3. update ownership;
+4. update roles;
+5. preserve membership;
+6. emit the appropriate event.
 
-1. Exact file path
-2. Complete file contents
+Do not allow a non-owner to transfer ownership.
 
-Never truncate code.
+---
 
-Never summarize source code instead of generating it.
+# 20. CONVERSATION METADATA
 
-Never generate pseudo-code.
+Implement editable conversation metadata appropriate to the product.
 
-Never generate placeholder files.
+Potential fields:
 
-Never generate TODO implementations.
+* name/title;
+* description;
+* avatar/media reference;
+* group settings;
+* privacy-related settings.
 
-When modifying an existing file:
+Only authorized users may modify group-level metadata.
 
-1. Provide the exact file path.
-2. Explain why it must change.
-3. Provide the complete updated file.
+Direct conversation metadata must not allow one participant to impersonate or modify the other participant's identity.
 
-Never regenerate unchanged files.
+---
 
-────────────────────────────────────────
+# 21. CONVERSATION LISTING
 
-SCOPE RESTRICTION
+Implement authenticated conversation listing.
 
-This volume covers only:
+The API must support efficient retrieval suitable for a messaging client.
 
-• Identity
-• Users
-• Accounts
-• Profiles
-• Authentication
-• Authorization
-• Sessions
-• Devices
-• Contacts
-• Privacy
-• Blocking
-• Security events
-• Audit foundations
-• Account recovery
+Return appropriate information such as:
 
-Do not implement complete:
+* conversation ID;
+* conversation type;
+* participant/group summary;
+* membership state;
+* metadata;
+* timestamps;
+* muted/pinned/archive state if implemented;
+* relevant synchronization metadata.
 
-• Messaging
-• Groups
-• Communities
-• Media processing
-• Stories
-• Calls
-• Search
-• Business messaging
-• Full moderation
-• Full analytics
-• Full E2EE implementation
+Do not include message history in the conversation-list endpoint.
 
-Those belong to later backend implementation volumes.
+Message retrieval belongs to the messaging domain.
 
-────────────────────────────────────────
+---
 
-QUALITY BAR
+# 22. PAGINATION
 
-Treat identity and access management as critical production infrastructure.
+Conversation and contact lists must use a stable pagination strategy.
 
-Assume:
+Prefer cursor-based pagination for high-volume collections.
 
-• Hundreds of millions of accounts
-• Millions of concurrent sessions
-• Multiple devices per account
-• High authentication traffic
-• Global deployment
-• Account takeover attempts
-• Automated abuse
-• Strict privacy requirements
+The cursor must be:
 
-Prioritize:
+* opaque;
+* validated;
+* stable;
+* tied to the ordering strategy.
 
-• Security
-• Correctness
-• Reliability
-• Scalability
-• Auditability
-• Maintainability
-• Clear domain ownership
-• Strong test covera
+Avoid offset pagination for large, continuously changing conversation lists when it would cause unacceptable performance or duplicate/skipped results.
 
-You are operating in Senior Engineering Team Mode.
+The pagination contract must be consistent with the existing backend.
 
-Build the production-ready identity, authentication, account, profile, device, authorization, contact, privacy, and session backend domains for an enterprise-scale global real-time messaging and communication platform comparable in architectural scope to WhatsApp.
+---
 
-The platform is an original implementation.
+# 23. CONVERSATION ORDERING
 
-Do not copy proprietary source code, internal architecture, branding, or confidential implementation details from WhatsApp or any other proprietary platform.
+Conversation listing must use deterministic ordering.
 
-This prompt is completely independent and may be executed in a separate conversation.
+Use an appropriate server-authoritative field, such as:
 
-The backend foundation and shared infrastructure are assumed to follow the project's established architecture.
+* last activity timestamp;
+* conversation update sequence;
+* another canonical ordering value.
 
-Do not redesign the architecture.
+Do not depend solely on client clocks.
 
-Do not generate frontend code.
+Prepare the model for later message activity updates.
 
-Do not generate mobile code.
+Do not implement fake message activity merely to populate a field.
 
-Do not generate Kubernetes manifests.
+---
 
-Do not generate Terraform.
+# 24. CONVERSATION SETTINGS
 
-Do not generate infrastructure implementation code.
+Where supported, implement user-specific conversation settings separately from shared conversation metadata.
 
-Do not generate CI/CD workflows.
+Examples:
 
-This volume focuses exclusively on identity and access-related backend domains.
+* muted;
+* archived;
+* pinned;
+* notification preferences.
 
-────────────────────────────────────────
+These are generally **per-user state**, not global conversation state.
 
-MISSION
+Do not store per-user settings directly on the shared conversation record.
 
-Implement the production-ready backend required for:
+---
 
-• Identity
-• Accounts
-• Users
-• Profiles
-• Authentication
-• Authorization
-• Sessions
-• Devices
-• Device management
-• Contacts
-• Contact discovery
-• Blocking
-• Privacy settings
-• Security settings
-• Account recovery
-• Login security
-• Audit events related to identity
+# 25. CONVERSATION MEMBER STATE
 
-The implementation must be:
+Distinguish:
 
-• Secure
-• Horizontally scalable
-• Observable
-• Testable
-• Maintainable
-• Multi-device capable
-• Multi-region ready
+* active member;
+* invited/pending member if invitations are supported;
+* left member;
+* removed member;
+* banned member where moderation requires it.
 
-────────────────────────────────────────
+Do not overload one boolean to represent all membership states.
 
-TECHNOLOGY STACK
+Design the state model so future synchronization and moderation features can distinguish transitions.
 
-Backend:
+---
 
-• Node.js
-• NestJS
-• TypeScript
+# 26. DATABASE MODELING
 
-Database:
+Implement appropriate PostgreSQL/Prisma models.
 
-• PostgreSQL
-• Prisma ORM
+At minimum the domain should support concepts equivalent to:
 
-Cache:
-
-• Redis
-
-Events:
-
-• Kafka or Redpanda
-
-Background Jobs:
-
-• BullMQ
-
-Authentication:
-
-• JWT or secure session architecture according to the established design
-
-Password Security:
-
-• Industry-standard password hashing library
-
-Testing:
-
-• Jest
-• Supertest
-• Integration testing tools where appropriate
-
-────────────────────────────────────────
-
-IMPLEMENTATION RULES
-
-Never generate pseudo-code.
-
-Never generate placeholders.
-
-Never generate TODO comments.
-
-Never omit implementations.
-
-Never say:
-
-- "implement similarly"
-- "left as an exercise"
-- "for brevity"
-- "remaining code omitted"
-
-Generate complete production-ready files.
-
-Every generated file must compile.
-
-Never regenerate unchanged files.
-
-Only modify existing files when required.
-
-Use strict TypeScript.
-
-Use dependency injection.
-
-Use centralized validation.
-
-Use centralized error handling.
-
-Use structured logging.
-
-Use the existing configuration and observability foundations.
-
-────────────────────────────────────────
-
-DOMAIN OWNERSHIP
-
-Implement clear boundaries between:
-
-Identity
-
-Authentication
-
-Accounts
-
-Users
-
-Profiles
-
-Sessions
-
-Devices
-
-Authorization
-
-Contacts
-
-Privacy
-
-Security
-
-Do not place all identity functionality into one uncontrolled service.
-
-Define clear application-service and repository boundaries.
-
-────────────────────────────────────────
-
-IDENTITY DOMAIN
-
-Implement:
-
-• User identity creation
-• User identity retrieval
-• User identity status
-• Identity lifecycle
-• Account association
-• Identity lookup
-• Identity deactivation
-• Identity deletion workflows where appropriate
-
-Use stable public identifiers.
-
-Do not expose internal database identifiers unnecessarily.
-
-Define identity states where required, such as:
-
-• Active
-• Suspended
-• Disabled
-• Pending verification
-• Deactivated
-• Deleted
-
-────────────────────────────────────────
-
-ACCOUNT DOMAIN
-
-Implement:
-
-• Account creation
-• Account status
-• Account lifecycle
-• Account settings
-• Account security settings
-• Account recovery state
-• Account deletion initiation
-• Account deletion processing
-• Account suspension
-• Account reactivation where allowed
-
-Separate:
-
-• Account-level data
-• User-level identity
-• Profile-level data
-• Device-level data
-• Session-level data
-
-Account operations must be audited where appropriate.
-
-────────────────────────────────────────
-
-USER DOMAIN
-
-Implement:
-
-• User creation
-• User retrieval
-• User updates
-• Public user representation
-• Private user representation
-• User status
-• User metadata required by the domain
-
-Prevent accidental exposure of:
-
-• Private settings
-• Security information
-• Device details
-• Session information
-• Sensitive identifiers
-
-Define explicit DTOs for public and private user responses.
-
-────────────────────────────────────────
-
-PROFILE DOMAIN
-
-Implement:
-
-• Profile creation
-• Profile updates
-• Display name
-• Username where applicable
-• Avatar metadata
-• About/status information
-• Profile visibility
-• Profile settings
-
-Do not store large binary profile media directly in PostgreSQL.
-
-Use object-storage references where appropriate.
-
-Define profile privacy boundaries.
-
-────────────────────────────────────────
-
-PRIVACY DOMAIN
-
-Implement privacy settings supporting:
-
-• Last seen visibility
-• Online status visibility
-• Profile photo visibility
-• About/status visibility
-• Read receipts
-• Contact discovery preferences
-• Group invitation controls
-• Blocking-related privacy behavior
-
-Define defaults.
-
-Define validation rules.
-
-Define how privacy rules are enforced by backend services.
-
-Do not rely on frontend filtering.
-
-────────────────────────────────────────
-
-AUTHENTICATION
-
-Implement production authentication foundations.
-
-Support:
-
-• Registration
-• Login
-• Logout
-• Refresh
-• Credential verification
-• Account verification
-• Session creation
-• Session revocation
-
-Prepare architecture for:
-
-• MFA
-• OAuth
-• Passkeys
-• Phone verification
-• Suspicious login detection
-
-Do not implement unsupported authentication methods merely as placeholders.
-
-For features that require external providers, establish real provider integration boundaries where appropriate.
-
-────────────────────────────────────────
-
-PASSWORD AUTHENTICATION
-
-Where password authentication is enabled, implement:
-
-• Password hashing
-• Password verification
-• Password change
-• Password reset
-• Password reset token generation
-• Password reset token expiration
-• Password reset token invalidation
-• Password history or reuse protection where appropriate
-• Login attempt protection
-
-Never store plaintext passwords.
-
-Never log passwords.
-
-Do not return password hashes through APIs.
-
-────────────────────────────────────────
-
-ACCOUNT VERIFICATION
-
-Implement appropriate verification architecture for:
-
-• Email verification
-• Phone verification where the project uses phone-based identity
-
-Define:
-
-• Verification tokens
-• Verification expiration
-• Single-use semantics
-• Resend limits
-• Rate limiting
-• Verification state
-• Replay prevention
-
-Verification tokens must be stored securely.
-
-────────────────────────────────────────
-
-SESSION MANAGEMENT
-
-Implement production session management.
-
-Support:
-
-• Session creation
-• Session lookup
-• Session refresh
-• Session expiration
-• Session revocation
-• Logout
-• Logout-all-devices
-• Session listing
-• Session metadata
-
-Track appropriate session metadata such as:
-
-• Device
-• Platform
-• Application version
-• Last activity
-• Created time
-• Expiration
-• Revocation state
-
-Do not store sensitive secrets unnecessarily.
-
-────────────────────────────────────────
-
-TOKEN ARCHITECTURE
-
-Implement the established authentication token strategy.
-
-Support as appropriate:
-
-• Access tokens
-• Refresh tokens
-• Token rotation
-• Token expiration
-• Token revocation
-• Token-family invalidation
-• Replay detection
-
-Refresh tokens must be protected against theft and replay.
-
-Define secure storage expectations for each client type.
-
-────────────────────────────────────────
-
-DEVICE DOMAIN
-
-Implement device management.
-
-Support:
-
-• Device registration
-• Device identification
-• Device metadata
-• Device capabilities
-• Device naming
-• Device status
-• Device revocation
-• Remote logout
-• Device listing
-• Last-seen information
-• Push token association
-
-Track:
-
-• Device ID
-• Platform
-• OS version
-• Application version
-• Device capabilities
-• Registration time
-• Last activity
-• Revocation status
-
-Do not collect unnecessary device information.
-
-────────────────────────────────────────
-
-DEVICE LIMITS
-
-Implement configurable device limits.
-
-Support:
-
-• Maximum registered devices
-• Maximum active sessions
-• Device replacement
-• Device revocation
-• Administrative device revocation where authorized
-
-Define behavior when the maximum device count is reached.
-
-Device limits must be enforced server-side.
-
-────────────────────────────────────────
-
-DEVICE SECURITY
-
-Implement architecture for:
-
-• Device verification
-• Device trust state
-• Device revocation
-• Suspicious-device detection
-• Security notifications
-• Remote logout
-
-Prepare integration boundaries for future E2EE device-key management.
-
-Do not implement cryptographic protocols in this volume.
-
-────────────────────────────────────────
-
-AUTHORIZATION
-
-Implement production RBAC and permission infrastructure.
-
-Support roles such as:
-
-• User
-• Group Member
-• Group Administrator
-• Community Administrator
-• Moderator
-• Support Agent
-• Administrator
-• Super Administrator
-• System Service
-
-Implement:
-
-• Permissions
-• Roles
-• Role assignment
-• Permission guards
-• Policy checks
-• Resource ownership checks
-• Administrative permission checks
-
-Do not rely solely on role names.
-
-Use explicit permissions for sensitive operations.
-
-────────────────────────────────────────
-
-PERMISSION MODEL
-
-Define permission categories for:
-
-• Account
-• Profile
-• Device
-• Conversation
-• Group
-• Community
-• Business
-• Moderation
-• Administration
-• Audit
-• System configuration
-
-Permissions must be enforceable by backend services.
-
-Do not encode permissions only in frontend navigation.
-
-────────────────────────────────────────
-
-POLICY ENGINE
-
-Implement a reusable authorization-policy foundation.
-
-Policies should support checks based on:
-
-• Actor
-• Resource
-• Action
-• Ownership
-• Role
-• Permission
-• Account status
-• Resource status
-• Privacy settings
-
-Keep policy logic separate from controllers.
-
-────────────────────────────────────────
-
-CONTACT DOMAIN
-
-Implement:
-
-• Contact creation
-• Contact removal
-• Contact listing
-• Contact state
-• Contact synchronization boundaries
-• Contact discovery boundaries
-
-Where the platform uses phone-based contact discovery, define secure matching behavior.
-
-Do not expose full contact information unnecessarily.
-
-────────────────────────────────────────
-
-CONTACT DISCOVERY
-
-Implement the backend architecture for privacy-preserving contact discovery.
-
-Support:
-
-• User discovery
-• Contact matching
-• Search by approved identifiers
-• Rate limiting
-• Enumeration protection
-
-Do not expose:
-
-• Private contact information
-• Unrelated account metadata
-• Internal identifiers
-
-Add appropriate abuse controls.
-
-────────────────────────────────────────
-
-BLOCKING
-
-Implement:
-
-• Block user
-• Unblock user
-• List blocked users
-• Block state lookup
-
-Blocking must affect:
-
-• Contact discovery
-• Messaging authorization
-• Presence visibility
-• Profile visibility where appropriate
-• Notifications
-• Group interactions where appropriate
-
-Enforce blocking server-side.
-
-────────────────────────────────────────
-
-SECURITY EVENTS
-
-Generate security-domain events such as:
-
-• UserLoggedIn
-• LoginFailed
-• SuspiciousLoginDetected
-• SessionCreated
-• SessionRevoked
-• DeviceRegistered
-• DeviceRevoked
-• PasswordChanged
-• PasswordResetRequested
-• PasswordResetCompleted
-• AccountVerified
-• AccountSuspended
-• UserBlocked
-
-Events must contain only required information.
-
-Never publish sensitive credentials or tokens.
-
-────────────────────────────────────────
-
-AUDIT LOGGING
-
-Implement audit logging for sensitive identity operations.
-
-Audit:
-
-• Login
-• Logout
-• Password changes
-• Password reset
-• Device registration
-• Device revocation
-• Session revocation
-• Role changes
-• Permission changes
-• Account suspension
-• Administrative account actions
-• Security setting changes
-
-Audit records should contain:
-
-• Actor
-• Action
-• Resource
-• Timestamp
-• Request ID
-• Correlation ID
-• Result
-• Relevant metadata
-
-Do not store secrets in audit logs.
-
-────────────────────────────────────────
-
-RATE LIMITING
-
-Implement rate limits for sensitive operations.
-
-At minimum cover:
-
-• Registration
-• Login
-• Password reset
-• Verification
-• Contact discovery
-• Device registration
-• Session refresh
-• Account recovery
-
-Support rate limiting by appropriate dimensions such as:
-
-• IP
-• Account
-• Device
-• Identifier
-• Operation
-
-Prevent distributed abuse without creating unnecessary false positives.
-
-────────────────────────────────────────
-
-ACCOUNT RECOVERY
-
-Implement secure recovery workflows.
-
-Support:
-
-• Password reset
-• Verification recovery where applicable
-• Session invalidation after credential recovery
-• Device/session review
-• Security notifications
-
-Recovery must invalidate compromised authentication state where appropriate.
-
-────────────────────────────────────────
-
-DATABASE
-
-Implement Prisma models and migrations for the domains covered by this volume.
-
-Include appropriate entities for:
-
-• User
-• Account
-• Profile
-• ProfileSettings
-• PrivacySettings
-• Session
-• Device
-• DeviceCapability
-• Contact
-• ContactRequest where required
-• BlockedUser
-• VerificationToken
-• PasswordResetToken
-• Role
-• Permission
-• RolePermission
-• UserRole or equivalent
-• AuditLog
-• SecurityEvent where appropriate
+* Contact;
+* Conversation;
+* ConversationMember;
+* GroupRole;
+* ConversationType;
+* MembershipStatus;
+* user-specific conversation settings if required.
 
 Use:
 
-• Primary keys
-• Foreign keys
-• Unique constraints
-• Check constraints
-• Appropriate indexes
-• Timestamps
-• Soft deletion where justified
+* foreign keys;
+* uniqueness constraints;
+* indexes;
+* appropriate cascading behavior;
+* timestamps.
 
-Do not create tables for future domains unless required by the current implementation.
+---
 
-────────────────────────────────────────
+# 27. CRITICAL DATABASE CONSTRAINTS
 
-API
+Enforce database-level uniqueness for:
 
-Implement production-ready APIs for:
+## Contacts
 
-Authentication
+Appropriate unique owner/target relationship.
 
-• Registration
-• Login
-• Logout
-• Refresh
-• Verification
-• Password reset
-• Password change
+## Direct conversations
 
-Accounts
+Canonical participant-pair uniqueness.
 
-• Account retrieval
-• Account settings
-• Account deletion initiation
-• Account security
+## Group memberships
 
-Profiles
+One active membership per user/conversation according to the selected state model.
 
-• Profile retrieval
-• Profile update
-• Privacy settings
+Do not rely solely on application logic.
 
-Sessions
+---
 
-• Session list
-• Session revoke
-• Revoke all sessions
+# 28. INDEXING
 
-Devices
-
-• Device registration
-• Device listing
-• Device update
-• Device revoke
-• Remote logout
-
-Contacts
-
-• Contact list
-• Contact create
-• Contact remove
-• Contact discovery
-
-Blocking
-
-• Block
-• Unblock
-• List blocked users
-
-Administration
-
-• Role management where authorized
-• Permission management where authorized
-• Audit access where authorized
-
-Every endpoint must include:
-
-• DTO validation
-• Authentication
-• Authorization
-• Rate limiting
-• OpenAPI documentation
-• Consistent errors
-• Structured logging
-
-────────────────────────────────────────
-
-SECURITY REQUIREMENTS
-
-Implement:
-
-• Password hashing
-• Secure token handling
-• Refresh-token protection
-• Rate limiting
-• Brute-force protection
-• Secure headers
-• Input validation
-• Authorization guards
-• Permission checks
-• Audit logging
-• Secret protection
-• Session revocation
-
-Follow OWASP security principles.
-
-Do not expose internal security implementation details through public APIs.
-
-────────────────────────────────────────
-
-EVENTS
-
-Publish appropriate events using the established event infrastructure.
+Design indexes for actual access patterns.
 
 At minimum consider:
 
-• AccountCreated
-• AccountVerified
-• UserLoggedIn
-• LoginFailed
-• SessionCreated
-• SessionRevoked
-• DeviceRegistered
-• DeviceRevoked
-• ContactAdded
-• ContactRemoved
-• UserBlocked
-• UserUnblocked
-• PasswordChanged
-• PasswordResetCompleted
-• PrivacySettingsChanged
-• RoleAssigned
-• RoleRevoked
+* conversations by member;
+* active memberships by user;
+* members by conversation;
+* contacts by owner;
+* contact lookup by normalized identifier where applicable;
+* direct conversation uniqueness;
+* conversation activity ordering.
 
-Use transactional outbox where events are associated with database transactions.
+Avoid redundant indexes.
 
-────────────────────────────────────────
+Verify query plans for high-frequency operations where practical.
 
-BACKGROUND JOBS
+---
 
-Implement background jobs where appropriate for:
+# 29. TRANSACTIONS
 
-• Verification cleanup
-• Password reset token cleanup
-• Session cleanup
-• Device cleanup
-• Security notification delivery
-• Audit retention processing
-• Account deletion processing
+Use database transactions for operations requiring atomicity.
 
-Every job must define:
+Examples:
 
-• Retry
-• Backoff
-• Idempotency
-• Failure handling
-• Monitoring
+* direct conversation creation;
+* group creation;
+* group membership changes;
+* role changes;
+* ownership transfer;
+* member removal;
+* account-related cleanup.
 
-────────────────────────────────────────
+A group membership change must not leave role/ownership state inconsistent.
 
-OBSERVABILITY
+---
 
-Instrument:
+# 30. IDEMPOTENCY
 
-• Authentication attempts
-• Authentication failures
-• Registration
-• Token refresh
-• Session operations
-• Device operations
-• Contact discovery
-• Blocking
-• Permission checks
-• Administrative actions
+Conversation operations must safely handle repeated requests where appropriate.
 
-Measure:
+Examples:
 
-• Latency
-• Error rate
-• Authentication failure rate
-• Rate-limit events
-• Suspicious activity
-• Database performance
+* create/get direct conversation;
+* add contact;
+* remove contact;
+* add group member;
+* leave group.
 
-Do not log passwords, tokens, encryption keys, or private message data.
+Repeated requests must produce deterministic outcomes.
 
-────────────────────────────────────────
+Do not treat a harmless retry as an internal server error.
 
-TESTING
+---
 
-Generate:
+# 31. PRIVACY AND BLOCKING INTEGRATION
 
-UNIT TESTS
+Conversation creation and access must respect privacy and blocking rules.
 
-• Password hashing
-• Token services
-• Authentication services
-• Permission policies
-• Privacy policies
-• Device policies
-• Account policies
+If the repository already contains blocking/privacy functionality:
 
-INTEGRATION TESTS
+* reuse it;
+* do not duplicate it.
 
-• Registration
-• Login
-• Refresh
-• Logout
-• Password reset
-• Session revocation
-• Device registration
-• Device revocation
-• Contact operations
-• Blocking
-• Role/permission operations
+If blocking is not yet implemented, create the minimal domain interface required to enforce conversation-access decisions without implementing a second blocking subsystem.
 
-API TESTS
+Conversation authorization must be able to answer questions such as:
 
-• Authentication endpoints
-• Account endpoints
-• Profile endpoints
-• Session endpoints
-• Device endpoints
-• Contact endpoints
-• Blocking endpoints
+* Can user A start a direct conversation with user B?
+* Can user A access this conversation?
+* Can user A add user B to this group?
 
-SECURITY TESTS
+Do not bypass privacy controls merely because the endpoint is authenticated.
 
-• Brute-force protection
-• Token replay
-• Session revocation
-• Authorization bypass
-• Privilege escalation
-• User enumeration
-• Rate-limit bypass
+---
 
-────────────────────────────────────────
+# 32. ACCOUNT STATE INTEGRATION
 
-DOCUMENTATION
+Conversation operations must respect user account state.
+
+For example:
+
+* suspended users may not be permitted to create conversations;
+* deleted accounts must not be treated as normal active users;
+* inactive users may require special handling.
+
+Use the identity domain's authoritative account state.
+
+Do not duplicate account status inside conversations unless there is a clear domain reason.
+
+---
+
+# 33. EVENT ARCHITECTURE
+
+Implement durable conversation domain events where asynchronous consumers will need them.
+
+Potential events include:
+
+* conversation.created;
+* conversation.updated;
+* conversation.member.added;
+* conversation.member.removed;
+* conversation.member.left;
+* conversation.role.changed;
+* conversation.owner.transferred;
+* contact.created;
+* contact.updated;
+* contact.removed.
+
+Use the repository's canonical event envelope.
+
+Events must contain appropriate:
+
+* event ID;
+* event type;
+* event version;
+* aggregate ID;
+* producer;
+* timestamp;
+* correlation ID;
+* causation ID where applicable;
+* trace context;
+* versioned payload.
+
+Do not publish events containing unnecessary private data.
+
+---
+
+# 34. TRANSACTIONAL EVENT DELIVERY
+
+When a database mutation must reliably produce a domain event:
+
+* use the existing transactional outbox infrastructure if present;
+* otherwise implement the smallest correct outbox mechanism required.
+
+The database state and outbox record must be committed atomically.
+
+Do not publish directly to Kafka and then assume the database transaction succeeded.
+
+Do not implement an outbox without a real delivery mechanism.
+
+---
+
+# 35. EVENT IDEMPOTENCY
+
+Design downstream consumers to tolerate duplicate events.
+
+Conversation events may be delivered more than once.
+
+Do not make later messaging/realtime services depend on exactly-once delivery.
+
+Use:
+
+* event IDs;
+* aggregate versions where appropriate;
+* idempotent handlers.
+
+---
+
+# 36. REDIS
+
+Use Redis only for appropriate ephemeral/high-performance state.
+
+Potential uses:
+
+* conversation access caching;
+* membership caching;
+* rate limiting;
+* short-lived discovery state;
+* distributed coordination.
+
+Do not make Redis the authoritative source for conversation membership.
+
+PostgreSQL remains authoritative.
+
+Every cache must define:
+
+* key;
+* purpose;
+* TTL;
+* invalidation;
+* stale behavior;
+* failure behavior.
+
+A Redis outage must not corrupt conversation state.
+
+---
+
+# 37. CACHE INVALIDATION
+
+If conversation or membership data is cached:
+
+Invalidate/update the cache whenever authoritative data changes.
+
+Consider:
+
+* membership changes;
+* role changes;
+* ownership transfer;
+* conversation metadata updates;
+* account deactivation.
+
+Never allow stale authorization cache state to grant access after revocation.
+
+Security-sensitive authorization should fail closed when cache correctness cannot be guaranteed.
+
+---
+
+# 38. API DESIGN
+
+Implement versioned REST endpoints following the existing API conventions.
+
+Appropriate endpoints may include:
+
+## Contacts
+
+* list contacts;
+* search contacts;
+* discover users;
+* create contact;
+* update contact;
+* remove contact.
+
+## Conversations
+
+* list conversations;
+* create/retrieve direct conversation;
+* create group;
+* retrieve conversation;
+* update conversation metadata;
+* leave conversation.
+
+## Membership
+
+* list members;
+* add member;
+* remove member;
+* update member role;
+* transfer ownership.
+
+Only implement endpoints justified by the actual domain.
+
+---
+
+# 39. AUTHORIZATION
+
+Every endpoint must explicitly enforce:
+
+* authenticated user;
+* conversation membership;
+* role/permission;
+* ownership;
+* account state;
+* privacy/blocking restrictions.
+
+Never use a generic `authenticated = true` check as a substitute for resource authorization.
+
+Test authorization independently.
+
+---
+
+# 40. IDOR PROTECTION
+
+Explicitly test for insecure direct object references.
+
+Examples:
+
+User A must not be able to:
+
+* retrieve User B's private contact records;
+* modify User B's contact relationship;
+* retrieve a private conversation where A is not a member;
+* modify another group's metadata;
+* add/remove members from another user's group;
+* transfer ownership of a group they do not own.
+
+Changing an ID in a request must never bypass authorization.
+
+---
+
+# 41. INPUT VALIDATION
+
+Validate:
+
+* user IDs;
+* conversation IDs;
+* contact IDs;
+* member IDs;
+* role values;
+* conversation types;
+* membership states;
+* names;
+* descriptions;
+* pagination cursors;
+* metadata sizes.
+
+Apply maximum lengths and payload limits.
+
+Reject malformed requests before database operations where possible.
+
+---
+
+# 42. SECURITY AGAINST MASS ASSIGNMENT
+
+Do not allow clients to submit arbitrary model fields.
+
+Explicitly map writable fields.
+
+Never accept objects such as:
+
+```text
+{
+  "role": "OWNER",
+  "isAdmin": true,
+  "ownerId": "..."
+}
+```
+
+unless the operation specifically authorizes and validates those fields.
+
+Client DTOs must not map directly into unrestricted Prisma updates.
+
+---
+
+# 43. GROUP SIZE AND RESOURCE LIMITS
+
+Define configurable group limits appropriate to the platform.
+
+The exact limit should be configurable rather than hardcoded throughout business logic.
+
+Enforce limits transactionally.
+
+Protect against requests attempting to add extremely large numbers of members in one operation.
+
+Apply appropriate request-size and operation-rate limits.
+
+---
+
+# 44. ABUSE PREVENTION
+
+Protect against:
+
+* mass contact creation;
+* user enumeration;
+* mass group creation;
+* mass member addition;
+* group invitation abuse;
+* repeated direct-conversation creation;
+* automated discovery;
+* authorization probing.
+
+Use:
+
+* rate limiting;
+* request validation;
+* server-side authorization;
+* audit/security events;
+* configurable thresholds.
+
+Do not block legitimate users through excessively aggressive hardcoded limits.
+
+---
+
+# 45. PRIVACY-AWARE RESPONSES
+
+API responses must contain only information the requester is authorized to see.
+
+Do not return:
+
+* private phone numbers;
+* email addresses;
+* internal identifiers;
+* security state;
+* device credentials;
+* private moderation data;
+
+unless the specific operation requires it and authorization permits it.
+
+Use dedicated response DTOs.
+
+Never return Prisma entities directly.
+
+---
+
+# 46. ERROR CONTRACT
+
+Use the backend's canonical error system.
+
+Examples:
+
+* `CONTACT_NOT_FOUND`
+* `USER_NOT_DISCOVERABLE`
+* `CONVERSATION_NOT_FOUND`
+* `NOT_CONVERSATION_MEMBER`
+* `INSUFFICIENT_GROUP_PERMISSION`
+* `GROUP_MEMBER_ALREADY_EXISTS`
+* `GROUP_MEMBER_NOT_FOUND`
+* `GROUP_LIMIT_REACHED`
+* `DIRECT_CONVERSATION_CONFLICT`
+* `CONVERSATION_ACCESS_DENIED`
+* `USER_BLOCKED`
+
+Use stable machine-readable codes.
+
+Do not leak whether a private user exists when privacy rules prohibit disclosure.
+
+---
+
+# 47. OBSERVABILITY
+
+Instrument important operations.
+
+At minimum measure/log:
+
+* contact creation/removal;
+* discovery requests;
+* direct conversation creation;
+* group creation;
+* membership changes;
+* role changes;
+* authorization failures;
+* rate-limit violations;
+* database conflicts;
+* event publication failures.
+
+Use correlation and trace IDs.
+
+Do not log private conversation content.
+
+Do not log unnecessary personal data.
+
+---
+
+# 48. METRICS
+
+Where appropriate expose metrics for:
+
+* conversation creation rate;
+* group creation rate;
+* membership changes;
+* contact operations;
+* authorization failures;
+* discovery requests;
+* rate-limit rejections;
+* database conflict rates;
+* event publication latency/failure.
+
+Metrics should be low-cardinality.
+
+Do not use user IDs or conversation IDs as unbounded metric labels.
+
+---
+
+# 49. TESTING REQUIREMENTS
+
+Implement meaningful tests.
+
+## Unit tests
+
+Cover:
+
+* direct conversation authorization;
+* group permissions;
+* ownership;
+* role transitions;
+* membership state transitions;
+* contact rules;
+* privacy/blocking decisions;
+* validation;
+* idempotency behavior.
+
+## Integration tests
+
+Cover:
+
+* Prisma persistence;
+* uniqueness constraints;
+* concurrent direct conversation creation;
+* group creation;
+* membership transactions;
+* ownership transfer;
+* Redis cache behavior if implemented;
+* event/outbox behavior.
+
+## API/E2E tests
+
+Cover:
+
+* unauthorized access;
+* authorized access;
+* IDOR attempts;
+* direct conversation creation;
+* duplicate direct conversation requests;
+* group creation;
+* member addition/removal;
+* role changes;
+* owner transfer;
+* leaving a group;
+* contact management;
+* pagination;
+* invalid input;
+* rate limiting.
+
+---
+
+# 50. CONCURRENCY TESTING
+
+Explicitly test race conditions around:
+
+* simultaneous direct conversation creation;
+* simultaneous member addition;
+* simultaneous member removal;
+* simultaneous role changes;
+* simultaneous ownership transfer;
+* concurrent leave/remove operations.
+
+Database constraints must remain the final protection against inconsistent state.
+
+---
+
+# 51. FAILURE HANDLING
+
+Handle:
+
+* PostgreSQL unavailable;
+* Redis unavailable;
+* event broker unavailable;
+* duplicate constraints;
+* transaction conflicts;
+* stale membership;
+* revoked account;
+* deleted account;
+* invalid conversation IDs;
+* authorization failures;
+* event publication failures.
+
+Never return a successful mutation if the authoritative transaction failed.
+
+If asynchronous event delivery fails after the database transaction, rely on the outbox/retry mechanism rather than falsely reporting the domain mutation as failed.
+
+---
+
+# 52. PERFORMANCE
+
+Conversation operations must be designed for scale.
+
+Avoid:
+
+* N+1 member queries;
+* loading entire groups unnecessarily;
+* unbounded contact searches;
+* offset pagination over massive tables;
+* repeated authorization queries that can be efficiently batched;
+* unnecessary Redis round trips.
+
+Use:
+
+* appropriate indexes;
+* selective projections;
+* cursor pagination;
+* batching;
+* transactions;
+* caching where justified.
+
+---
+
+# 53. DATABASE MIGRATIONS
+
+Create proper Prisma migrations for all schema changes.
+
+Validate:
+
+* clean installation;
+* existing database migration;
+* unique constraints;
+* foreign keys;
+* indexes;
+* nullable transitions;
+* deletion behavior.
+
+Do not use destructive schema changes without a safe migration plan.
+
+---
+
+# 54. API DOCUMENTATION
+
+Update OpenAPI documentation for all implemented functionality.
 
 Document:
 
-• Identity architecture
-• Authentication flow
-• Token lifecycle
-• Session lifecycle
-• Device lifecycle
-• Authorization model
-• Permission model
-• Privacy model
-• Contact discovery
-• Blocking behavior
-• Security events
-• Audit logging
-• API contracts
-• Database objects
-• Testing strategy
+* request DTOs;
+* response DTOs;
+* authorization requirements;
+* error codes;
+* pagination;
+* role/permission behavior;
+* validation constraints.
 
-────────────────────────────────────────
+Documentation must match the actual API.
 
-PROJECT INDEX
+---
 
-Update the backend Project Index with:
+# 55. FUTURE MESSAGE COMPATIBILITY
 
-• Completed identity modules
-• Completed authentication modules
-• Completed account modules
-• Completed profile modules
-• Completed device modules
-• Completed session modules
-• Completed authorization modules
-• Completed contact modules
-• Completed privacy modules
-• Completed security modules
-• Database objects
-• Migrations
-• APIs
-• Events
-• Queues
-• Tests
-• Generated files
-• Remaining work
-• Dependencies
-• Current milestone
+The conversation domain must provide stable contracts for the future messaging system.
 
-────────────────────────────────────────
+Future message operations must be able to ask:
 
-IMPLEMENTATION MILESTONES
+```text
+Is user U an active member of conversation C?
+```
 
-Implement this volume incrementally.
+and:
 
-MILESTONE 1
+```text
+Is device D associated with authenticated user U?
+```
 
-Identity, users, accounts, and database models.
+and:
 
-MILESTONE 2
+```text
+Is user U authorized to perform operation X in conversation C?
+```
 
-Authentication, password handling, verification, and sessions.
+These checks must have clear service/domain interfaces.
 
-MILESTONE 3
+Do not force the future messaging module to duplicate membership logic.
 
-Devices, device lifecycle, and device security.
+---
 
-MILESTONE 4
+# 56. REAL-TIME COMPATIBILITY
 
-Authorization, roles, permissions, and policies.
+The future WebSocket layer will need to notify clients when:
 
-MILESTONE 5
+* conversations are created;
+* group metadata changes;
+* members join;
+* members leave;
+* roles change.
 
-Profiles, privacy, contacts, discovery, and blocking.
+Create appropriate domain events/contracts without implementing the entire real-time notification subsystem in this volume.
 
-MILESTONE 6
+The event model must support later delivery to:
 
-Security events, audit logging, recovery workflows, and cleanup jobs.
+* connected devices;
+* offline devices through push notifications;
+* multi-device synchronization.
 
-MILESTONE 7
+---
 
-API integration, observability, security testing, and integration testing.
+# 57. MULTI-DEVICE COMPATIBILITY
 
-Each milestone should contain approximately 20–40 files where practical.
+Conversation state is user/account-level domain state.
 
-Every milestone must compile before moving to the next.
+A user may have multiple authenticated devices.
 
-────────────────────────────────────────
+Do not incorrectly model a conversation as belonging to a single device.
 
-OUTPUT FORMAT
+Later synchronization services must be able to distribute conversation changes to all eligible devices.
 
-For every generated file provide:
+Device-specific delivery belongs to the real-time/synchronization layer, not the core conversation authorization model.
 
-1. Exact file path
-2. Complete file contents
+---
 
-Never truncate code.
+# 58. ACCOUNT DELETION COMPATIBILITY
 
-Never summarize source code instead of generating it.
+Design conversation relationships so account deletion can later be handled safely.
 
-Never generate pseudo-code.
+Do not use destructive cascades that would unexpectedly delete entire conversation histories merely because one user is deleted.
 
-Never generate placeholder files.
+Conversation/member historical integrity must be considered.
 
-Never generate TODO implementations.
+The exact retention/anonymization strategy must remain compatible with the platform's privacy requirements.
 
-When modifying an existing file:
+---
 
-1. Provide the exact file path.
-2. Explain why it must change.
-3. Provide the complete updated file.
+# 59. NO MESSAGE IMPLEMENTATION
 
-Never regenerate unchanged files.
+Do not implement:
 
-────────────────────────────────────────
+* sending messages;
+* message retrieval;
+* delivery receipts;
+* read receipts;
+* typing indicators;
+* reactions;
+* replies;
+* forwarding;
+* message editing;
+* message deletion.
 
-SCOPE RESTRICTION
+The conversation domain only establishes the authorization and persistence foundation those features will use.
 
-This volume covers only:
+---
 
-• Identity
-• Users
-• Accounts
-• Profiles
-• Authentication
-• Authorization
-• Sessions
-• Devices
-• Contacts
-• Privacy
-• Blocking
-• Security events
-• Audit foundations
-• Account recovery
+# 60. NO PLACEHOLDERS
 
-Do not implement complete:
+Do not leave:
 
-• Messaging
-• Groups
-• Communities
-• Media processing
-• Stories
-• Calls
-• Search
-• Business messaging
-• Full moderation
-• Full analytics
-• Full E2EE implementation
+* TODO;
+* FIXME;
+* pseudo-code;
+* empty services;
+* fake repositories;
+* fake events;
+* fake API responses;
+* unimplemented permission checks;
+* pretend database migrations;
+* placeholder authorization.
 
-Those belong to later backend implementation volumes.
+Every implemented path must be functional.
 
-────────────────────────────────────────
+---
 
-QUALITY BAR
+# 61. BACKWARD COMPATIBILITY
 
-Treat identity and access management as critical production infrastructure.
+Preserve existing behavior wherever possible.
 
-Assume:
+If existing repository functionality conflicts with this implementation:
 
-• Hundreds of millions of accounts
-• Millions of concurrent sessions
-• Multiple devices per account
-• High authentication traffic
-• Global deployment
-• Account takeover attempts
-• Automated abuse
-• Strict privacy requirements
+1. inspect the actual behavior;
+2. determine compatibility requirements;
+3. make the smallest safe change;
+4. migrate data when necessary;
+5. preserve API compatibility where practical;
+6. document unavoidable breaking changes.
 
-Prioritize:
+Never replace working identity/session functionality merely for stylistic reasons.
 
-• Security
-• Correctness
-• Reliability
-• Scalability
-• Auditability
-• Maintainability
-• Clear domain ownership
-• Strong test coverage
+---
+
+# 62. REQUIRED VALIDATION
+
+Before considering this volume complete, actually run the applicable validation.
+
+At minimum:
+
+* TypeScript type checking;
+* linting;
+* formatting checks;
+* Prisma generation;
+* Prisma migration validation;
+* unit tests;
+* integration tests;
+* API/E2E tests;
+* application startup;
+* health checks;
+* relevant performance/query validation.
+
+Fix discovered failures.
+
+Do not claim success without actual validation.
+
+---
+
+# 63. IMPLEMENTATION ORDER
+
+Use this implementation sequence unless repository constraints require a different safe order:
+
+1. inspect repository;
+2. inspect existing identity/security contracts;
+3. inspect existing database/event infrastructure;
+4. implement contact domain;
+5. implement secure discovery;
+6. implement conversation schema;
+7. implement membership schema;
+8. implement direct-conversation uniqueness;
+9. implement direct conversation creation;
+10. implement group creation;
+11. implement membership operations;
+12. implement roles and permissions;
+13. implement ownership transfer;
+14. implement conversation settings;
+15. implement conversation listing;
+16. implement authorization;
+17. implement privacy/blocking enforcement;
+18. implement domain events/outbox integration;
+19. implement Redis caching only where justified;
+20. implement API documentation;
+21. implement tests;
+22. execute complete validation;
+23. fix all failures.
+
+---
+
+# 64. FINAL ENGINEERING REQUIREMENT
+
+The completed implementation must leave the repository with a real, production-quality conversation and contact backend.
+
+It must be:
+
+* secure;
+* transactional;
+* concurrency-safe;
+* privacy-aware;
+* observable;
+* scalable;
+* testable;
+* multi-device compatible;
+* ready for real-time integration;
+* ready for message authorization;
+* compatible with the identity layer;
+* compatible with future messaging, notification, synchronization, and moderation domains.
+
+Do not merely describe the implementation.
+
+**Inspect the actual repository and implement this backend volume completely.**

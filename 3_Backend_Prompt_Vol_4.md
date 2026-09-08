@@ -1,2821 +1,1726 @@
-You are operating in Senior Engineering Team Mode.
+# BACKEND IMPLEMENTATION PROMPT — VOLUME 4
+
+## Production-Grade Real-Time Communication Platform
+
+### WebSockets, Socket.IO, Presence, Typing Indicators, Multi-Device Synchronization, Kafka/Redpanda Consumers, BullMQ Workers, Offline Recovery, and Reliable Event Delivery
+
+You are implementing **Volume 4 of the backend** for a production-grade, globally scalable, WhatsApp-like real-time communication platform.
 
-Build the production-ready backend domains for media, stories/status, notifications, voice/video calls, search, business accounts, moderation, administration, analytics, audit logging, and feature flags for an enterprise-scale global real-time messaging and communication platform comparable in architectural scope to WhatsApp.
+This is an original communication platform inspired by modern real-time messaging products. It is not an implementation of proprietary WhatsApp source code, private infrastructure, undocumented protocols, or proprietary algorithms.
 
-The platform is an original implementation.
+This prompt is **fully standalone**. It must be executable without requiring another prompt, previous conversation, architecture document, or previously generated prompt to be present.
 
-Do not copy proprietary source code, internal architecture, branding, or confidential implementation details from WhatsApp or any other proprietary platform.
+The actual repository is the source of truth for existing implementation.
 
-This prompt is completely independent and may be executed in a separate conversation.
+This volume is an implementation unit of **one coherent backend system**. It must integrate with the repository's actual identity, authentication, users, devices, sessions, contacts, conversations, memberships, messaging, database, Redis, event, error, security, observability, and testing systems.
 
-The backend must follow the established architecture, domain boundaries, security model, database ownership rules, API conventions, event architecture, queue architecture, and real-time architecture of the project.
+Do not create competing implementations.
 
-Do not redesign the architecture.
+Do not duplicate existing functionality.
 
-Do not generate frontend code.
+---
 
-Do not generate mobile code.
+# 1. PRIMARY OBJECTIVE
 
-Do not generate Kubernetes manifests.
+Implement the production-grade distributed real-time backend layer.
 
-Do not generate Terraform.
+This volume must provide real functionality for:
 
-Do not generate infrastructure implementation code.
+* authenticated WebSocket connections;
+* Socket.IO integration where appropriate;
+* connection lifecycle;
+* device/session association;
+* real-time message delivery;
+* conversation event delivery;
+* presence;
+* typing indicators;
+* multi-device synchronization;
+* reconnect recovery;
+* synchronization cursors;
+* event consumption;
+* Kafka/Redpanda consumers;
+* BullMQ background processing where required;
+* delivery acknowledgement integration;
+* offline-device handling;
+* event retries;
+* idempotent consumers;
+* dead-letter handling;
+* graceful degradation;
+* real-time observability;
+* abuse protection.
 
-Do not generate CI/CD workflows.
+The system must continue functioning correctly when users are offline, connections drop, events are duplicated, workers restart, or downstream infrastructure temporarily fails.
 
-────────────────────────────────────────
+---
 
-MISSION
+# 2. PRODUCT CONTEXT
 
-Implement the production-ready backend required for:
+The platform supports:
 
-• Media uploads
-• Media metadata
-• Media processing
-• Image processing
-• Video processing
-• Audio processing
-• Voice messages
-• Documents
-• Stickers
-• GIFs
-• Thumbnails
-• CDN delivery
-• Stories/status
-• Push notifications
-• In-app notifications
-• Email notifications where appropriate
-• Voice calls
-• Video calls
-• Group calls
-• Call signaling
-• Call sessions
-• Search
-• Business accounts
-• Business profiles
-• Business messaging
-• Reporting
-• Moderation
-• Administration
-• Audit logging
-• Analytics
-• Feature flags
+* accounts;
+* multiple devices per user;
+* direct conversations;
+* groups;
+* messages;
+* delivery receipts;
+* read receipts;
+* typing indicators;
+* presence;
+* reactions;
+* replies;
+* forwarding;
+* edits;
+* deletions;
+* media;
+* notifications;
+* search;
+* privacy controls;
+* blocking/reporting;
+* voice/video calling.
 
-The implementation must support:
+The messaging engine persists authoritative state.
 
-• Hundreds of millions of users
-• Billions of messages
-• Large media volumes
-• Large notification volumes
-• Large numbers of calls
-• Multi-region deployment
-• High availability
-• Horizontal scaling
-• Fault tolerance
+This volume is responsible for moving relevant state changes reliably to connected devices and maintaining ephemeral real-time state.
 
-────────────────────────────────────────
+---
 
-TECHNOLOGY STACK
+# 3. REQUIRED TECHNOLOGY STACK
 
-Backend:
+Use the repository's existing compatible implementation of:
 
-• Node.js
-• NestJS
-• TypeScript
+* Node.js;
+* NestJS;
+* TypeScript;
+* PostgreSQL;
+* Prisma;
+* Redis;
+* Kafka or Redpanda;
+* BullMQ;
+* WebSockets;
+* Socket.IO where appropriate;
+* OpenTelemetry;
+* Prometheus;
+* structured logging.
 
-Database:
+Do not replace working infrastructure.
 
-• PostgreSQL
-• Prisma ORM
+Do not introduce a second event broker.
 
-Cache:
+Do not introduce a second queue system.
 
-• Redis
+---
 
-Event Streaming:
+# 4. FIRST ACTION — INSPECT THE ACTUAL REPOSITORY
 
-• Kafka or Redpanda
+Before changing anything:
 
-Background Jobs:
+1. Inspect the backend.
+2. Inspect identity/authentication.
+3. Inspect devices/sessions.
+4. Inspect conversations/membership.
+5. Inspect messaging.
+6. Inspect Prisma models/migrations.
+7. Inspect Redis integration.
+8. Inspect Kafka/Redpanda integration.
+9. Inspect transactional outbox.
+10. Inspect BullMQ.
+11. Inspect existing WebSocket/Socket.IO code.
+12. Inspect event schemas.
+13. Inspect API error contracts.
+14. Inspect observability.
+15. Inspect tests.
 
-• BullMQ
+If any of these already exist:
 
-Search:
+* extend them;
+* preserve compatible behavior;
+* consolidate duplicates;
+* repair incomplete functionality.
 
-• Elasticsearch or OpenSearch
+Never create parallel infrastructure merely because the current implementation is imperfect.
 
-Object Storage:
+---
 
-• AWS S3-compatible object storage
+# 5. ARCHITECTURAL RESPONSIBILITIES
 
-CDN:
+Maintain clear boundaries.
 
-• CloudFront or equivalent CDN
+## PostgreSQL
 
-Push Notifications:
+Authoritative source for durable:
 
-• Firebase Cloud Messaging
-• Apple Push Notification Service
+* users;
+* devices;
+* sessions;
+* conversations;
+* memberships;
+* messages;
+* durable read/delivery state;
+* durable domain state.
 
-Voice/Video:
+## Redis
 
-• WebRTC
-• STUN
-• TURN
-• Media infrastructure where required
+Use for:
 
-Observability:
+* presence;
+* typing state;
+* connection/device routing metadata;
+* ephemeral coordination;
+* short-lived synchronization state;
+* rate limiting;
+* distributed locks where justified.
 
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
+Redis must not become the sole durable source for messages.
 
-Testing:
+## Kafka/Redpanda
 
-• Jest
-• Supertest
-• Integration and contract testing tools where appropriate
+Use for durable asynchronous domain/event distribution.
 
-────────────────────────────────────────
+## BullMQ
 
-IMPLEMENTATION RULES
+Use for background jobs requiring:
 
-Never generate pseudo-code.
+* delayed execution;
+* retries;
+* controlled concurrency;
+* worker processing;
+* scheduled processing.
 
-Never generate placeholders.
+## WebSocket/Socket.IO
 
-Never generate TODO comments.
+Use for real-time transport.
 
-Never omit implementations.
+Transport must not become the authoritative message store.
 
-Never say:
+---
 
-- "implement similarly"
-- "left as an exercise"
-- "for brevity"
-- "remaining code omitted"
+# 6. WEBSOCKET AUTHENTICATION
 
-Every generated file must be complete.
+Implement secure authenticated WebSocket connections.
 
-Every generated file must compile.
+A connection must be associated with:
 
-Never regenerate unchanged files.
+* authenticated user;
+* authenticated device;
+* authenticated session.
 
-Only modify existing files when required.
+Validate credentials during connection establishment.
 
-Use strict TypeScript.
+Do not trust:
 
-Use dependency injection.
+* client-provided user ID;
+* client-provided device ID;
+* arbitrary conversation membership;
+* client-provided role.
 
-Keep controllers thin.
+Reuse the repository's authentication/session validation system.
 
-Keep domain logic inside appropriate services/domain modules.
+---
 
-Use repositories for persistence.
-
-Use centralized validation.
-
-Use centralized error handling.
-
-Use structured logging.
-
-Use the established observability infrastructure.
-
-────────────────────────────────────────
-
-MEDIA DOMAIN
-
-Implement media management.
-
-Support:
-
-• Media asset creation
-• Media metadata
-• Media ownership
-• Media type
-• MIME type
-• File size
-• Duration
-• Dimensions
-• Processing state
-• Storage state
-• Access state
-• Lifecycle state
-
-Media types:
-
-• Image
-• Video
-• Audio
-• Voice
-• Document
-• Sticker
-• GIF
-• Thumbnail
-
-Do not store large binary files directly in PostgreSQL.
-
-Store object-storage references and metadata.
-
-────────────────────────────────────────
-
-MEDIA UPLOADS
-
-Implement secure upload authorization.
-
-Support:
-
-• Upload initialization
-• Signed upload URLs
-• Multipart upload where appropriate
-• Upload completion
-• Upload verification
-• Content-type validation
-• File-size validation
-• Ownership validation
-• Expiration
-
-Do not trust client-supplied MIME type or file metadata.
-
-Validate uploaded objects server-side.
-
-────────────────────────────────────────
-
-MEDIA PROCESSING
-
-Implement asynchronous processing architecture.
-
-Support:
-
-• Image processing
-• Video processing
-• Audio processing
-• Thumbnail generation
-• Preview generation
-• Metadata extraction
-• Compression
-• Format validation
-
-Use BullMQ for processing jobs where appropriate.
-
-Every processing job must support:
-
-• Job ID
-• Retry
-• Exponential backoff
-• Idempotency
-• Timeout
-• Failure state
-• Dead-letter handling
-• Monitoring
-
-────────────────────────────────────────
-
-MEDIA SECURITY
+# 7. CONNECTION LIFECYCLE
 
 Implement:
 
-• MIME validation
-• File-size restrictions
-• Malware scanning integration boundary
-• Extension validation
-• Storage isolation
-• Access authorization
-• Signed URLs
-• URL expiration
-• Media ownership validation
+* connection;
+* authentication;
+* authorization;
+* registration;
+* heartbeat;
+* disconnect;
+* reconnect;
+* session invalidation;
+* device revocation;
+* graceful server shutdown.
 
-Never assume a file is safe because its extension is valid.
+When a session/device is revoked, active real-time connections associated with it must eventually be disconnected or rendered unauthorized.
 
-────────────────────────────────────────
+Do not allow revoked sessions to remain indefinitely active.
 
-MEDIA ACCESS
+---
 
-Implement secure media authorization.
+# 8. CONNECTION IDENTIFICATION
 
-Support:
+Maintain a reliable mapping between:
 
-• Download authorization
-• Signed access
-• Expiration
-• Ownership checks
-• Conversation-membership checks
-• Block/privacy checks where required
+* user;
+* device;
+* session;
+* socket connection.
 
-Do not expose permanent public URLs for private media.
+A single user may have:
 
-────────────────────────────────────────
+* multiple devices;
+* multiple connections where the platform permits it.
 
-CDN INTEGRATION
+Do not assume:
 
-Implement backend integration for CDN delivery.
+```text
+one user = one socket
+```
 
-Support:
+The routing layer must support multiple active devices.
 
-• Signed URLs
-• Signed cookies where appropriate
-• Cache invalidation where required
-• Expiration
-• Origin references
-• Protected asset access
+---
 
-Do not make CDN access bypass backend authorization.
+# 9. SOCKET ROOM MODEL
 
-────────────────────────────────────────
+Use a consistent room/channel strategy.
 
-VOICE MESSAGE DOMAIN
+Potential logical scopes include:
 
-Implement voice-message metadata and lifecycle.
+* user scope;
+* device scope;
+* conversation scope.
 
-Support:
+Do not allow clients to join arbitrary rooms by submitting arbitrary room IDs.
 
-• Voice message creation
-• Duration
-• Audio format
-• Processing state
-• Storage reference
-• Download authorization
-• Delivery through existing messaging infrastructure
+Room membership must be authorized server-side.
 
-Do not implement audio capture in backend.
+A user must not receive events for conversations they cannot access.
 
-────────────────────────────────────────
+---
 
-STORIES / STATUS
+# 10. MESSAGE REAL-TIME DELIVERY
 
-Implement stories/status backend functionality.
+When a canonical `message.created` event is available:
 
-Support:
+1. identify the conversation;
+2. resolve eligible recipients;
+3. identify eligible devices;
+4. determine online connections;
+5. deliver through the WebSocket transport;
+6. record appropriate delivery state;
+7. allow offline recipients to recover through synchronization/push systems.
 
-• Story creation
-• Story retrieval
-• Story deletion
-• Story expiration
-• Story visibility
-• Audience selection
-• Viewer tracking
-• Reactions where appropriate
+Do not make message persistence depend on immediate WebSocket delivery.
 
-Story types:
+If all recipients are offline, the message must remain safely persisted.
 
-• Text
-• Image
-• Video
+---
 
-Define privacy rules for:
+# 11. EVENT-DRIVEN TRANSPORT
 
-• Public/allowed audience
-• Contacts
-• Excluded users
-• Blocked users
+The message service must not directly depend on individual sockets.
 
-────────────────────────────────────────
+Instead:
 
-STORY EXPIRATION
+```text
+Database mutation
+→ transactional outbox
+→ Kafka/Redpanda
+→ realtime consumer
+→ connection/device routing
+→ WebSocket delivery
+```
 
-Implement automated story expiration.
+Use the actual repository's event infrastructure.
 
-Use BullMQ or scheduled infrastructure for:
+Do not introduce a second path that creates inconsistent message events.
 
-• Expiration
-• Viewer cleanup
-• Temporary media cleanup
-• Metadata cleanup
+---
 
-Ensure expired content is no longer returned by APIs.
+# 12. EVENT CONSUMERS
 
-Distinguish:
+Implement consumers for relevant events such as:
 
-• Logical expiration
-• CDN/object-storage cleanup
-• Physical deletion
+* message.created;
+* message.edited;
+* message.deleted;
+* message.reaction.added;
+* message.reaction.removed;
+* conversation.created;
+* conversation.updated;
+* member.added;
+* member.removed;
+* member.role.changed;
+* read-state changes;
+* delivery-state changes.
 
-────────────────────────────────────────
+Only consume events that actually exist.
 
-STORY VIEWERS
+Do not fabricate event types without integrating them into the producer side.
 
-Implement:
+---
 
-• Mark viewed
-• List viewers where authorized
-• Viewer counts
-• Idempotent viewer records
-• Privacy checks
+# 13. CONSUMER IDEMPOTENCY
 
-Avoid excessive duplicate viewer writes.
+Kafka/Redpanda delivery is at-least-once.
 
-────────────────────────────────────────
-
-NOTIFICATION DOMAIN
-
-Implement notification infrastructure.
-
-Support:
-
-• Push notifications
-• In-app notifications
-• Email-ready architecture
-
-Notification types:
-
-• New message
-• Missed call
-• Group activity
-• Community activity
-• Security alert
-• Account event
-• Business event
-• Administrative event
-
-────────────────────────────────────────
-
-PUSH NOTIFICATIONS
-
-Implement integrations for:
-
-• Firebase Cloud Messaging
-• Apple Push Notification Service
-
-Support:
-
-• Device token registration
-• Token rotation
-• Invalid token handling
-• Notification preferences
-• Notification deduplication
-• Retry
-• Backoff
-• Provider failure handling
-• Multi-device routing
-
-Never include sensitive plaintext message content unnecessarily in notification payloads.
-
-Respect privacy requirements.
-
-────────────────────────────────────────
-
-NOTIFICATION PREFERENCES
-
-Implement preferences for:
-
-• Messages
-• Calls
-• Groups
-• Communities
-• Business notifications
-• Security notifications
-• Marketing notifications where applicable
-
-Support:
-
-• Global defaults
-• Per-category preferences
-• Per-conversation overrides where appropriate
-• Device-specific preferences where needed
-
-────────────────────────────────────────
-
-NOTIFICATION QUEUES
-
-Implement BullMQ queues for:
-
-• Push delivery
-• Email delivery
-• Notification retries
-• Notification cleanup
-• Invalid token cleanup
-
-Each worker must be:
-
-• Idempotent
-• Retryable
-• Observable
-• Rate-limited where appropriate
-
-────────────────────────────────────────
-
-CALL DOMAIN
-
-Implement call-management backend functionality.
-
-Support:
-
-• Call creation
-• Call invitation
-• Call acceptance
-• Call rejection
-• Call cancellation
-• Call termination
-• Call state
-• Participant management
-• Device selection
-• Call history metadata
-
-Call states may include:
-
-• Initiating
-• Ringing
-• Accepted
-• Active
-• Reconnecting
-• Ended
-• Failed
-• Rejected
-• Missed
-
-────────────────────────────────────────
-
-CALL SIGNALING
-
-Implement backend signaling infrastructure for WebRTC.
-
-Support:
-
-• Offer
-• Answer
-• ICE candidates
-• Session negotiation
-• Call invitations
-• Call acceptance
-• Call rejection
-• Call termination
-• Reconnection
-
-Use WebSocket signaling.
-
-Do not route audio/video payloads through NestJS APIs.
-
-────────────────────────────────────────
-
-CALL AUTHORIZATION
-
-Before allowing call actions, validate:
-
-• User authentication
-• Conversation relationship
-• Blocking
-• Privacy
-• Device authorization
-• Call permissions
-• Account status
-
-Do not trust client-provided call participant information.
-
-────────────────────────────────────────
-
-GROUP CALLS
-
-Implement backend foundations for:
-
-• Group call creation
-• Participant admission
-• Participant removal
-• Call state
-• Participant state
-• Signaling events
-
-Design for future SFU/media-server integration.
-
-Do not embed media transport into the application API.
-
-────────────────────────────────────────
-
-TURN / MEDIA SERVER INTEGRATION
-
-Implement backend integration boundaries for:
-
-• TURN credentials
-• Short-lived access
-• Region selection
-• Media server selection where appropriate
-• Session authorization
-
-Never expose long-lived TURN credentials.
-
-────────────────────────────────────────
-
-SEARCH DOMAIN
-
-Implement search architecture for:
-
-• Users
-• Contacts
-• Groups
-• Communities
-• Conversations
-• Business accounts
-
-Support message search only where it is compatible with the encryption/privacy architecture.
-
-Do not index E2EE-protected message plaintext server-side.
-
-────────────────────────────────────────
-
-SEARCH INDEXING
-
-Implement Elasticsearch/OpenSearch integration.
-
-Support:
-
-• Index creation
-• Document serialization
-• Indexing
-• Updates
-• Deletes
-• Bulk indexing
-• Reindexing
-• Aliases
-• Index versioning
-• Retry
-• Failure handling
-
-Search documents must contain only data appropriate for indexing.
-
-────────────────────────────────────────
-
-SEARCH AUTHORIZATION
-
-Search must respect:
-
-• User permissions
-• Conversation membership
-• Group membership
-• Community membership
-• Blocking
-• Privacy
-• Business permissions
-
-Never return documents the requesting user cannot access.
-
-────────────────────────────────────────
-
-BUSINESS ACCOUNT DOMAIN
-
-Implement:
-
-• Business account creation
-• Business profiles
-• Business verification state
-• Business users
-• Business roles
-• Business permissions
-• Business hours
-• Business metadata
-
-Keep business functionality separate from consumer account state where appropriate.
-
-────────────────────────────────────────
-
-BUSINESS MESSAGING
-
-Implement backend support for:
-
-• Business conversations
-• Business participants
-• Business roles
-• Automated responses foundation
-• Business catalogs foundation
-• Business messaging permissions
-
-Do not implement frontend business UI.
-
-────────────────────────────────────────
-
-REPORTING
-
-Implement reporting functionality.
-
-Support reports for:
-
-• Users
-• Messages where reportable
-• Groups
-• Communities
-• Businesses
-• Media
-• Abuse
-
-Implement:
-
-• Report creation
-• Report status
-• Report categories
-• Evidence references where permitted
-• Report assignment
-• Resolution state
-
-Respect E2EE boundaries.
-
-────────────────────────────────────────
-
-MODERATION
-
-Implement moderation foundations.
-
-Support:
-
-• Moderation cases
-• Administrative actions
-• Suspensions
-• Restrictions
-• Warnings
-• Content takedown references
-• Appeals
-• Case history
-
-Do not create a hidden system for inspecting E2EE-protected content.
-
-────────────────────────────────────────
-
-MODERATION POLICIES
-
-Implement policy/version structures for:
-
-• Abuse
-• Spam
-• Account restrictions
-• Media policies
-• Business policies
-
-Administrative decisions must be auditable.
-
-────────────────────────────────────────
-
-ADMINISTRATION
-
-Implement backend administration capabilities.
-
-Support:
-
-• User investigation
-• Account status management
-• Device investigation
-• Group investigation
-• Business management
-• Reports
-• Moderation
-• Feature flags
-• System configuration
-• Audit access
-
-Administrative operations must require explicit authorization.
-
-────────────────────────────────────────
-
-AUDIT LOGGING
-
-Implement comprehensive audit logging for sensitive operations.
-
-Track:
-
-• Actor
-• Action
-• Resource
-• Timestamp
-• Result
-• Request ID
-• Correlation ID
-• Relevant metadata
-
-Audit:
-
-• Administrative actions
-• Moderation actions
-• Business verification
-• Feature flag changes
-• System configuration changes
-• Security changes
-
-Never store secrets or message plaintext unnecessarily.
-
-────────────────────────────────────────
-
-ANALYTICS DOMAIN
-
-Implement analytics event generation and aggregation foundations.
-
-Support metrics for:
-
-• User activity
-• Messaging
-• Delivery
-• Groups
-• Communities
-• Stories
-• Calls
-• Media processing
-• Notifications
-• Business activity
-• Security events
-
-Do not run analytical workloads directly against transactional tables where avoidable.
-
-────────────────────────────────────────
-
-ANALYTICS PIPELINE
-
-Use Kafka and appropriate background processing.
-
-Support:
-
-• Event ingestion
-• Aggregation
-• Batch processing
-• Real-time metrics where appropriate
-• Retention
-• Privacy controls
-
-Define analytics event schemas separately from domain events where necessary.
-
-────────────────────────────────────────
-
-FEATURE FLAGS
-
-Implement feature flag backend.
-
-Support:
-
-• Global flags
-• Percentage rollout
-• User targeting
-• Region targeting
-• Device/platform targeting
-• Kill switches
-• Experiment assignments
-
-Implement:
-
-• Flag creation
-• Flag update
-• Flag deletion
-• Evaluation
-• Caching
-• Audit history
-
-────────────────────────────────────────
-
-FEATURE FLAG EVALUATION
-
-Flag evaluation must support deterministic results.
-
-Do not allow clients to bypass server-side feature controls.
-
-Sensitive feature flags must be evaluated server-side.
-
-────────────────────────────────────────
-
-EVENTS
-
-Implement and publish relevant events including:
-
-MEDIA
-
-• MediaUploaded
-• MediaProcessingStarted
-• MediaProcessingCompleted
-• MediaProcessingFailed
-
-STORIES
-
-• StoryCreated
-• StoryExpired
-• StoryViewed
-
-NOTIFICATIONS
-
-• NotificationCreated
-• NotificationDelivered
-• NotificationFailed
-
-CALLS
-
-• CallCreated
-• CallStarted
-• CallEnded
-• CallParticipantJoined
-• CallParticipantLeft
-
-SEARCH
-
-• SearchIndexed
-• SearchIndexFailed
-
-BUSINESS
-
-• BusinessAccountCreated
-• BusinessAccountVerified
-• BusinessUserAdded
-
-MODERATION
-
-• ReportCreated
-• ModerationCaseOpened
-• ModerationActionTaken
-
-ADMINISTRATION
-
-• AdministrativeActionTaken
-
-ANALYTICS
-
-• AnalyticsEventRecorded
-
-FEATURE FLAGS
-
-• FeatureFlagCreated
-• FeatureFlagChanged
-• FeatureFlagDeleted
-
-Use the established event envelope and transactional outbox where appropriate.
-
-────────────────────────────────────────
-
-BACKGROUND JOBS
-
-Implement queues/workers for:
-
-• Image processing
-• Video processing
-• Audio processing
-• Thumbnail generation
-• Media cleanup
-• Story expiration
-• Story cleanup
-• Push notifications
-• Email notifications
-• Search indexing
-• Search reindexing
-• Analytics aggregation
-• Report processing
-• Moderation workflows
-• Audit retention
-• Feature flag cleanup
-
-Every worker must support:
-
-• Retry
-• Backoff
-• Idempotency
-• Concurrency
-• Failure handling
-• Dead-letter behavior
-• Metrics
-
-────────────────────────────────────────
-
-DATABASE
-
-Implement Prisma models and migrations for the domains in this volume.
-
-Include appropriate models for:
-
-• MediaAsset
-• MediaProcessingJob
-• MediaVariant
-• Story
-• StoryAudience
-• StoryViewer
-• Notification
-• NotificationPreference
-• PushToken
-• Call
-• CallParticipant
-• CallSession
-• BusinessAccount
-• BusinessProfile
-• BusinessUser
-• Report
-• ModerationCase
-• ModerationAction
-• AuditLog extensions
-• Analytics event references where appropriate
-• FeatureFlag
-• FeatureFlagRule
-• FeatureFlagEvaluation where appropriate
+Consumers must tolerate duplicate events.
 
 Use:
 
-• Primary keys
-• Foreign keys
-• Unique constraints
-• Composite indexes
-• Status constraints
-• Timestamps
-• Retention fields
-• Partitioning where justified
+* event ID;
+* aggregate ID;
+* version;
+* durable/ephemeral deduplication where appropriate.
 
-Do not create unnecessary transactional tables for analytics data.
+Do not assume exactly-once delivery.
 
-────────────────────────────────────────
+Repeated processing must not:
 
+* send uncontrolled duplicate notifications;
+* regress read state;
+* corrupt presence;
+* duplicate durable records.
+
+---
+
+# 14. EVENT ORDERING
+
+Respect ordering where the domain requires it.
+
+For conversation message events, preserve canonical message sequence.
+
+Kafka/Redpanda partitioning should be compatible with the desired ordering key, such as:
+
+* conversation ID.
+
+Do not rely on global event ordering.
+
+Do not assume events from unrelated conversations need to be globally ordered.
+
+---
+
+# 15. EVENT REPLAY
+
+Design consumers to tolerate:
+
+* replay;
+* delayed events;
+* duplicate events;
+* consumer restart.
+
+A consumer must not corrupt state when an older valid event is replayed after newer state.
+
+Use versions/sequences where appropriate.
+
+---
+
+# 16. DEAD-LETTER HANDLING
+
+Implement real failure handling for events that repeatedly fail processing.
+
+Support:
+
+* bounded retries;
+* retry backoff;
+* dead-letter queue/topic;
+* failure metadata;
+* observability;
+* operational recovery.
+
+Do not silently discard failed events.
+
+Do not endlessly retry poison messages.
+
+---
+
+# 17. EVENT CORRELATION
+
+Preserve:
+
+* event ID;
+* correlation ID;
+* causation ID where available;
+* trace context.
+
+Trace a message through:
+
+```text
 API
+→ database
+→ outbox
+→ Kafka/Redpanda
+→ consumer
+→ routing
+→ WebSocket
+```
 
-Implement production-ready APIs for:
+This must be observable in production.
 
-MEDIA
+---
 
-• Upload initialization
-• Upload completion
-• Media metadata
-• Media authorization
-• Media deletion
+# 18. PRESENCE
 
-STORIES
+Implement ephemeral user presence.
 
-• Create
-• List
-• Get
-• View
-• Delete
+Support states appropriate to the product, such as:
 
-NOTIFICATIONS
+* online;
+* offline;
+* away/idle if implemented.
 
-• Preferences
-• Notification center
-• Device token registration
+Presence must account for multiple devices.
 
-CALLS
-
-• Create
-• Accept
-• Reject
-• End
-• Participants
-• Signaling
+A user should not become offline merely because one device disconnects while another remains active.
 
-SEARCH
+---
 
-• User search
-• Group search
-• Conversation search
-• Business search
-• Message search where allowed
+# 19. PRESENCE SOURCE OF TRUTH
 
-BUSINESS
+Presence is ephemeral.
 
-• Business profile
-• Business users
-• Business permissions
+Redis may be the authoritative operational store for current presence.
 
-REPORTING
+It must include:
 
-• Create report
-• Get report status
+* user/device identity;
+* last heartbeat;
+* connection information;
+* expiration/TTL.
 
-ADMINISTRATION
+Use TTLs so crashed servers/connections do not leave users permanently online.
 
-• Users
-• Accounts
-• Reports
-• Moderation
-• Feature flags
-• Audit logs
+---
 
-Every endpoint must include:
+# 20. PRESENCE HEARTBEATS
 
-• Validation
-• Authentication
-• Authorization
-• Rate limiting
-• OpenAPI documentation
-• Consistent errors
-• Idempotency where appropriate
+Implement bounded heartbeat behavior.
 
-────────────────────────────────────────
+A connected device should periodically refresh its presence state.
 
-SECURITY
+When heartbeats stop:
 
-Enforce:
+* expire the device connection state;
+* recompute user presence;
+* emit the appropriate state transition.
 
-• Authorization
-• Ownership
-• Conversation membership
-• Group membership
-• Privacy settings
-• Signed media access
-• Short-lived call credentials
-• Rate limits
-• Administrative permissions
-• Business permissions
+Do not require a persistent database write for every heartbeat.
 
-Never trust:
+Avoid excessive Redis traffic.
 
-• Client-provided media ownership
-• Client-provided call participants
-• Client-provided administrative roles
-• Client-provided moderation status
-• Client-provided feature evaluation for sensitive features
+---
 
-────────────────────────────────────────
+# 21. MULTI-DEVICE PRESENCE
 
-OBSERVABILITY
+User presence should be derived from the set of active devices/connections.
 
-Instrument:
-
-• Media processing
-• Upload failures
-• Download authorization
-• Story creation
-• Story views
-• Notification delivery
-• Push provider errors
-• Call signaling
-• Search latency
-• Search errors
-• Business operations
-• Moderation
-• Administration
-• Analytics processing
-
-Track:
-
-• Latency
-• Throughput
-• Error rates
-• Queue depth
-• Retry counts
-• Dead-letter counts
-• External provider failures
-
-Never log sensitive message content or encryption keys.
-
-────────────────────────────────────────
-
-TESTING
-
-UNIT TESTS
-
-Test:
-
-• Media validation
-• Story visibility
-• Notification routing
-• Call state transitions
-• Search authorization
-• Business permissions
-• Moderation policies
-• Feature-flag evaluation
-
-INTEGRATION TESTS
-
-Test:
-
-• S3 integration
-• Redis
-• Kafka
-• BullMQ
-• PostgreSQL
-• Search
-• Push providers
-• WebSocket signaling
-
-API TESTS
-
-Test:
-
-• Media APIs
-• Story APIs
-• Notification APIs
-• Call APIs
-• Search APIs
-• Business APIs
-• Moderation APIs
-• Administration APIs
-
-SECURITY TESTS
-
-Test:
-
-• Unauthorized media access
-• Notification privacy
-• Call authorization
-• Search authorization
-• Business privilege escalation
-• Administrative privilege escalation
-• Report manipulation
-• Feature-flag bypass
+For example:
 
-PERFORMANCE TESTS
+```text
+Device A online
+Device B offline
+→ user online
+```
 
-Test:
+When the last active device disappears:
 
-• Media processing queues
-• Notification throughput
-• Search throughput
-• Call signaling
-• Story traffic
-• Analytics ingestion
+```text
+Device A offline
+Device B offline
+→ user offline
+```
 
-────────────────────────────────────────
+Do not overwrite user-level presence independently from device state in a way that creates contradictions.
 
-DOCUMENTATION
+---
 
-Document:
+# 22. PRESENCE PRIVACY
 
-• Media architecture
-• S3 integration
-• CDN integration
-• Processing pipeline
-• Story lifecycle
-• Notification system
-• Call signaling
-• Search architecture
-• Business account model
-• Moderation model
-• Reporting
-• Administration
-• Analytics
-• Feature flags
-• API contracts
-• Event contracts
-• Queue architecture
-• Security requirements
+Presence visibility must eventually respect privacy settings.
 
-────────────────────────────────────────
+If the repository already implements privacy controls:
 
-PROJECT INDEX
+* reuse them.
 
-Update the backend Project Index with:
+If privacy settings are not yet available, design presence authorization so visibility decisions can later be enforced without rewriting the presence system.
 
-• Completed media modules
-• Completed story modules
-• Completed notification modules
-• Completed call modules
-• Completed search modules
-• Completed business-account modules
-• Completed moderation modules
-• Completed administration modules
-• Completed analytics modules
-• Completed feature-flag modules
-• Database models
-• Migrations
-• APIs
-• WebSocket contracts
-• Events
-• Queues
-• Workers
-• Tests
-• Generated files
-• Remaining work
-• Current milestone
-• Dependencies
+Do not expose presence universally by default if the product's privacy model does not permit it.
 
-────────────────────────────────────────
+---
 
-IMPLEMENTATION MILESTONES
+# 23. TYPING INDICATORS
 
-Implement incrementally.
-
-MILESTONE 1
-
-Media metadata, upload authorization, and object-storage integration.
-
-MILESTONE 2
-
-Media processing workers and media lifecycle.
-
-MILESTONE 3
-
-Stories/status and expiration.
-
-MILESTONE 4
-
-Notifications, push tokens, preferences, and workers.
-
-MILESTONE 5
-
-Call sessions, signaling, and WebRTC integration boundaries.
-
-MILESTONE 6
-
-Search and indexing.
-
-MILESTONE 7
-
-Business accounts and business permissions.
-
-MILESTONE 8
-
-Reporting and moderation.
-
-MILESTONE 9
-
-Administration and audit functionality.
-
-MILESTONE 10
-
-Analytics and feature flags.
-
-MILESTONE 11
-
-Cross-domain events, observability, security hardening, and integration testing.
-
-Each milestone should contain approximately 20–40 files where practical.
-
-Every milestone must compile before proceeding.
-
-────────────────────────────────────────
-
-OUTPUT FORMAT
-
-For every generated file provide:
-
-1. Exact file path
-2. Complete file contents
-
-Never truncate code.
-
-Never summarize source code instead of generating it.
-
-Never generate pseudo-code.
-
-Never generate placeholder files.
-
-Never generate TODO implementations.
-
-When modifying an existing file:
-
-1. Provide the exact file path.
-2. State why it must change.
-3. Provide the complete updated file.
-
-Never regenerate unchanged files.
-
-────────────────────────────────────────
-
-SCOPE RESTRICTION
-
-This volume covers:
-
-• Media
-• Media processing
-• Stories/status
-• Notifications
-• Voice/video calls
-• Call signaling
-• Search
-• Business accounts
-• Reporting
-• Moderation
-• Administration
-• Audit
-• Analytics
-• Feature flags
-
-Do not implement infrastructure deployment.
-
-Do not implement frontend UI.
-
-Do not implement mobile UI.
-
-Do not implement Terraform.
-
-Do not implement Kubernetes.
-
-Do not implement CI/CD.
-
-Do not replace established E2EE cryptographic architecture with custom cryptography.
-
-────────────────────────────────────────
-
-QUALITY BAR
-
-Treat these systems as enterprise production infrastructure.
-
-Assume:
-
-• Massive media traffic
-• Millions of notifications
-• High call concurrency
-• Global search traffic
-• Large business workloads
-• Large moderation workloads
-• High-volume analytics
-• Multi-region operation
-
-Prioritize:
-
-• Security
-• Privacy
-• Reliability
-• Scalability
-• Idempotency
-• Observability
-• Fault tolerance
-• Maintainability
-• Clear domain ownership
-• Production readine
-
-You are operating in Senior Engineering Team Mode.
-
-Build the production-ready backend domains for media, stories/status, notifications, voice/video calls, search, business accounts, moderation, administration, analytics, audit logging, and feature flags for an enterprise-scale global real-time messaging and communication platform comparable in architectural scope to WhatsApp.
-
-The platform is an original implementation.
-
-Do not copy proprietary source code, internal architecture, branding, or confidential implementation details from WhatsApp or any other proprietary platform.
-
-This prompt is completely independent and may be executed in a separate conversation.
-
-The backend must follow the established architecture, domain boundaries, security model, database ownership rules, API conventions, event architecture, queue architecture, and real-time architecture of the project.
-
-Do not redesign the architecture.
-
-Do not generate frontend code.
-
-Do not generate mobile code.
-
-Do not generate Kubernetes manifests.
-
-Do not generate Terraform.
-
-Do not generate infrastructure implementation code.
-
-Do not generate CI/CD workflows.
-
-────────────────────────────────────────
-
-MISSION
-
-Implement the production-ready backend required for:
-
-• Media uploads
-• Media metadata
-• Media processing
-• Image processing
-• Video processing
-• Audio processing
-• Voice messages
-• Documents
-• Stickers
-• GIFs
-• Thumbnails
-• CDN delivery
-• Stories/status
-• Push notifications
-• In-app notifications
-• Email notifications where appropriate
-• Voice calls
-• Video calls
-• Group calls
-• Call signaling
-• Call sessions
-• Search
-• Business accounts
-• Business profiles
-• Business messaging
-• Reporting
-• Moderation
-• Administration
-• Audit logging
-• Analytics
-• Feature flags
-
-The implementation must support:
-
-• Hundreds of millions of users
-• Billions of messages
-• Large media volumes
-• Large notification volumes
-• Large numbers of calls
-• Multi-region deployment
-• High availability
-• Horizontal scaling
-• Fault tolerance
-
-────────────────────────────────────────
-
-TECHNOLOGY STACK
-
-Backend:
-
-• Node.js
-• NestJS
-• TypeScript
-
-Database:
-
-• PostgreSQL
-• Prisma ORM
-
-Cache:
-
-• Redis
-
-Event Streaming:
-
-• Kafka or Redpanda
-
-Background Jobs:
-
-• BullMQ
-
-Search:
-
-• Elasticsearch or OpenSearch
-
-Object Storage:
-
-• AWS S3-compatible object storage
-
-CDN:
-
-• CloudFront or equivalent CDN
-
-Push Notifications:
-
-• Firebase Cloud Messaging
-• Apple Push Notification Service
-
-Voice/Video:
-
-• WebRTC
-• STUN
-• TURN
-• Media infrastructure where required
-
-Observability:
-
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
-
-Testing:
-
-• Jest
-• Supertest
-• Integration and contract testing tools where appropriate
-
-────────────────────────────────────────
-
-IMPLEMENTATION RULES
-
-Never generate pseudo-code.
-
-Never generate placeholders.
-
-Never generate TODO comments.
-
-Never omit implementations.
-
-Never say:
-
-- "implement similarly"
-- "left as an exercise"
-- "for brevity"
-- "remaining code omitted"
-
-Every generated file must be complete.
-
-Every generated file must compile.
-
-Never regenerate unchanged files.
-
-Only modify existing files when required.
-
-Use strict TypeScript.
-
-Use dependency injection.
-
-Keep controllers thin.
-
-Keep domain logic inside appropriate services/domain modules.
-
-Use repositories for persistence.
-
-Use centralized validation.
-
-Use centralized error handling.
-
-Use structured logging.
-
-Use the established observability infrastructure.
-
-────────────────────────────────────────
-
-MEDIA DOMAIN
-
-Implement media management.
+Implement ephemeral typing state.
 
 Support:
 
-• Media asset creation
-• Media metadata
-• Media ownership
-• Media type
-• MIME type
-• File size
-• Duration
-• Dimensions
-• Processing state
-• Storage state
-• Access state
-• Lifecycle state
+* start typing;
+* stop typing;
+* automatic expiration;
+* conversation authorization.
 
-Media types:
+Typing indicators must never be stored as durable message data.
 
-• Image
-• Video
-• Audio
-• Voice
-• Document
-• Sticker
-• GIF
-• Thumbnail
+Use Redis with short TTLs where appropriate.
 
-Do not store large binary files directly in PostgreSQL.
+---
 
-Store object-storage references and metadata.
+# 24. TYPING AUTHORIZATION
 
-────────────────────────────────────────
+A user may only publish typing state to conversations they are authorized to access.
 
-MEDIA UPLOADS
+A client must not be able to:
 
-Implement secure upload authorization.
+* impersonate another user;
+* publish typing into arbitrary conversations;
+* observe typing state from unauthorized conversations.
 
-Support:
+Do not trust client-provided sender identity.
 
-• Upload initialization
-• Signed upload URLs
-• Multipart upload where appropriate
-• Upload completion
-• Upload verification
-• Content-type validation
-• File-size validation
-• Ownership validation
-• Expiration
+---
 
-Do not trust client-supplied MIME type or file metadata.
+# 25. TYPING EXPIRATION
 
-Validate uploaded objects server-side.
+Typing state must expire automatically.
 
-────────────────────────────────────────
+This protects against:
 
-MEDIA PROCESSING
+* crashed clients;
+* lost disconnect events;
+* network failures;
+* application suspension.
 
-Implement asynchronous processing architecture.
+Do not require the client to always send a stop event.
 
-Support:
+---
 
-• Image processing
-• Video processing
-• Audio processing
-• Thumbnail generation
-• Preview generation
-• Metadata extraction
-• Compression
-• Format validation
+# 26. REAL-TIME EVENT SCHEMA
 
-Use BullMQ for processing jobs where appropriate.
+Define stable WebSocket event envelopes.
 
-Every processing job must support:
+Events should contain appropriate fields such as:
 
-• Job ID
-• Retry
-• Exponential backoff
-• Idempotency
-• Timeout
-• Failure state
-• Dead-letter handling
-• Monitoring
+* event ID;
+* event type;
+* version;
+* timestamp;
+* conversation ID where relevant;
+* sender/user/device context where appropriate;
+* sequence/version;
+* payload.
 
-────────────────────────────────────────
+Do not expose internal database fields unnecessarily.
 
-MEDIA SECURITY
+Do not send secrets.
 
-Implement:
+---
 
-• MIME validation
-• File-size restrictions
-• Malware scanning integration boundary
-• Extension validation
-• Storage isolation
-• Access authorization
-• Signed URLs
-• URL expiration
-• Media ownership validation
+# 27. WEBSOCKET EVENT CATEGORIES
 
-Never assume a file is safe because its extension is valid.
+Support appropriate events such as:
 
-────────────────────────────────────────
+### Messaging
 
-MEDIA ACCESS
+* message.created;
+* message.updated;
+* message.deleted;
+* message.reaction.updated;
+* message.delivery.updated;
+* message.read.updated.
 
-Implement secure media authorization.
+### Conversations
 
-Support:
+* conversation.created;
+* conversation.updated;
+* member.added;
+* member.removed;
+* member.role.changed.
 
-• Download authorization
-• Signed access
-• Expiration
-• Ownership checks
-• Conversation-membership checks
-• Block/privacy checks where required
+### Presence
 
-Do not expose permanent public URLs for private media.
+* presence.updated.
 
-────────────────────────────────────────
+### Typing
 
-CDN INTEGRATION
+* typing.started;
+* typing.stopped.
 
-Implement backend integration for CDN delivery.
+### Synchronization
 
-Support:
+* sync.available;
+* sync.required;
+* synchronization state events where appropriate.
 
-• Signed URLs
-• Signed cookies where appropriate
-• Cache invalidation where required
-• Expiration
-• Origin references
-• Protected asset access
+Only expose events to authorized clients.
 
-Do not make CDN access bypass backend authorization.
+---
 
-────────────────────────────────────────
+# 28. CLIENT ACKNOWLEDGEMENTS
 
-VOICE MESSAGE DOMAIN
-
-Implement voice-message metadata and lifecycle.
-
-Support:
-
-• Voice message creation
-• Duration
-• Audio format
-• Processing state
-• Storage reference
-• Download authorization
-• Delivery through existing messaging infrastructure
-
-Do not implement audio capture in backend.
-
-────────────────────────────────────────
-
-STORIES / STATUS
-
-Implement stories/status backend functionality.
-
-Support:
-
-• Story creation
-• Story retrieval
-• Story deletion
-• Story expiration
-• Story visibility
-• Audience selection
-• Viewer tracking
-• Reactions where appropriate
-
-Story types:
-
-• Text
-• Image
-• Video
-
-Define privacy rules for:
-
-• Public/allowed audience
-• Contacts
-• Excluded users
-• Blocked users
-
-────────────────────────────────────────
-
-STORY EXPIRATION
-
-Implement automated story expiration.
-
-Use BullMQ or scheduled infrastructure for:
-
-• Expiration
-• Viewer cleanup
-• Temporary media cleanup
-• Metadata cleanup
-
-Ensure expired content is no longer returned by APIs.
+Implement explicit acknowledgement behavior where appropriate.
 
 Distinguish:
 
-• Logical expiration
-• CDN/object-storage cleanup
-• Physical deletion
+* WebSocket transport delivered;
+* client acknowledged receipt;
+* durable message delivery state.
 
-────────────────────────────────────────
+Do not interpret a TCP/socket write as equivalent to a user/device delivery receipt.
 
-STORY VIEWERS
+---
 
-Implement:
+# 29. DELIVERY STATE INTEGRATION
 
-• Mark viewed
-• List viewers where authorized
-• Viewer counts
-• Idempotent viewer records
-• Privacy checks
+Integrate WebSocket delivery with the durable messaging system.
 
-Avoid excessive duplicate viewer writes.
+When the platform defines a message as delivered after a recipient device/client acknowledges it:
 
-────────────────────────────────────────
+1. validate the authenticated device;
+2. validate the conversation;
+3. validate message sequence/identity;
+4. update durable delivery state;
+5. publish the appropriate event.
 
-NOTIFICATION DOMAIN
+The client must never be able to acknowledge delivery for another device/user.
 
-Implement notification infrastructure.
+---
 
-Support:
+# 30. READ STATE INTEGRATION
 
-• Push notifications
-• In-app notifications
-• Email-ready architecture
+When a client marks messages as read:
 
-Notification types:
+* validate conversation access;
+* validate the read cursor;
+* enforce monotonicity;
+* persist authoritative state;
+* publish the read-state event.
 
-• New message
-• Missed call
-• Group activity
-• Community activity
-• Security alert
-• Account event
-• Business event
-• Administrative event
+Do not allow arbitrary future sequence numbers.
 
-────────────────────────────────────────
+---
 
-PUSH NOTIFICATIONS
+# 31. MULTI-DEVICE SYNCHRONIZATION
 
-Implement integrations for:
+Implement the foundation for syncing account state across devices.
 
-• Firebase Cloud Messaging
-• Apple Push Notification Service
+A newly connected device must be able to determine what durable state it has missed.
 
-Support:
+Synchronization must support:
 
-• Device token registration
-• Token rotation
-• Invalid token handling
-• Notification preferences
-• Notification deduplication
-• Retry
-• Backoff
-• Provider failure handling
-• Multi-device routing
+* messages;
+* edits;
+* deletions;
+* reactions;
+* read state;
+* conversation changes;
+* membership changes.
 
-Never include sensitive plaintext message content unnecessarily in notification payloads.
+Do not rely solely on transient WebSocket events.
 
-Respect privacy requirements.
+---
 
-────────────────────────────────────────
+# 32. SYNCHRONIZATION CURSOR
 
-NOTIFICATION PREFERENCES
+Implement a durable synchronization cursor strategy appropriate to the repository.
 
-Implement preferences for:
+The cursor must allow a client to communicate:
 
-• Messages
-• Calls
-• Groups
-• Communities
-• Business notifications
-• Security notifications
-• Marketing notifications where applicable
+```text
+I have processed events/state through position X.
+```
 
-Support:
+The server must be able to determine what comes after X.
 
-• Global defaults
-• Per-category preferences
-• Per-conversation overrides where appropriate
-• Device-specific preferences where needed
+Do not use only wall-clock time if it can cause ambiguity.
 
-────────────────────────────────────────
+---
 
-NOTIFICATION QUEUES
+# 33. GAP DETECTION
 
-Implement BullMQ queues for:
+Detect situations where:
 
-• Push delivery
-• Email delivery
-• Notification retries
-• Notification cleanup
-• Invalid token cleanup
+* the client missed events;
+* the connection was interrupted;
+* events are no longer available in the transient layer;
+* the client's cursor is stale.
 
-Each worker must be:
+In such cases, instruct the client to perform durable synchronization rather than assuming the transient event stream is complete.
 
-• Idempotent
-• Retryable
-• Observable
-• Rate-limited where appropriate
+---
 
-────────────────────────────────────────
+# 34. RECONNECT RECOVERY
 
-CALL DOMAIN
+On reconnect:
 
-Implement call-management backend functionality.
+1. authenticate the device;
+2. validate session;
+3. establish connection;
+4. receive synchronization state;
+5. determine whether a gap exists;
+6. replay/recover durable changes where possible;
+7. restore subscriptions;
+8. resume real-time delivery.
 
-Support:
+Do not simply reconnect the socket and assume no events were lost.
 
-• Call creation
-• Call invitation
-• Call acceptance
-• Call rejection
-• Call cancellation
-• Call termination
-• Call state
-• Participant management
-• Device selection
-• Call history metadata
+---
 
-Call states may include:
+# 35. OFFLINE DEVICES
 
-• Initiating
-• Ringing
-• Accepted
-• Active
-• Reconnecting
-• Ended
-• Failed
-• Rejected
-• Missed
+Do not attempt to maintain an unbounded WebSocket queue for offline devices.
 
-────────────────────────────────────────
+Offline devices should recover durable state through:
 
-CALL SIGNALING
+* synchronization;
+* message history;
+* push notifications where appropriate.
 
-Implement backend signaling infrastructure for WebRTC.
+Transient Redis queues must not become the only copy of an event.
 
-Support:
+---
 
-• Offer
-• Answer
-• ICE candidates
-• Session negotiation
-• Call invitations
-• Call acceptance
-• Call rejection
-• Call termination
-• Reconnection
+# 36. USER-SPECIFIC SYNCHRONIZATION
 
-Use WebSocket signaling.
+Multi-device synchronization must distinguish:
 
-Do not route audio/video payloads through NestJS APIs.
+* user-level state;
+* device-specific acknowledgement state.
 
-────────────────────────────────────────
+A message may need to be synchronized to multiple devices belonging to the same user.
 
-CALL AUTHORIZATION
+Do not incorrectly suppress delivery to one device because another device already received the event unless the canonical synchronization model explicitly allows that.
 
-Before allowing call actions, validate:
+---
 
-• User authentication
-• Conversation relationship
-• Blocking
-• Privacy
-• Device authorization
-• Call permissions
-• Account status
+# 37. EVENT RETENTION
 
-Do not trust client-provided call participant information.
+Determine an appropriate retention window for transient event/synchronization data.
 
-────────────────────────────────────────
+If events are no longer available:
 
-GROUP CALLS
+* fall back to authoritative database synchronization.
 
-Implement backend foundations for:
+Do not guarantee indefinite replay from Kafka/Redis unless the infrastructure actually provides it.
 
-• Group call creation
-• Participant admission
-• Participant removal
-• Call state
-• Participant state
-• Signaling events
+---
 
-Design for future SFU/media-server integration.
+# 38. REDIS KEY DESIGN
 
-Do not embed media transport into the application API.
+Every real-time Redis key must use a consistent namespace.
 
-────────────────────────────────────────
+Examples of logical categories:
 
-TURN / MEDIA SERVER INTEGRATION
+```text
+presence:user:{userId}
+presence:device:{deviceId}
+typing:conversation:{conversationId}:user:{userId}
+connection:user:{userId}
+connection:device:{deviceId}
+sync:{deviceId}
+```
 
-Implement backend integration boundaries for:
+Adapt the exact convention to the repository.
 
-• TURN credentials
-• Short-lived access
-• Region selection
-• Media server selection where appropriate
-• Session authorization
+Every key must define:
 
-Never expose long-lived TURN credentials.
+* purpose;
+* TTL;
+* owner;
+* serialization;
+* cleanup;
+* failure behavior.
 
-────────────────────────────────────────
+Do not create arbitrary undocumented keys.
 
-SEARCH DOMAIN
+---
 
-Implement search architecture for:
+# 39. DISTRIBUTED CONNECTION ROUTING
 
-• Users
-• Contacts
-• Groups
-• Communities
-• Conversations
-• Business accounts
+The platform may run multiple backend instances.
 
-Support message search only where it is compatible with the encryption/privacy architecture.
+A WebSocket connection may exist on any instance.
 
-Do not index E2EE-protected message plaintext server-side.
+Design routing so a Kafka event received by one instance can reach a client connected to another instance.
 
-────────────────────────────────────────
+Use a shared coordination mechanism appropriate to the repository, such as:
 
-SEARCH INDEXING
+* Socket.IO Redis adapter;
+* Redis pub/sub;
+* another explicitly justified mechanism.
 
-Implement Elasticsearch/OpenSearch integration.
+Do not assume all connections exist inside one process.
 
-Support:
+---
 
-• Index creation
-• Document serialization
-• Indexing
-• Updates
-• Deletes
-• Bulk indexing
-• Reindexing
-• Aliases
-• Index versioning
-• Retry
-• Failure handling
+# 40. HORIZONTAL SCALING
 
-Search documents must contain only data appropriate for indexing.
+The real-time layer must support multiple replicas.
 
-────────────────────────────────────────
+Do not store authoritative connection state only in local process memory.
 
-SEARCH AUTHORIZATION
+Local memory may be used as a performance optimization, but the architecture must remain correct when:
 
-Search must respect:
+* multiple pods exist;
+* a pod restarts;
+* traffic is load balanced;
+* clients reconnect to another pod.
 
-• User permissions
-• Conversation membership
-• Group membership
-• Community membership
-• Blocking
-• Privacy
-• Business permissions
+---
 
-Never return documents the requesting user cannot access.
+# 41. REDIS PUB/SUB
 
-────────────────────────────────────────
+If Redis pub/sub is used:
 
-BUSINESS ACCOUNT DOMAIN
+* keep messages ephemeral;
+* do not treat pub/sub as durable;
+* handle subscriber reconnect;
+* handle duplicate delivery;
+* handle missed publications.
 
-Implement:
+Durable state must come from PostgreSQL/event infrastructure.
 
-• Business account creation
-• Business profiles
-• Business verification state
-• Business users
-• Business roles
-• Business permissions
-• Business hours
-• Business metadata
+---
 
-Keep business functionality separate from consumer account state where appropriate.
+# 42. BULLMQ
 
-────────────────────────────────────────
+Use BullMQ for tasks that genuinely require asynchronous job processing.
 
-BUSINESS MESSAGING
+Potential jobs include:
 
-Implement backend support for:
+* stale presence cleanup where appropriate;
+* synchronization maintenance;
+* event retry processing where appropriate;
+* cleanup;
+* deferred processing.
 
-• Business conversations
-• Business participants
-• Business roles
-• Automated responses foundation
-• Business catalogs foundation
-• Business messaging permissions
+Each job must define:
 
-Do not implement frontend business UI.
+* queue;
+* job name;
+* payload;
+* priority;
+* timeout;
+* retry count;
+* backoff;
+* concurrency;
+* idempotency;
+* dead-letter/failure handling.
 
-────────────────────────────────────────
+Do not create BullMQ jobs for operations that must be synchronous and transactional.
 
-REPORTING
+---
 
-Implement reporting functionality.
+# 43. WORKER IMPLEMENTATION
 
-Support reports for:
+Every worker must:
 
-• Users
-• Messages where reportable
-• Groups
-• Communities
-• Businesses
-• Media
-• Abuse
+* validate input;
+* process idempotently;
+* emit useful logs/metrics;
+* handle retries;
+* handle permanent failures;
+* respect shutdown;
+* avoid duplicate side effects.
 
-Implement:
+Do not let workers silently swallow exceptions.
 
-• Report creation
-• Report status
-• Report categories
-• Evidence references where permitted
-• Report assignment
-• Resolution state
+---
 
-Respect E2EE boundaries.
+# 44. WORKER CONCURRENCY
 
-────────────────────────────────────────
+Configure worker concurrency deliberately.
 
-MODERATION
+Do not assume unlimited concurrency.
 
-Implement moderation foundations.
+Consider:
 
-Support:
+* database connection limits;
+* Redis capacity;
+* Kafka throughput;
+* WebSocket routing;
+* CPU/memory;
+* downstream provider limits.
 
-• Moderation cases
-• Administrative actions
-• Suspensions
-• Restrictions
-• Warnings
-• Content takedown references
-• Appeals
-• Case history
+---
 
-Do not create a hidden system for inspecting E2EE-protected content.
+# 45. JOB TIMEOUTS
 
-────────────────────────────────────────
+Every long-running job must have bounded execution.
 
-MODERATION POLICIES
-
-Implement policy/version structures for:
-
-• Abuse
-• Spam
-• Account restrictions
-• Media policies
-• Business policies
-
-Administrative decisions must be auditable.
-
-────────────────────────────────────────
-
-ADMINISTRATION
-
-Implement backend administration capabilities.
-
-Support:
-
-• User investigation
-• Account status management
-• Device investigation
-• Group investigation
-• Business management
-• Reports
-• Moderation
-• Feature flags
-• System configuration
-• Audit access
-
-Administrative operations must require explicit authorization.
-
-────────────────────────────────────────
-
-AUDIT LOGGING
-
-Implement comprehensive audit logging for sensitive operations.
-
-Track:
-
-• Actor
-• Action
-• Resource
-• Timestamp
-• Result
-• Request ID
-• Correlation ID
-• Relevant metadata
-
-Audit:
-
-• Administrative actions
-• Moderation actions
-• Business verification
-• Feature flag changes
-• System configuration changes
-• Security changes
-
-Never store secrets or message plaintext unnecessarily.
-
-────────────────────────────────────────
-
-ANALYTICS DOMAIN
-
-Implement analytics event generation and aggregation foundations.
-
-Support metrics for:
-
-• User activity
-• Messaging
-• Delivery
-• Groups
-• Communities
-• Stories
-• Calls
-• Media processing
-• Notifications
-• Business activity
-• Security events
-
-Do not run analytical workloads directly against transactional tables where avoidable.
-
-────────────────────────────────────────
-
-ANALYTICS PIPELINE
-
-Use Kafka and appropriate background processing.
-
-Support:
-
-• Event ingestion
-• Aggregation
-• Batch processing
-• Real-time metrics where appropriate
-• Retention
-• Privacy controls
-
-Define analytics event schemas separately from domain events where necessary.
-
-────────────────────────────────────────
-
-FEATURE FLAGS
-
-Implement feature flag backend.
-
-Support:
-
-• Global flags
-• Percentage rollout
-• User targeting
-• Region targeting
-• Device/platform targeting
-• Kill switches
-• Experiment assignments
-
-Implement:
-
-• Flag creation
-• Flag update
-• Flag deletion
-• Evaluation
-• Caching
-• Audit history
-
-────────────────────────────────────────
-
-FEATURE FLAG EVALUATION
-
-Flag evaluation must support deterministic results.
-
-Do not allow clients to bypass server-side feature controls.
-
-Sensitive feature flags must be evaluated server-side.
-
-────────────────────────────────────────
-
-EVENTS
-
-Implement and publish relevant events including:
-
-MEDIA
-
-• MediaUploaded
-• MediaProcessingStarted
-• MediaProcessingCompleted
-• MediaProcessingFailed
-
-STORIES
-
-• StoryCreated
-• StoryExpired
-• StoryViewed
-
-NOTIFICATIONS
-
-• NotificationCreated
-• NotificationDelivered
-• NotificationFailed
-
-CALLS
-
-• CallCreated
-• CallStarted
-• CallEnded
-• CallParticipantJoined
-• CallParticipantLeft
-
-SEARCH
-
-• SearchIndexed
-• SearchIndexFailed
-
-BUSINESS
-
-• BusinessAccountCreated
-• BusinessAccountVerified
-• BusinessUserAdded
-
-MODERATION
-
-• ReportCreated
-• ModerationCaseOpened
-• ModerationActionTaken
-
-ADMINISTRATION
-
-• AdministrativeActionTaken
-
-ANALYTICS
-
-• AnalyticsEventRecorded
-
-FEATURE FLAGS
-
-• FeatureFlagCreated
-• FeatureFlagChanged
-• FeatureFlagDeleted
-
-Use the established event envelope and transactional outbox where appropriate.
-
-────────────────────────────────────────
-
-BACKGROUND JOBS
-
-Implement queues/workers for:
-
-• Image processing
-• Video processing
-• Audio processing
-• Thumbnail generation
-• Media cleanup
-• Story expiration
-• Story cleanup
-• Push notifications
-• Email notifications
-• Search indexing
-• Search reindexing
-• Analytics aggregation
-• Report processing
-• Moderation workflows
-• Audit retention
-• Feature flag cleanup
-
-Every worker must support:
-
-• Retry
-• Backoff
-• Idempotency
-• Concurrency
-• Failure handling
-• Dead-letter behavior
-• Metrics
-
-────────────────────────────────────────
-
-DATABASE
-
-Implement Prisma models and migrations for the domains in this volume.
-
-Include appropriate models for:
-
-• MediaAsset
-• MediaProcessingJob
-• MediaVariant
-• Story
-• StoryAudience
-• StoryViewer
-• Notification
-• NotificationPreference
-• PushToken
-• Call
-• CallParticipant
-• CallSession
-• BusinessAccount
-• BusinessProfile
-• BusinessUser
-• Report
-• ModerationCase
-• ModerationAction
-• AuditLog extensions
-• Analytics event references where appropriate
-• FeatureFlag
-• FeatureFlagRule
-• FeatureFlagEvaluation where appropriate
+A worker stuck indefinitely must not consume capacity forever.
 
 Use:
 
-• Primary keys
-• Foreign keys
-• Unique constraints
-• Composite indexes
-• Status constraints
-• Timestamps
-• Retention fields
-• Partitioning where justified
+* job-level timeout;
+* provider timeout;
+* database timeout where applicable;
+* cancellation/shutdown handling.
 
-Do not create unnecessary transactional tables for analytics data.
+---
 
-────────────────────────────────────────
+# 46. RETRIES
 
-API
+Retries must use:
 
-Implement production-ready APIs for:
+* bounded attempts;
+* exponential/backoff strategy where appropriate;
+* jitter where appropriate;
+* distinction between transient and permanent failures.
 
-MEDIA
+Do not retry:
 
-• Upload initialization
-• Upload completion
-• Media metadata
-• Media authorization
-• Media deletion
+* malformed payloads;
+* authorization failures;
+* permanent validation failures;
 
-STORIES
+indefinitely.
 
-• Create
-• List
-• Get
-• View
-• Delete
+---
 
-NOTIFICATIONS
+# 47. DEAD-LETTER QUEUES
 
-• Preferences
-• Notification center
-• Device token registration
+Failed jobs requiring manual investigation must be recoverable.
 
-CALLS
+Capture:
 
-• Create
-• Accept
-• Reject
-• End
-• Participants
-• Signaling
+* job ID;
+* job type;
+* failure reason;
+* retry count;
+* timestamps;
+* correlation ID;
+* safe metadata.
 
-SEARCH
+Do not store sensitive tokens or private message content unnecessarily.
 
-• User search
-• Group search
-• Conversation search
-• Business search
-• Message search where allowed
+---
 
-BUSINESS
+# 48. REAL-TIME RATE LIMITING
 
-• Business profile
-• Business users
-• Business permissions
+Protect WebSocket operations against abuse.
 
-REPORTING
+Apply appropriate limits to:
 
-• Create report
-• Get report status
+* connection attempts;
+* authentication attempts;
+* typing events;
+* read acknowledgements;
+* delivery acknowledgements;
+* subscription changes;
+* synchronization requests;
+* arbitrary event submissions.
 
-ADMINISTRATION
+Do not allow a malicious client to flood a conversation or server.
 
-• Users
-• Accounts
-• Reports
-• Moderation
-• Feature flags
-• Audit logs
+---
 
-Every endpoint must include:
+# 49. WEBSOCKET INPUT VALIDATION
 
-• Validation
-• Authentication
-• Authorization
-• Rate limiting
-• OpenAPI documentation
-• Consistent errors
-• Idempotency where appropriate
+Validate every inbound event.
 
-────────────────────────────────────────
+Reject:
 
-SECURITY
+* malformed event names;
+* invalid IDs;
+* unauthorized conversation IDs;
+* oversized payloads;
+* invalid sequences;
+* invalid cursors;
+* unexpected fields.
 
-Enforce:
+Do not trust WebSocket payloads merely because they bypass HTTP.
 
-• Authorization
-• Ownership
-• Conversation membership
-• Group membership
-• Privacy settings
-• Signed media access
-• Short-lived call credentials
-• Rate limits
-• Administrative permissions
-• Business permissions
+---
 
-Never trust:
+# 50. WEBSOCKET AUTHORIZATION
 
-• Client-provided media ownership
-• Client-provided call participants
-• Client-provided administrative roles
-• Client-provided moderation status
-• Client-provided feature evaluation for sensitive features
+Authorization must occur for every resource-sensitive operation.
 
-────────────────────────────────────────
+Examples:
 
-OBSERVABILITY
+* joining a conversation;
+* requesting synchronization;
+* marking read;
+* acknowledging delivery;
+* publishing typing;
+* requesting presence;
+* receiving private events.
 
-Instrument:
+Do not assume that authentication at socket connection time grants access to every future resource.
 
-• Media processing
-• Upload failures
-• Download authorization
-• Story creation
-• Story views
-• Notification delivery
-• Push provider errors
-• Call signaling
-• Search latency
-• Search errors
-• Business operations
-• Moderation
-• Administration
-• Analytics processing
+Membership can change after connection.
+
+---
+
+# 51. MEMBERSHIP REVOCATION
+
+If a user is:
+
+* removed from a group;
+* leaves a group;
+* banned;
+* loses authorization;
+
+the real-time layer must stop delivering protected conversation events to that user.
+
+Do not depend solely on a socket reconnect.
+
+Authorization state must be refreshed or invalidated appropriately.
+
+---
+
+# 52. BLOCKING INTEGRATION
+
+Real-time delivery must respect blocking/privacy rules.
+
+If user A blocks user B:
+
+* future event delivery must follow the product's blocking semantics;
+* presence visibility must respect privacy;
+* typing visibility must respect privacy;
+* direct conversation events must not bypass the block.
+
+Do not implement a second blocking subsystem.
+
+Use authoritative privacy/security decisions.
+
+---
+
+# 53. SECURITY
+
+Defend the real-time system against:
+
+* connection flooding;
+* authentication brute force;
+* token replay;
+* unauthorized subscriptions;
+* room enumeration;
+* event spoofing;
+* user impersonation;
+* message acknowledgement spoofing;
+* oversized payloads;
+* event amplification;
+* Redis abuse;
+* synchronization abuse.
+
+Do not trust client identity fields.
+
+---
+
+# 54. CONNECTION LIMITS
+
+Define configurable limits for:
+
+* connections per user;
+* connections per device;
+* subscriptions;
+* event frequency;
+* payload size.
+
+Handle excess connections deterministically.
+
+Do not allow one compromised account to consume unlimited socket resources.
+
+---
+
+# 55. HEARTBEAT AND DEAD CONNECTIONS
+
+Implement appropriate heartbeat/ping behavior.
+
+Clean up:
+
+* dead sockets;
+* stale connection metadata;
+* stale presence;
+* expired typing state.
+
+Do not rely on application-level disconnect callbacks alone.
+
+Network failures may prevent graceful disconnect events.
+
+---
+
+# 56. BACKPRESSURE
+
+The real-time system must handle slow consumers.
+
+Do not allow one slow client to block a server worker or event consumer indefinitely.
+
+Use appropriate:
+
+* bounded buffers;
+* disconnect thresholds;
+* batching;
+* event coalescing for ephemeral events.
+
+Never drop durable message state.
+
+Transient events such as typing may safely expire/coalesce according to product semantics.
+
+---
+
+# 57. MESSAGE BURSTS
+
+The system must remain stable when a conversation experiences bursts of messages.
+
+Avoid:
+
+* one database query per socket unnecessarily;
+* unbounded in-memory queues;
+* synchronous push to every device inside the database transaction.
+
+Use asynchronous event processing where appropriate.
+
+---
+
+# 58. EVENT FANOUT
+
+For group conversations:
+
+* identify eligible recipients efficiently;
+* avoid loading unnecessary user data;
+* handle large groups without quadratic behavior;
+* separate durable persistence from transport fanout.
+
+Do not perform massive synchronous database work inside the message creation request merely to deliver WebSocket events.
+
+---
+
+# 59. PUSH NOTIFICATION HANDOFF
+
+Offline recipients may eventually require push notifications.
+
+This volume should publish sufficient message/conversation events for a future notification service.
+
+Do not make message persistence depend on FCM/APNs availability.
+
+Do not implement fake push delivery.
+
+---
+
+# 60. OBSERVABILITY
+
+Instrument the entire real-time path.
 
 Track:
 
-• Latency
-• Throughput
-• Error rates
-• Queue depth
-• Retry counts
-• Dead-letter counts
-• External provider failures
+* active connections;
+* connection attempts;
+* authentication failures;
+* disconnects;
+* reconnects;
+* event throughput;
+* event delivery latency;
+* delivery failures;
+* consumer lag;
+* retry counts;
+* dead-letter counts;
+* Redis latency;
+* synchronization latency;
+* presence updates;
+* typing events;
+* worker execution.
 
-Never log sensitive message content or encryption keys.
+Use low-cardinality metrics.
 
-────────────────────────────────────────
+Do not use:
 
-TESTING
+* user ID;
+* device ID;
+* conversation ID;
 
-UNIT TESTS
+as unrestricted metric labels.
+
+---
+
+# 61. DISTRIBUTED TRACING
+
+Propagate tracing across:
+
+```text
+HTTP/WebSocket
+→ domain service
+→ PostgreSQL
+→ outbox
+→ Kafka/Redpanda
+→ consumer
+→ Redis
+→ WebSocket
+```
+
+Preserve trace context through asynchronous boundaries where supported.
+
+Do not break tracing when events cross processes.
+
+---
+
+# 62. LOGGING
+
+Log structured operational information such as:
+
+* event type;
+* event ID;
+* connection state;
+* worker state;
+* latency;
+* retry count;
+* error category;
+* correlation ID.
+
+Never log:
+
+* passwords;
+* access tokens;
+* refresh tokens;
+* private keys;
+* push credentials;
+* unnecessary message contents;
+* sensitive personal data.
+
+---
+
+# 63. HEALTH CHECKS
+
+Extend health/readiness infrastructure for:
+
+* Redis;
+* Kafka/Redpanda;
+* BullMQ workers;
+* WebSocket subsystem where appropriate.
+
+Do not make liveness dependent on every downstream service.
+
+Readiness should reflect whether the instance can safely accept traffic.
+
+---
+
+# 64. GRACEFUL SHUTDOWN
+
+On shutdown:
+
+1. stop accepting new WebSocket connections;
+2. stop accepting new jobs;
+3. stop Kafka consumers;
+4. allow in-flight processing to finish within a bounded deadline;
+5. disconnect sockets cleanly;
+6. release Redis resources;
+7. close database connections;
+8. flush telemetry;
+9. exit.
+
+Do not lose acknowledged durable state.
+
+---
+
+# 65. FAILURE MATRIX
+
+Implement explicit behavior for:
+
+| Failure                 | Required behavior                      |
+| ----------------------- | -------------------------------------- |
+| WebSocket disconnect    | Client reconnect/sync                  |
+| Redis unavailable       | Fail/recover ephemeral features safely |
+| Kafka unavailable       | Preserve durable DB state/outbox       |
+| Consumer crash          | Restart/reprocess safely               |
+| Duplicate event         | Idempotent processing                  |
+| Slow client             | Apply bounded backpressure             |
+| Worker crash            | Retry job                              |
+| Poison event            | Retry then DLQ                         |
+| Session revoked         | Terminate/deny connection              |
+| Membership revoked      | Stop protected delivery                |
+| Presence heartbeat lost | TTL-based expiry                       |
+| Typing stop event lost  | TTL-based expiry                       |
+
+Do not allow transient infrastructure failure to corrupt durable messaging state.
+
+---
+
+# 66. SYNCHRONIZATION API
+
+Provide an appropriate synchronization endpoint/service.
+
+It should allow an authenticated device to request changes after a known cursor.
+
+The response must support:
+
+* events/changes;
+* cursor advancement;
+* pagination/batching;
+* gap detection;
+* resynchronization.
+
+Do not return unbounded histories in one response.
+
+---
+
+# 67. SYNC AUTHORIZATION
+
+Synchronization must be scoped to the authenticated account/device.
+
+A device must never request arbitrary users' synchronization streams.
+
+The server must determine the correct state from authenticated identity.
+
+---
+
+# 68. SYNC BATCHING
+
+Large synchronization operations must be bounded.
+
+Use:
+
+* batch size;
+* cursor;
+* continuation token where needed.
+
+Do not allocate massive memory for a device with months of missed activity.
+
+---
+
+# 69. SYNC ORDERING
+
+Synchronization must return changes in a deterministic order appropriate to the canonical event model.
+
+If multiple domains produce events, define a consistent synchronization strategy.
+
+Do not mix unrelated timestamps without a clear ordering contract.
+
+---
+
+# 70. EVENT SCHEMA EVOLUTION
+
+Consumers must tolerate supported event versions.
+
+Implement:
+
+* explicit versions;
+* compatibility handling;
+* validation;
+* safe rejection of unsupported versions;
+* observability for schema mismatches.
+
+Do not silently interpret unknown event schemas.
+
+---
+
+# 71. SECURITY EVENT HANDLING
+
+Real-time security events may include:
+
+* suspicious connection attempts;
+* invalid authentication;
+* repeated authorization failures;
+* session revocation;
+* device revocation;
+* abnormal event rates.
+
+Integrate with the existing security/audit mechanism.
+
+Do not expose internal security signals to ordinary users.
+
+---
+
+# 72. TESTING — UNIT
 
 Test:
 
-• Media validation
-• Story visibility
-• Notification routing
-• Call state transitions
-• Search authorization
-• Business permissions
-• Moderation policies
-• Feature-flag evaluation
+* WebSocket authentication;
+* authorization;
+* connection lifecycle;
+* presence;
+* typing;
+* synchronization;
+* event routing;
+* event idempotency;
+* retry logic;
+* worker logic;
+* backpressure rules.
 
-INTEGRATION TESTS
+---
+
+# 73. TESTING — INTEGRATION
+
+Test against realistic infrastructure where possible:
+
+* PostgreSQL;
+* Redis;
+* Kafka/Redpanda;
+* BullMQ;
+* Socket.IO/WebSocket.
+
+Verify:
+
+* event publication;
+* event consumption;
+* duplicate events;
+* retry;
+* DLQ;
+* presence TTL;
+* multi-device routing;
+* reconnect recovery.
+
+---
+
+# 74. TESTING — MULTI-INSTANCE
+
+Where the repository supports integration environments, run multiple backend instances.
+
+Verify:
+
+* user connects to instance A;
+* event consumed by instance B;
+* event reaches the user;
+* Redis/shared routing bridges the instances.
+
+This is critical.
+
+Do not declare horizontal scaling correct based only on a single-process test.
+
+---
+
+# 75. TESTING — RECONNECT
 
 Test:
 
-• S3 integration
-• Redis
-• Kafka
-• BullMQ
-• PostgreSQL
-• Search
-• Push providers
-• WebSocket signaling
+1. device connects;
+2. receives events;
+3. connection drops;
+4. messages/events occur while offline;
+5. device reconnects;
+6. synchronization detects missed state;
+7. device recovers all required durable changes;
+8. real-time delivery resumes.
 
-API TESTS
+---
 
-Test:
-
-• Media APIs
-• Story APIs
-• Notification APIs
-• Call APIs
-• Search APIs
-• Business APIs
-• Moderation APIs
-• Administration APIs
-
-SECURITY TESTS
+# 76. TESTING — SECURITY
 
 Test:
 
-• Unauthorized media access
-• Notification privacy
-• Call authorization
-• Search authorization
-• Business privilege escalation
-• Administrative privilege escalation
-• Report manipulation
-• Feature-flag bypass
+* invalid WebSocket credentials;
+* revoked sessions;
+* unauthorized room subscription;
+* unauthorized synchronization;
+* unauthorized read acknowledgement;
+* unauthorized delivery acknowledgement;
+* blocked users;
+* removed group members;
+* event spoofing;
+* payload flooding;
+* connection flooding.
 
-PERFORMANCE TESTS
+---
+
+# 77. TESTING — FAILURE
 
 Test:
 
-• Media processing queues
-• Notification throughput
-• Search throughput
-• Call signaling
-• Story traffic
-• Analytics ingestion
+* Redis outage;
+* Kafka outage;
+* worker restart;
+* consumer restart;
+* duplicate events;
+* delayed events;
+* DLQ behavior;
+* slow clients;
+* dropped connections;
+* database outage.
 
-────────────────────────────────────────
+The system must fail safely.
 
-DOCUMENTATION
+---
 
-Document:
+# 78. PERFORMANCE
 
-• Media architecture
-• S3 integration
-• CDN integration
-• Processing pipeline
-• Story lifecycle
-• Notification system
-• Call signaling
-• Search architecture
-• Business account model
-• Moderation model
-• Reporting
-• Administration
-• Analytics
-• Feature flags
-• API contracts
-• Event contracts
-• Queue architecture
-• Security requirements
+Measure:
 
-────────────────────────────────────────
+* WebSocket connection capacity;
+* event throughput;
+* fanout latency;
+* Redis operations;
+* Kafka consumer lag;
+* synchronization throughput;
+* worker throughput.
+
+Identify bottlenecks.
+
+Do not optimize based solely on theoretical assumptions.
+
+---
 
-PROJECT INDEX
+# 79. NO PLACEHOLDERS
 
-Update the backend Project Index with:
+Do not leave:
 
-• Completed media modules
-• Completed story modules
-• Completed notification modules
-• Completed call modules
-• Completed search modules
-• Completed business-account modules
-• Completed moderation modules
-• Completed administration modules
-• Completed analytics modules
-• Completed feature-flag modules
-• Database models
-• Migrations
-• APIs
-• WebSocket contracts
-• Events
-• Queues
-• Workers
-• Tests
-• Generated files
-• Remaining work
-• Current milestone
-• Dependencies
-
-────────────────────────────────────────
-
-IMPLEMENTATION MILESTONES
-
-Implement incrementally.
-
-MILESTONE 1
-
-Media metadata, upload authorization, and object-storage integration.
-
-MILESTONE 2
-
-Media processing workers and media lifecycle.
-
-MILESTONE 3
-
-Stories/status and expiration.
-
-MILESTONE 4
-
-Notifications, push tokens, preferences, and workers.
-
-MILESTONE 5
-
-Call sessions, signaling, and WebRTC integration boundaries.
-
-MILESTONE 6
-
-Search and indexing.
-
-MILESTONE 7
-
-Business accounts and business permissions.
-
-MILESTONE 8
-
-Reporting and moderation.
-
-MILESTONE 9
-
-Administration and audit functionality.
-
-MILESTONE 10
-
-Analytics and feature flags.
-
-MILESTONE 11
-
-Cross-domain events, observability, security hardening, and integration testing.
-
-Each milestone should contain approximately 20–40 files where practical.
-
-Every milestone must compile before proceeding.
-
-────────────────────────────────────────
-
-OUTPUT FORMAT
-
-For every generated file provide:
-
-1. Exact file path
-2. Complete file contents
-
-Never truncate code.
-
-Never summarize source code instead of generating it.
-
-Never generate pseudo-code.
-
-Never generate placeholder files.
-
-Never generate TODO implementations.
-
-When modifying an existing file:
-
-1. Provide the exact file path.
-2. State why it must change.
-3. Provide the complete updated file.
-
-Never regenerate unchanged files.
-
-────────────────────────────────────────
-
-SCOPE RESTRICTION
-
-This volume covers:
-
-• Media
-• Media processing
-• Stories/status
-• Notifications
-• Voice/video calls
-• Call signaling
-• Search
-• Business accounts
-• Reporting
-• Moderation
-• Administration
-• Audit
-• Analytics
-• Feature flags
-
-Do not implement infrastructure deployment.
-
-Do not implement frontend UI.
-
-Do not implement mobile UI.
-
-Do not implement Terraform.
-
-Do not implement Kubernetes.
-
-Do not implement CI/CD.
-
-Do not replace established E2EE cryptographic architecture with custom cryptography.
-
-────────────────────────────────────────
-
-QUALITY BAR
-
-Treat these systems as enterprise production infrastructure.
-
-Assume:
-
-• Massive media traffic
-• Millions of notifications
-• High call concurrency
-• Global search traffic
-• Large business workloads
-• Large moderation workloads
-• High-volume analytics
-• Multi-region operation
-
-Prioritize:
-
-• Security
-• Privacy
-• Reliability
-• Scalability
-• Idempotency
-• Observability
-• Fault tolerance
-• Maintainability
-• Clear domain ownership
-• Production readiness
+* TODO;
+* FIXME;
+* fake event consumers;
+* fake WebSocket handlers;
+* fake presence;
+* in-memory-only production state;
+* fake synchronization;
+* fake workers;
+* silently swallowed failures.
+
+Every implemented path must work.
+
+---
+
+# 80. BACKWARD COMPATIBILITY
+
+Preserve existing:
+
+* authentication;
+* messaging APIs;
+* event schemas;
+* Redis conventions;
+* database behavior;
+* WebSocket contracts.
+
+If incompatible behavior must change:
+
+1. inspect actual clients/contracts;
+2. design migration;
+3. preserve compatibility where possible;
+4. document unavoidable changes.
+
+Do not break existing functionality simply to simplify implementation.
+
+---
+
+# 81. CROSS-SYSTEM CONTRACTS
+
+Preserve canonical:
+
+* User ID;
+* Device ID;
+* Session ID;
+* Conversation ID;
+* Message ID;
+* message sequence;
+* event ID;
+* event type/version;
+* cursor;
+* timestamp;
+* correlation ID;
+* trace context;
+* error codes.
+
+These contracts must remain consistent across:
+
+* REST;
+* WebSocket;
+* Kafka/Redpanda;
+* Redis;
+* BullMQ;
+* PostgreSQL;
+* web;
+* mobile.
+
+Do not introduce parallel representations.
+
+---
+
+# 82. FINAL VALIDATION
+
+Before considering this volume complete, actually run applicable:
+
+* TypeScript type checking;
+* linting;
+* formatting;
+* unit tests;
+* integration tests;
+* API/E2E tests;
+* WebSocket tests;
+* Redis tests;
+* Kafka/Redpanda tests;
+* BullMQ tests;
+* synchronization tests;
+* reconnect tests;
+* multi-instance tests where available;
+* security tests;
+* application startup;
+* health/readiness checks.
+
+Fix failures.
+
+Do not claim successful validation without actually running it.
+
+---
+
+# 83. IMPLEMENTATION ORDER
+
+Use this sequence unless repository constraints require a safer alternative:
+
+1. inspect repository;
+2. inspect existing messaging/event contracts;
+3. establish WebSocket authentication;
+4. establish connection/device mapping;
+5. implement distributed socket routing;
+6. implement Kafka/Redpanda consumers;
+7. implement real-time message delivery;
+8. implement conversation event delivery;
+9. implement delivery acknowledgements;
+10. implement read-state real-time updates;
+11. implement presence;
+12. implement typing;
+13. implement synchronization cursor;
+14. implement synchronization API/service;
+15. implement reconnect recovery;
+16. implement event deduplication;
+17. implement retries/DLQ;
+18. implement BullMQ workers where justified;
+19. implement rate limiting/backpressure;
+20. implement membership/privacy revocation handling;
+21. implement observability;
+22. implement tests;
+23. validate multi-instance behavior;
+24. validate failure scenarios;
+25. run complete backend validation;
+26. fix all discovered issues.
+
+---
+
+# 84. FINAL ENGINEERING REQUIREMENT
+
+The completed implementation must leave the repository with a real distributed real-time backend.
+
+It must be:
+
+* horizontally scalable;
+* authenticated;
+* authorization-aware;
+* multi-device capable;
+* reconnect-safe;
+* event-driven;
+* idempotent;
+* observable;
+* resilient to infrastructure failures;
+* resistant to abuse;
+* compatible with offline clients;
+* compatible with future push notifications;
+* compatible with future media processing;
+* compatible with future search;
+* compatible with future calling.
+
+The critical architectural guarantee is:
+
+```text
+Durable state
+    ↓
+Transactional event
+    ↓
+Kafka/Redpanda
+    ↓
+Real-time consumers
+    ↓
+Distributed connection routing
+    ↓
+WebSocket/Socket.IO
+    ↓
+Client
+```
+
+And when the client is offline:
+
+```text
+Durable state
+    ↓
+Synchronization
+    ↓
+Client recovery
+```
+
+The WebSocket layer must never become the authoritative source of message state.
+
+Redis must never become the only durable copy of messages.
+
+Kafka/Redpanda must not be treated as an exactly-once transport.
+
+Every consumer and worker must be safe under retries and duplicate delivery.
+
+Do not merely describe what should be implemented.
+
+**Inspect the actual repository and implement this backend volume completely.**
