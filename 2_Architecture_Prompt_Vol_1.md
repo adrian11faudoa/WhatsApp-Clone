@@ -1,137 +1,137 @@
-# ARCHITECTURE PROMPT — VOLUME 1
+# WHATSAPP — ARCHITECTURE VOLUME 1
 
-# PRODUCTION-GRADE REAL-TIME COMMUNICATION PLATFORM
+## ROLE
 
-# SYSTEM, DOMAIN, DATA, SECURITY, AND API ARCHITECTURE
+You are operating as the senior architecture and distributed-systems engineering organization responsible for defining the production architecture of a globally scalable real-time communication platform comparable in product capability to WhatsApp, Telegram, Signal, Messenger, Discord, and Teams.
 
-You are the principal architecture team responsible for defining the production architecture of an original, enterprise-grade real-time communication platform.
+Operate simultaneously as:
 
-This platform is an original product inspired by the capabilities users expect from modern messaging applications. Do not copy proprietary source code, private APIs, undocumented protocols, or proprietary internal implementation details from WhatsApp or any other proprietary platform.
+* Principal Software Architect
+* Staff Backend Engineer
+* Distributed Systems Engineer
+* Real-Time Systems Engineer
+* Database Architect
+* Security Engineer
+* Privacy Engineer
+* Cloud Architect
+* DevOps Engineer
+* Site Reliability Engineer
+* Performance Engineer
+* QA Architect
+* Mobile Architect
+* Frontend Architect
+* Technical Writer
 
-This architecture specification must be complete for the scope defined in this prompt.
+Do not implement the application during this architecture phase unless a concrete repository inspection is required to determine the current implementation state.
 
-Do not generate application source code.
+Your responsibility is to produce a complete, implementation-ready architecture blueprint for the WhatsApp project described in this prompt.
 
-Do not generate pseudo-code.
-
-Do not create implementation scaffolding.
-
-Produce architecture, specifications, contracts, engineering decisions, data models, interfaces, constraints, and operational requirements only.
-
-The architecture defined here must be usable independently by an engineering team while also being designed to integrate into the actual repository with later implementation work.
+The architecture must be sufficiently precise that independent backend, frontend, mobile, infrastructure, and QA implementation work can later be performed without inventing incompatible system contracts.
 
 ---
 
-# 1. PROJECT CONTEXT
+# PROJECT
 
-The product is a globally scalable real-time communication platform serving web and mobile clients.
+Build an enterprise-grade, globally scalable real-time communication platform named **WhatsApp**.
 
 The platform must support:
 
-* user accounts
-* authentication
-* user profiles
-* devices
-* contacts
-* one-to-one conversations
+* individual conversations
 * group conversations
-* messaging
-* message states
-* reactions
-* replies
-* editing
-* deletion
+* user accounts
+* profiles
+* contacts
+* devices
+* authentication
+* authorization
 * presence
 * typing indicators
-* multi-device synchronization
-* media
+* message delivery states
+* read receipts
+* replies
+* reactions
+* editing
+* deletion
+* forwarding
+* pinned messages
+* starred/saved messages
+* media messages
+* documents
+* voice messages
+* images
+* videos
+* stickers
+* GIF-oriented media
+* link previews
+* message search
+* notifications
 * push notifications
-* search
+* multi-device synchronization
+* offline synchronization
+* network recovery
 * blocking
 * reporting
 * privacy controls
-* voice calls
-* video calls
-* background processing
+* disappearing messages
+* administrative capabilities
+* abuse prevention
+* analytics
+* secure media storage and delivery
 
-The system must be designed for production workloads rather than tutorial or prototype workloads.
+The target architecture must support a global user base with potentially hundreds of millions of accounts, very large concurrent connection counts, high message throughput, substantial media traffic, large group fan-out, and geographically distributed workloads.
+
+The system must be designed around horizontal scalability, fault tolerance, secure access control, observability, and graceful degradation.
 
 ---
 
-# 2. TECHNOLOGY BASELINE
+# TECHNOLOGY DIRECTION
 
-The architecture must be designed around:
+The architecture must be based on the following technology direction unless repository inspection identifies an existing technically justified compatible implementation:
 
-## Backend
-
-* Node.js
-* NestJS
-* TypeScript
-
-## Primary database
-
-* PostgreSQL
-* Prisma ORM
-
-## Distributed infrastructure
-
-* Redis
-* Kafka or Redpanda
-* BullMQ
-
-## Real-time
-
-* WebSockets
-* Socket.IO where appropriate
-
-## Object storage
-
-* AWS S3
-
-## CDN
-
-* AWS CloudFront
-
-## Media processing
-
-* FFmpeg
-* appropriate image-processing tooling
-
-## Push notifications
-
-* Firebase Cloud Messaging
-* Apple Push Notification service
-
-## Voice/video
-
-* WebRTC
-* STUN
-* TURN
-
-## Search
-
-* Elasticsearch or OpenSearch
-
-## Web
+### Web
 
 * Next.js
 * React
 * TypeScript
 * Tailwind CSS
-* shadcn/ui
-* TanStack Query
-* Zustand where appropriate
+* reusable accessible UI components
+* TanStack Query or equivalent server-state management
+* Zustand or equivalent client-state management where appropriate
 
-## Mobile
+### Mobile
 
 * React Native
-* Expo
+* Expo where compatible with required capabilities
 * TypeScript
 * React Navigation
-* TanStack Query
-* Zustand where appropriate
+* secure device storage
+* FCM
+* APNs
 
-## Infrastructure
+### Backend
+
+* Node.js
+* TypeScript
+* NestJS
+* REST APIs
+* WebSockets / Socket.IO or equivalent
+* PostgreSQL
+* Prisma
+* Redis
+* BullMQ
+* Kafka or Redpanda
+
+### Search
+
+* Elasticsearch or OpenSearch
+
+### Media
+
+* S3-compatible object storage
+* CloudFront or equivalent CDN
+* FFmpeg
+
+### Infrastructure
 
 * Docker
 * Kubernetes
@@ -139,7 +139,7 @@ The architecture must be designed around:
 * Terraform
 * GitHub Actions
 
-## Observability
+### Observability
 
 * OpenTelemetry
 * Prometheus
@@ -147,1142 +147,1102 @@ The architecture must be designed around:
 * Loki
 * Tempo
 
+### Cloud
+
+AWS is the default cloud direction unless the repository establishes another explicit requirement.
+
 ---
 
-# 3. ARCHITECTURAL OBJECTIVE
+# SOURCE OF TRUTH
 
-Design a system that can scale from an initial deployment to a large global communication platform without requiring a fundamental rewrite of the core domain model.
+The repository is the authoritative source of truth for the implementation state.
 
-The architecture must optimize for:
+Before defining architecture:
 
-* correctness
+1. Inspect the repository.
+2. Identify existing applications and services.
+3. Identify existing modules and domains.
+4. Inspect database schemas and migrations.
+5. Inspect API definitions.
+6. Inspect WebSocket infrastructure.
+7. Inspect event infrastructure.
+8. Inspect queue infrastructure.
+9. Inspect frontend and mobile applications.
+10. Inspect infrastructure definitions.
+11. Inspect tests.
+12. Inspect configuration and environment conventions.
+13. Identify existing architectural decisions that must be preserved.
+14. Identify architectural inconsistencies that require explicit resolution.
+
+Do not assume that the repository is empty.
+
+Do not discard compatible existing architecture without a concrete reason.
+
+Do not invent repository components that do not exist.
+
+This prompt defines the target architecture; the repository defines the current implementation state.
+
+---
+
+# 1. ARCHITECTURAL MISSION
+
+Produce a production-grade architecture for a global communication platform.
+
+The architecture must provide explicit answers for:
+
+* system boundaries
+* domain boundaries
+* service boundaries
+* module boundaries
+* ownership
+* data flow
+* API flow
+* real-time flow
+* event flow
+* queue flow
+* synchronization
+* storage
+* caching
+* search
+* media
+* notifications
+* authentication
+* authorization
 * privacy
 * security
-* availability
-* consistency where required
-* eventual consistency where acceptable
-* horizontal scalability
-* operational simplicity
-* failure isolation
 * observability
-* maintainability
+* deployment
+* scalability
+* failure handling
+* disaster recovery
 
-Do not introduce microservices merely for appearance.
+Do not produce a conceptual diagram without implementation-level contracts.
 
-Prefer modular boundaries and extract independently deployable services only when there is a concrete architectural reason.
+The architecture must be sufficiently precise for engineering teams to implement it.
 
 ---
 
-# 4. SYSTEM CONTEXT
+# 2. ARCHITECTURAL STYLE
 
-Define the complete high-level system context.
+Design the platform around domain-oriented services and modules.
 
-Identify:
+The architecture must support a practical evolution from an initially manageable deployment into a large-scale distributed platform.
 
-* web clients
-* mobile clients
-* API layer
-* authentication
-* core backend modules/services
-* PostgreSQL
-* Redis
-* Kafka/Redpanda
-* BullMQ
-* object storage
-* CDN
+Avoid prematurely creating dozens of independently deployable services without operational justification.
+
+At the same time, do not create a monolithic architecture that prevents independent scaling of:
+
+* real-time connections
+* messaging
+* media processing
+* notifications
 * search
-* push notification providers
-* WebRTC signaling
-* STUN
-* TURN
-* observability infrastructure
-* administrative/moderation interfaces
-* external dependencies
+* background jobs
+* analytics
+* administrative workloads
 
-For every external dependency define:
+Define which capabilities should initially be implemented as:
 
-* responsibility
-* data exchanged
-* trust boundary
-* failure modes
-* timeout expectations
-* retry expectations
-* security requirements
+* modular monolith modules
+* independently scalable workers
+* independently scalable services
+* infrastructure-managed components
 
-Clearly identify authoritative systems versus derived systems.
+Explain the boundaries and scaling rationale.
 
 ---
 
-# 5. ARCHITECTURAL STYLE
+# 3. CORE DOMAIN MAP
 
-Define the recommended initial architecture.
+Define the major bounded contexts and their responsibilities.
 
-Evaluate whether the platform should begin as:
+At minimum, evaluate:
 
-* a modular monolith
-* a service-oriented architecture
-* a hybrid architecture
+### Identity Domain
 
-The recommendation must be based on:
+Responsible for:
 
-* team complexity
-* operational burden
-* domain boundaries
-* scaling characteristics
-* real-time requirements
-* messaging throughput
-* data ownership
-* deployment independence
-
-The architecture must permit later extraction of components where justified without creating unnecessary distributed-system complexity during initial development.
-
-Define explicit module/service boundaries.
-
----
-
-# 6. BOUNDED CONTEXTS
-
-Define the major bounded contexts.
-
-At minimum evaluate:
-
-## Identity
-
-Responsibilities:
-
-* account identity
-* authentication
+* accounts
 * credentials
-* sessions
+* verification
+* authentication
 * account lifecycle
+* recovery
+* security state
 
-## User Profile
+### Profile Domain
 
-Responsibilities:
+Responsible for:
 
-* display identity
-* profile information
-* profile media
-* privacy-related profile visibility
+* user profile
+* display name
+* avatar
+* biography/status where applicable
+* profile visibility
 
-## Device Management
+### Device Domain
 
-Responsibilities:
+Responsible for:
 
 * registered devices
-* device sessions
-* push tokens
+* device identity
 * device capabilities
-* revocation
+* push tokens
+* session state
+* device revocation
 
-## Contacts
+### Contact Domain
 
-Responsibilities:
+Responsible for:
 
-* contacts
-* discovery
-* contact relationships where applicable
+* contact relationships
+* contact discovery
+* contact visibility
+* contact synchronization
+* blocking relationships
 
-## Conversations
+### Conversation Domain
 
-Responsibilities:
+Responsible for:
 
-* direct conversations
-* group conversations
+* conversations
+* participants
+* conversation type
+* conversation metadata
 * membership
-* conversation settings
-* lifecycle
 
-## Messaging
+### Group Domain
 
-Responsibilities:
+Responsible for:
+
+* group creation
+* group membership
+* roles
+* permissions
+* invitations
+* administrative operations
+* group metadata
+
+### Messaging Domain
+
+Responsible for:
 
 * messages
-* message content
-* message metadata
+* message types
 * message lifecycle
-* edits
+* replies
+* forwarding
+* editing
 * deletion
+* reactions
+* pins
+* saved/starred state
 
-## Message State
+### Delivery Domain
 
-Responsibilities:
+Responsible for:
 
-* sent
-* delivered
-* read
-* failed
-* synchronization state
+* message delivery
+* acknowledgements
+* read state
+* synchronization
+* retry/reconciliation
 
-## Presence
+### Presence Domain
 
-Responsibilities:
+Responsible for:
 
 * online state
-* last-seen information
+* last-seen state
 * typing state
+* ephemeral presence information
 
-## Media
+### Media Domain
 
-Responsibilities:
+Responsible for:
 
-* uploads
+* upload authorization
+* media metadata
 * processing
-* metadata
 * variants
-* access
+* storage
+* CDN delivery
+* lifecycle
 
-## Notifications
+### Notification Domain
 
-Responsibilities:
+Responsible for:
 
 * push notifications
 * notification preferences
-* delivery
+* device targeting
+* provider abstraction
+* retry behavior
 
-## Search
+### Search Domain
 
-Responsibilities:
+Responsible for:
 
 * indexing
 * querying
-* privacy filtering
-* reindexing
+* filtering
+* ranking
+* index synchronization
 
-## Privacy and Safety
+### Privacy Domain
 
-Responsibilities:
+Responsible for:
 
 * privacy settings
+* visibility controls
 * blocking
-* reporting
-* abuse controls
-
-## Calling
-
-Responsibilities:
-
-* call sessions
-* participants
-* signaling
-* call state
-
-## Administration
-
-Responsibilities:
-
-* moderation
-* operational administration
-* security audit access
-
-For every bounded context define:
-
-* ownership
-* responsibilities
-* owned entities
-* inbound dependencies
-* outbound dependencies
-* synchronous interfaces
-* asynchronous interfaces
-* consistency model
-
----
-
-# 7. DOMAIN MODEL
-
-Define the conceptual domain model.
-
-At minimum specify the relationships between:
-
-* User
-* Account
-* Session
-* Device
-* PushToken
-* Contact
-* Conversation
-* ConversationMember
-* Group
-* GroupRole
-* Message
-* MessageAttachment
-* MessageReaction
-* MessageReceipt
-* MessageEdit
-* MessageDeletion
-* Presence
-* Block
-* Report
-* MediaAsset
-* Notification
-* Call
-* CallParticipant
-
-Do not prematurely dictate implementation-specific classes.
-
-Define:
-
-* identity
-* ownership
-* lifecycle
-* invariants
-* relationships
-* cardinality
-* deletion behavior
-
-Clearly distinguish entities from value objects and derived state.
-
----
-
-# 8. ID STRATEGY
-
-Define the identifier strategy.
-
-Consider:
-
-* UUID
-* UUIDv7
-* ULID
-* database-generated identifiers
-
-The chosen strategy must account for:
-
-* distributed generation
-* index locality
-* ordering
-* privacy
-* collision resistance
-* client-generated IDs
-* idempotency
-
-Define which IDs may be generated by clients and which must be server authoritative.
-
-Do not expose internal sequential database identifiers where that could create enumeration or privacy problems.
-
----
-
-# 9. TIME AND ORDERING
-
-Define authoritative time semantics.
-
-Specify:
-
-* server timestamps
-* client timestamps
-* message creation time
-* event time
-* ordering semantics
-* clock skew handling
-* timezone handling
-* last-seen timestamps
-* expiration timestamps
-
-Do not rely on client clocks for authoritative ordering.
-
-Define how concurrent messages are ordered.
-
-Define how ordering behaves across:
-
-* devices
-* reconnects
-* retries
-* offline sends
-* server nodes
-
----
-
-# 10. DATABASE ARCHITECTURE
-
-Design the PostgreSQL architecture.
-
-Define:
-
-* schema organization
-* ownership boundaries
-* transactional boundaries
-* indexes
-* foreign keys
-* uniqueness constraints
-* check constraints
-* deletion semantics
 * retention
-* partitioning strategy where justified
+* disappearing-message policies
 
-The message system must be designed for potentially extremely large message volumes.
+### Moderation and Abuse Domain
 
-Define strategies for:
+Responsible for:
 
-* message pagination
-* conversation pagination
-* unread counts
-* message receipts
-* group membership
-* concurrent writes
-* large groups
-* high-frequency state updates
+* reports
+* abuse signals
+* spam controls
+* administrative restrictions
+* moderation workflows
 
-Do not recommend database partitioning merely because it sounds scalable. Explain the conditions under which it becomes necessary.
+### Administration Domain
 
----
+Responsible for:
 
-# 11. TRANSACTIONAL CONSISTENCY
+* privileged administrative operations
+* audit trails
+* platform controls
+* operational management
 
-Define where strong transactional consistency is required.
-
-Examples to analyze:
-
-* account creation
-* authentication state
-* conversation membership
-* message creation
-* group membership changes
-* blocking
-* deletion
-* device revocation
-
-Define where eventual consistency is acceptable.
-
-Examples may include:
-
-* search indexes
-* notification delivery
-* presence
-* analytics
-* derived counters
-* secondary indexes
-
-For every important workflow, identify:
-
-* authoritative transaction
-* derived operations
-* failure recovery
-* consistency expectations
+The final architecture must explicitly define which domain owns which authoritative data.
 
 ---
 
-# 12. MESSAGE CREATION ARCHITECTURE
+# 4. SERVICE AND MODULE BOUNDARIES
 
-Define the complete logical message-creation workflow.
+For each major service or module, define:
 
-It must account for:
+* responsibility
+* owned data
+* APIs exposed
+* events published
+* events consumed
+* synchronous dependencies
+* asynchronous dependencies
+* scaling characteristics
+* failure behavior
+* security boundary
+* observability requirements
 
-1. client submission
-2. authentication
-3. authorization
-4. validation
-5. idempotency
-6. persistence
-7. message ordering
-8. event publication
-9. recipient fan-out
-10. delivery state
-11. push notification
-12. multi-device synchronization
+Do not allow multiple domains to independently modify the same authoritative state without an explicit consistency strategy.
 
-Define what must happen synchronously before acknowledging the message.
+Avoid circular dependencies.
 
-Define what may happen asynchronously.
+Where cross-domain operations are necessary, define:
 
-Define behavior when:
-
-* Kafka/Redpanda is unavailable
-* Redis is unavailable
-* push notifications fail
-* recipient is offline
-* recipient has multiple devices
-* duplicate requests arrive
-* the client reconnects after sending
-
-Use the outbox pattern where appropriate.
+* synchronous orchestration
+* events
+* sagas/workflows
+* transactional boundaries
+* eventual consistency
 
 ---
 
-# 13. MESSAGE IDEMPOTENCY
+# 5. HIGH-LEVEL SYSTEM TOPOLOGY
 
-Define an idempotency strategy for message submission.
+Define the production topology including:
 
-The architecture must prevent duplicate messages when:
+* web clients
+* mobile clients
+* DNS
+* CDN
+* WAF
+* API gateway/load balancer
+* REST API layer
+* WebSocket gateway layer
+* authentication services
+* application services
+* workers
+* event brokers
+* Redis
+* PostgreSQL
+* search cluster
+* object storage
+* media-processing workers
+* notification providers
+* observability systems
+* administrative interfaces
 
-* the client retries
-* network responses are lost
-* the connection drops after server persistence
-* multiple requests arrive concurrently
+Define traffic direction and responsibility for every major connection.
 
-Define:
+Clearly distinguish:
 
-* client submission identifier
-* uniqueness constraints
-* deduplication window
-* server response behavior
-* retry behavior
-
-Idempotency must be enforced server-side.
-
----
-
-# 14. MESSAGE DELIVERY MODEL
-
-Define the delivery-state model.
-
-At minimum consider:
-
-* pending
-* accepted
-* sent
-* delivered
-* read
-* failed
-
-Define whether states are:
-
-* per message
-* per recipient
-* per device
-
-The architecture must support multi-device recipients without corrupting delivery semantics.
-
-Define how delivery state is recovered after reconnect.
+* synchronous request paths
+* real-time paths
+* asynchronous paths
+* data-storage paths
+* external-provider paths
 
 ---
 
-# 15. CONVERSATION ARCHITECTURE
+# 6. CLIENT-TO-SERVER ARCHITECTURE
 
-Define direct and group conversations.
+Define how web and mobile clients communicate with the platform.
 
-For direct conversations specify:
+Cover:
 
-* identity
-* uniqueness
-* membership
-* lifecycle
+* HTTPS
+* REST APIs
+* WebSocket connections
+* authentication
+* device identification
+* connection establishment
+* connection renewal
+* reconnect behavior
+* synchronization
+* push notification fallback
+* media uploads
+* media downloads
+* search requests
 
-For groups specify:
+Define which operations are:
 
-* owner
-* administrators
-* members
-* permissions
-* membership changes
-* invitations
-* removals
-* leaving
-* group metadata
-* moderation
-
-Define authorization rules for every membership-changing operation.
-
----
-
-# 16. GROUP MESSAGE FAN-OUT
-
-Design the architecture for group message delivery.
-
-Account for:
-
-* small groups
-* large groups
-* very large groups
-* online recipients
-* offline recipients
-* multiple devices
-* push notifications
-* high fan-out
-* backpressure
-
-Define when fan-out should be:
-
-* synchronous
+* request/response
+* real-time
 * asynchronous
-* batched
 
-Avoid architectures that require a single request to synchronously perform an unbounded number of downstream operations.
-
----
-
-# 17. PRESENCE ARCHITECTURE
-
-Design presence as ephemeral state.
-
-Define:
-
-* online
-* offline
-* last seen
-* typing
-* connection heartbeat
-* expiration
-* multiple devices
-
-Presence should tolerate:
-
-* server failures
-* dropped connections
-* network partitions
-* stale state
-* reconnects
-
-Define how Redis is used and what happens when Redis is unavailable.
-
-Presence must never be treated as durable identity data.
+Define authoritative server behavior for each category.
 
 ---
 
-# 18. WEBSOCKET ARCHITECTURE
+# 7. API ARCHITECTURE
 
-Define:
+Define the API architecture for:
+
+* authentication
+* accounts
+* profiles
+* devices
+* contacts
+* conversations
+* groups
+* messages
+* message states
+* reactions
+* media
+* notifications
+* privacy
+* search
+* reports
+* administration
+
+For every major API family, define:
+
+* endpoint responsibility
+* HTTP semantics
+* authentication requirements
+* authorization requirements
+* request validation
+* response contract
+* error model
+* pagination
+* idempotency requirements
+* rate limiting
+* observability
+
+Use consistent versioning.
+
+Define a standard API error model.
+
+Define cursor-based pagination for high-volume collections where appropriate.
+
+---
+
+# 8. REAL-TIME ARCHITECTURE
+
+Define the WebSocket architecture in detail.
+
+Cover:
 
 * connection authentication
 * connection authorization
-* namespaces/rooms where appropriate
-* event naming
-* event payload structure
-* correlation IDs
-* acknowledgements
-* reconnect behavior
-* synchronization
-* connection limits
-* rate limits
+* connection registration
+* device association
+* connection lifecycle
 * heartbeat
 * disconnect handling
+* reconnect handling
+* session expiration
+* horizontal scaling
+* pub/sub
+* presence
+* typing indicators
+* message events
+* delivery events
+* read events
+* group events
+* synchronization events
 
-Define how WebSocket servers scale horizontally.
+Define what state is:
 
-Specify whether and where Redis adapters or equivalent coordination are required.
+* authoritative
+* cached
+* ephemeral
+* derived
 
-Define how a client determines what events it missed after reconnecting.
+Do not store critical durable state solely inside WebSocket processes.
+
+Define how a message created through one WebSocket node reaches recipients connected to other nodes.
 
 ---
 
-# 19. REAL-TIME EVENT CONTRACT
+# 9. MESSAGE LIFECYCLE
 
-Define a common real-time event envelope.
+Define the complete lifecycle of a message.
 
-It should support appropriate fields such as:
+At minimum, cover:
+
+1. Client creation
+2. Client-side identifier generation
+3. Authentication
+4. Authorization
+5. Validation
+6. Persistence
+7. Event publication
+8. Recipient fan-out
+9. Delivery acknowledgement
+10. Read acknowledgement
+11. Offline recipient handling
+12. Multi-device synchronization
+13. Retry
+14. Duplicate detection
+15. Failure recovery
+16. Editing
+17. Deletion
+18. Retention or expiration
+
+Define the authoritative message state machine.
+
+Define legal state transitions.
+
+Define behavior when:
+
+* a client retries
+* a recipient reconnects
+* a WebSocket node fails
+* an event is delivered twice
+* a worker fails
+* a notification provider fails
+* a database transaction succeeds but event publication fails
+* an event is delivered before another dependent event
+
+---
+
+# 10. MESSAGE ORDERING
+
+Define ordering semantics explicitly.
+
+The architecture must distinguish between:
+
+* client creation order
+* server persistence order
+* conversation sequence order
+* event delivery order
+* device synchronization order
+
+Define how ordering is maintained within a conversation.
+
+Do not require global ordering across the entire platform.
+
+Define behavior under:
+
+* concurrent sends
+* reconnects
+* multi-device usage
+* retries
+* delayed events
+* duplicated events
+
+---
+
+# 11. IDEMPOTENCY
+
+Identify every operation that may be retried.
+
+Define idempotency mechanisms for:
+
+* message creation
+* media processing
+* notification delivery
+* event consumption
+* background jobs
+* administrative operations
+* account operations
+
+Define:
+
+* idempotency key
+* uniqueness constraint
+* deduplication storage
+* expiration
+* retry behavior
+
+Do not depend solely on client-side deduplication.
+
+---
+
+# 12. MULTI-DEVICE ARCHITECTURE
+
+The platform must support users operating multiple devices.
+
+Define:
+
+* device registration
+* device identity
+* device authentication
+* device capabilities
+* device revocation
+* device synchronization
+* per-device delivery state
+* per-device read state where required
+* message fan-out
+* reconnect synchronization
+* stale-device handling
+* push token management
+
+Define which state belongs to:
+
+* account
+* device
+* session
+* conversation
+* message
+
+Ensure that revoking one device does not incorrectly invalidate unrelated devices.
+
+---
+
+# 13. OFFLINE AND SYNCHRONIZATION ARCHITECTURE
+
+Define how clients operate under unreliable connectivity.
+
+Cover:
+
+* local message queue
+* pending operations
+* retry
+* backoff
+* acknowledgement
+* synchronization cursors
+* missed events
+* state reconciliation
+* duplicate handling
+* conflict resolution
+* ordering
+* attachment upload recovery
+
+Define the synchronization protocol sufficiently precisely for clients to implement it consistently.
+
+The architecture must support clients reconnecting after:
+
+* seconds
+* minutes
+* hours
+* extended offline periods
+
+without requiring complete conversation reloads whenever incremental synchronization is possible.
+
+---
+
+# 14. PRESENCE ARCHITECTURE
+
+Presence is ephemeral and must not unnecessarily burden the primary relational database.
+
+Define:
+
+* online state
+* offline state
+* last-seen state
+* typing indicators
+* presence TTL
+* heartbeat
+* expiration
+* privacy controls
+* horizontal scaling
+* Redis usage
+* event fan-out
+
+Define failure behavior when Redis or the real-time layer is unavailable.
+
+Presence must degrade gracefully rather than corrupt durable messaging state.
+
+---
+
+# 15. GROUP ARCHITECTURE
+
+Define group-specific architecture for:
+
+* group creation
+* membership
+* administrators
+* roles
+* permissions
+* invitations
+* participant changes
+* metadata
+* group deletion
+* participant removal
+* membership history where required
+
+Define authorization rules for:
+
+* adding members
+* removing members
+* promoting administrators
+* demoting administrators
+* changing group metadata
+* sending messages
+* pinning messages
+* changing disappearing-message settings
+
+Define how membership changes propagate to connected devices.
+
+---
+
+# 16. GROUP FAN-OUT
+
+The architecture must address large groups and high fan-out.
+
+Define strategies for:
+
+* small groups
+* large groups
+* message event distribution
+* online recipients
+* offline recipients
+* multi-device recipients
+* push notification generation
+
+Avoid architectures where a single request synchronously performs an unbounded number of downstream operations.
+
+Define asynchronous fan-out where appropriate.
+
+Define backpressure and failure handling.
+
+---
+
+# 17. MESSAGE STORAGE
+
+Define the PostgreSQL data model at architectural level.
+
+Identify major entities including, where appropriate:
+
+* Account
+* Profile
+* Device
+* Session
+* Contact
+* Block
+* Conversation
+* ConversationParticipant
+* Group
+* GroupRole
+* Message
+* MessageRecipientState
+* MessageReaction
+* MessageAttachment
+* MessageEdit
+* MessageDeletion
+* Notification
+* PrivacySetting
+* Report
+* AuditRecord
+
+For each entity, define:
+
+* purpose
+* ownership
+* major identifiers
+* important relationships
+* lifecycle
+* high-volume considerations
+* indexing requirements
+* retention implications
+
+Do not write the final Prisma schema in this volume unless necessary to resolve an architectural contract.
+
+---
+
+# 18. DATABASE SCALABILITY
+
+Define how PostgreSQL will scale.
+
+Address:
+
+* connection pooling
+* read replicas
+* partitioning
+* indexing
+* archival
+* high-volume message tables
+* write-heavy workloads
+* transaction boundaries
+* hot rows
+* lock contention
+* migration strategy
+* backup strategy
+
+Determine where partitioning is appropriate.
+
+Do not introduce database sharding without a clear reason.
+
+If future sharding is expected, define the architectural boundary that would permit it.
+
+---
+
+# 19. REDIS ARCHITECTURE
+
+Define Redis usage by domain.
+
+For every major Redis use case, specify:
+
+* purpose
+* key structure
+* data format
+* TTL
+* invalidation
+* consistency expectations
+* failure behavior
+
+Explicitly address:
+
+* presence
+* typing
+* rate limits
+* caching
+* coordination
+* ephemeral state
+
+Identify which Redis data may be safely reconstructed after failure.
+
+---
+
+# 20. EVENT-DRIVEN ARCHITECTURE
+
+Define the event architecture using Kafka or Redpanda.
+
+Identify major event categories such as:
+
+* account events
+* device events
+* conversation events
+* membership events
+* message events
+* delivery events
+* read events
+* media events
+* notification events
+* moderation events
+
+For every important event family define:
+
+* producer
+* consumer
+* purpose
+* ordering requirements
+* partitioning strategy
+* retention
+* replay expectations
+* idempotency
+* schema versioning
+* failure handling
+
+Use a transactional outbox where required.
+
+---
+
+# 21. EVENT SCHEMA STANDARDS
+
+All durable events must use a consistent envelope.
+
+The architecture must define fields appropriate for:
 
 * event ID
 * event type
 * version
-* timestamp
-* aggregate ID
+* aggregate/entity ID
+* producer
+* occurred-at timestamp
 * correlation ID
-* trace ID
+* causation ID where useful
+* trace context
 * payload
+
+Event payloads must contain only information required by consumers.
+
+Avoid embedding secrets or unnecessary private content.
+
+Define schema evolution rules.
+
+Consumers must tolerate compatible future schema changes.
+
+---
+
+# 22. QUEUE ARCHITECTURE
+
+Define BullMQ responsibilities separately from durable event streaming.
+
+Appropriate queue workloads may include:
+
+* notification delivery
+* media processing
+* thumbnail generation
+* search indexing
+* cleanup
+* moderation processing
+* analytics aggregation
+* retryable provider calls
 
 Define:
 
-* versioning
-* backward compatibility
-* duplicate handling
-* ordering
-* replay/recovery
-
-Do not require clients to trust event arrival order unless the architecture guarantees it.
-
----
-
-# 20. KAFKA/REDPANDA EVENT ARCHITECTURE
-
-Define appropriate event categories.
-
-Potential events include:
-
-* user events
-* device events
-* conversation events
-* message events
-* message-state events
-* media events
-* notification events
-* privacy events
-* moderation events
-* call events
-
-For each important event define:
-
-* producer
-* consumer
-* topic
-* key
-* ordering requirements
-* retention
-* retry behavior
-* dead-letter strategy
-* idempotency requirements
-
-Use partition keys that preserve required ordering without creating unnecessary hot partitions.
-
----
-
-# 21. OUTBOX ARCHITECTURE
-
-Define when the transactional outbox pattern is required.
-
-Specify:
-
-* outbox ownership
-* transaction boundaries
-* event status
-* publishing behavior
-* retry behavior
-* duplicate handling
-* cleanup
+* queue names
+* job categories
+* retry policies
+* backoff
+* concurrency
+* timeout
+* idempotency
+* dead-letter handling
 * monitoring
 
-The architecture must avoid the dual-write problem where database state succeeds but event publication fails.
+Do not use queues as an excuse to hide consistency problems.
 
 ---
 
-# 22. REDIS ARCHITECTURE
+# 23. MEDIA ARCHITECTURE
 
-Define Redis responsibilities separately from PostgreSQL.
+Define the complete media flow.
 
-Potential uses:
+Cover:
 
-* presence
+1. Client requests upload authorization.
+2. Server validates authorization.
+3. Client uploads securely to object storage.
+4. Upload completion is recorded.
+5. Media is validated.
+6. Processing is queued where necessary.
+7. FFmpeg generates required variants.
+8. Metadata is persisted.
+9. Media becomes available.
+10. CDN delivery is authorized.
+11. Lifecycle policies manage retention.
+
+Define:
+
+* upload limits
+* MIME validation
+* object naming
+* signed URLs
+* expiration
+* processing states
+* failure states
+* retries
+* cleanup
+* access control
+
+---
+
+# 24. SEARCH ARCHITECTURE
+
+Define search architecture using Elasticsearch or OpenSearch.
+
+Cover:
+
+* message indexing
+* conversation filtering
+* authorization filtering
+* indexing events
+* retries
+* reindexing
+* aliases
+* versioning
+* retention
+* consistency
+* deleted-message handling
+
+Search must never expose messages that the requesting user is not authorized to access.
+
+Define how index lag is handled.
+
+The relational database remains authoritative.
+
+---
+
+# 25. NOTIFICATION ARCHITECTURE
+
+Define push notification architecture for:
+
+* FCM
+* APNs
+
+Cover:
+
+* device token management
+* token invalidation
+* notification preferences
+* offline users
+* multiple devices
+* message grouping
+* retries
+* provider failures
 * rate limiting
-* ephemeral connection state
-* caching
-* distributed coordination
-* counters
+* privacy-sensitive notification content
 
-For every important Redis use define:
+Do not expose unnecessary private message content in notifications.
 
-* key namespace
-* value semantics
-* TTL
-* invalidation
-* ownership
-* failure behavior
-
-Do not store irreplaceable durable business data solely in Redis.
+Define fallback behavior when notification providers are unavailable.
 
 ---
 
-# 23. CACHE ARCHITECTURE
+# 26. PRIVACY ARCHITECTURE
 
-Define what should and should not be cached.
+Define privacy controls for:
 
-Potential candidates:
-
-* user profiles
-* conversation summaries
-* membership data
-* authorization-related derived state where safe
-* unread counts
-* configuration
-
-For every cache define:
-
-* cache key
-* TTL
-* invalidation trigger
-* stale-data policy
-* cache stampede protection
-* failure behavior
-
-Do not cache private data without explicitly considering authorization and tenant/user isolation.
-
----
-
-# 24. PRIVACY ARCHITECTURE
-
-Define privacy boundaries across the entire system.
-
-Privacy must be enforced consistently across:
-
-* PostgreSQL
-* Redis
-* APIs
-* WebSockets
-* search
-* notifications
-* media
-* Kafka/Redpanda
-* background workers
-
-Define how the architecture handles:
-
-* blocked users
-* private profiles
-* deleted messages
-* deleted accounts
-* restricted content
-* removed group members
-* revoked devices
-
-Derived systems must not continue exposing information after authorization changes.
-
----
-
-# 25. BLOCKING ARCHITECTURE
-
-Define blocking semantics.
-
-Specify how blocking affects:
-
-* direct messaging
-* group interactions where applicable
-* calls
-* presence
 * profile visibility
-* search
-* notifications
-* media
-* WebSockets
+* online status
+* last seen
+* read receipts
+* contact discovery
+* group invitations
+* blocked users
+* media access
+* message retention
+* disappearing messages
 
-Blocking must be enforced server-side.
+Privacy decisions must be enforced server-side.
 
-Do not rely on clients to hide blocked entities.
+Define precedence rules when privacy settings conflict with relationship or group state.
 
 ---
 
-# 26. SECURITY BOUNDARIES
+# 27. SECURITY ARCHITECTURE
 
-Identify security trust boundaries between:
+Define security boundaries for:
 
-* clients
-* API
-* WebSocket infrastructure
-* backend
+* public APIs
+* authenticated APIs
+* WebSockets
+* internal services
+* workers
 * databases
 * Redis
-* Kafka/Redpanda
-* queues
-* S3
-* CDN
+* event brokers
+* object storage
 * search
-* notification providers
-* WebRTC infrastructure
+* administrative systems
 
-For each boundary define:
+Define:
 
 * authentication
 * authorization
-* encryption
-* validation
+* secret management
+* encryption in transit
+* encryption at rest
+* key management
 * rate limiting
 * abuse prevention
-* audit requirements
+* audit logging
+* administrative access
+
+Clearly distinguish:
+
+* transport encryption
+* storage encryption
+* application-level encryption
+* end-to-end encryption
+
+Do not represent one as another.
+
+If end-to-end encryption is part of the product architecture, define its boundaries and cryptographic integration requirements without inventing custom cryptographic algorithms.
 
 ---
 
-# 27. AUTHENTICATION ARCHITECTURE
+# 28. RATE LIMITING AND ABUSE CONTROL
 
-Define the authentication model.
+Define rate limits for major abuse-sensitive operations.
 
 Consider:
 
-* account registration
 * login
-* session management
-* access tokens
-* refresh tokens
-* token rotation
-* revocation
-* device sessions
-* suspicious login detection
-* credential protection
-* brute-force protection
-
-Define the difference between:
-
-* user identity
-* device identity
-* session identity
-
-Do not design authentication around insecure long-lived bearer credentials without appropriate protection.
-
----
-
-# 28. AUTHORIZATION MODEL
-
-Define server-side authorization.
-
-Authorization must cover:
-
-* conversations
-* messages
-* groups
-* group roles
-* media
-* devices
-* calls
-* privacy settings
-* moderation
-* administration
-
-Explicitly defend against:
-
-* IDOR
-* privilege escalation
-* unauthorized membership access
-* cross-user data access
-* revoked-device access
-
----
-
-# 29. MEDIA ARCHITECTURE
-
-Define the media lifecycle:
-
-1. upload authorization
-2. upload
-3. validation
-4. processing
-5. malware/security checks where appropriate
-6. metadata extraction
-7. variant generation
-8. storage
-9. database registration
-10. access authorization
-11. CDN delivery
-12. lifecycle cleanup
-
-Define S3 object-key strategy.
-
-Define how private media is protected.
-
-Define signed URL/token strategy.
-
-Define retention and deletion behavior.
-
----
-
-# 30. SEARCH ARCHITECTURE
-
-Define the relationship between PostgreSQL and Elasticsearch/OpenSearch.
-
-PostgreSQL remains authoritative.
-
-Search indexes are derived.
-
-Define:
-
-* indexed entities
-* indexing events
-* update behavior
-* deletion behavior
-* reindexing
-* eventual consistency
-* authorization filtering
-* privacy changes
-* failure recovery
-
-Search must never become a bypass around application authorization.
-
----
-
-# 31. NOTIFICATION ARCHITECTURE
-
-Define the notification pipeline:
-
-* domain event
-* notification decision
-* preference evaluation
-* device selection
-* provider routing
-* FCM/APNs
-* delivery result
-* token cleanup
-
-Account for:
-
-* muted conversations
-* multiple devices
-* offline recipients
-* provider failures
-* duplicate events
-* privacy
-
----
-
-# 32. CALLING ARCHITECTURE
-
-Define the signaling architecture separately from WebRTC media transport.
-
-Specify:
-
-* call creation
-* authorization
-* invitation
-* acceptance
-* rejection
-* cancellation
-* signaling
-* ICE candidates
-* participant state
-* timeout
-* termination
-* failure
-* call history
-
-Define the role of:
-
-* application servers
-* WebSockets
-* STUN
-* TURN
-* WebRTC
-
-Do not route all real-time media through the application server unless specifically justified.
-
----
-
-# 33. DATA RETENTION
-
-Define retention policies for:
-
-* messages
-* deleted messages
-* media
-* sessions
-* devices
-* audit logs
-* notification records
-* events
-* search indexes
-* temporary processing data
-
-Distinguish between:
-
-* active data
-* soft-deleted data
-* permanently deleted data
-* derived data
-* legally retained data where applicable
-
-Deletion semantics must be explicit.
-
----
-
-# 34. FAILURE ARCHITECTURE
-
-Define behavior for failure of:
-
-* PostgreSQL
-* Redis
-* Kafka/Redpanda
-* BullMQ
-* S3
-* CloudFront
+* registration
+* verification
+* password recovery
+* contact discovery
+* message sending
+* group creation
+* group invitations
+* media uploads
 * search
-* FCM
-* APNs
-* WebSocket nodes
-* TURN infrastructure
-
-For each failure define:
-
-* user-visible behavior
-* retry behavior
-* timeout
-* fallback
-* degradation
-* recovery
-* observability
-
-Critical messaging operations must not silently lose data.
-
----
-
-# 35. SCALABILITY ARCHITECTURE
-
-Define scaling strategies for:
-
-* API servers
-* WebSocket servers
-* PostgreSQL
-* Redis
-* Kafka/Redpanda
-* BullMQ workers
-* search
-* media processing
-* notification workers
-* TURN
-
-Identify potential bottlenecks including:
-
-* hot conversation partitions
-* group fan-out
-* unread counters
-* presence
-* connection concentration
-* database indexes
-* event partitions
-* queue backlogs
-
-Define horizontal-scaling strategies.
-
----
-
-# 36. API ARCHITECTURE
-
-Define the API style.
-
-Prefer REST for conventional resource operations.
+* WebSocket connection attempts
+* administrative operations
 
 Define:
 
-* resource naming
-* HTTP semantics
-* versioning
-* pagination
-* filtering
-* sorting
-* error format
-* validation errors
-* idempotency
-* authentication
-* authorization
-* rate limiting
+* identity key
+* IP key
+* device key
+* account key
+* burst behavior
+* sustained rate
+* Redis implementation
+* failure behavior
 
-Use cursor pagination for high-volume resources where appropriate.
-
-Define a consistent error contract.
-
-The API contract must be usable by both web and mobile clients.
+Avoid rate limiting that creates trivial bypasses.
 
 ---
 
-# 37. API SECURITY
+# 29. ADMINISTRATION
 
-Every API endpoint must have an explicit security classification:
+Define the administrative architecture.
 
-* public
-* authenticated
-* user-authorized
-* privileged
-* administrative
+Cover:
 
-Define:
+* administrator authentication
+* privileged roles
+* permissions
+* audit logging
+* user lookup
+* account restrictions
+* abuse reports
+* moderation workflows
+* operational dashboards
 
-* authentication requirements
-* authorization requirements
-* input validation
-* rate limits
-* abuse controls
-* audit requirements
+Administrative APIs must not reuse ordinary user authorization assumptions.
 
-Never assume that hiding an endpoint from the frontend provides security.
+All privileged actions must be auditable.
 
 ---
 
-# 38. OBSERVABILITY ARCHITECTURE
+# 30. OBSERVABILITY ARCHITECTURE
 
 Define observability across:
 
-* HTTP
+* REST
 * WebSockets
 * PostgreSQL
 * Prisma
 * Redis
 * Kafka/Redpanda
 * BullMQ
-* S3
-* search
-* push notifications
 * media processing
-* WebRTC signaling
+* search
+* FCM
+* APNs
+* external providers
 
 Define:
 
@@ -1290,11379 +1250,293 @@ Define:
 * logs
 * traces
 * correlation IDs
-* health checks
-* readiness
-* liveness
-* alerts
+* alerting
+* dashboards
+* SLO-oriented measurements
 
-Ensure telemetry does not leak private communication content.
+At minimum identify important measurements for:
 
----
-
-# 39. ARCHITECTURAL TRADEOFFS
-
-Explicitly document major decisions and alternatives considered.
-
-At minimum evaluate:
-
-* modular monolith vs microservices
-* REST vs GraphQL
-* Socket.IO vs raw WebSockets
-* Kafka vs Redpanda
-* Redis usage boundaries
-* synchronous vs asynchronous message fan-out
-* PostgreSQL partitioning
-* Elasticsearch/OpenSearch
-* S3 direct uploads
-* WebRTC topology
-* notification architecture
-* event-driven architecture
-* outbox pattern
-
-For every major decision explain:
-
-* selected approach
-* reason
-* advantages
-* disadvantages
-* operational cost
-* scaling implications
-* migration implications
+* message latency
+* message throughput
+* WebSocket connection count
+* reconnect rate
+* event lag
+* queue depth
+* job failures
+* database latency
+* Redis latency
+* search latency
+* notification delivery
+* media processing latency
 
 ---
 
-# 40. ARCHITECTURE ARTIFACTS
+# 31. FAILURE MODEL
 
-Produce complete architecture artifacts for this scope, including:
+Document expected behavior for failures including:
 
-* system context
-* component architecture
-* bounded-context map
-* domain model
-* data ownership model
-* database architecture
-* event architecture
-* real-time architecture
-* API architecture
-* security boundaries
-* privacy boundaries
+* API instance failure
+* WebSocket node failure
+* database connection failure
+* Redis failure
+* Kafka/Redpanda failure
+* queue worker failure
+* search failure
+* object-storage failure
+* CDN failure
+* FCM failure
+* APNs failure
+
+For each dependency, define:
+
+* timeout
+* retry
+* fallback
+* degradation
+* recovery
+* user-visible behavior
+
+Critical messaging functionality must not fail unnecessarily because a noncritical subsystem is unavailable.
+
+---
+
+# 32. DATA CONSISTENCY MODEL
+
+Explicitly classify major operations as:
+
+* strongly consistent
+* transactionally consistent
+* eventually consistent
+* ephemeral
+
+At minimum address:
+
+* message persistence
+* message delivery
+* read receipts
+* presence
+* typing
+* group membership
+* profile updates
+* search indexing
+* notification delivery
+* media processing
+
+Do not hide eventual consistency.
+
+Define how clients observe and reconcile it.
+
+---
+
+# 33. DISASTER RECOVERY
+
+Define architectural requirements for:
+
+* PostgreSQL backups
+* point-in-time recovery
+* Redis recovery where relevant
+* event retention
+* object-storage durability
+* search reconstruction
+* infrastructure recreation
+* secrets recovery
+* regional failure
+
+Define appropriate:
+
+* RPO
+* RTO
+* backup frequency
+* retention
+* restoration procedures
+* regional recovery strategy
+
+Search indexes and caches should be reconstructible where practical.
+
+---
+
+# 34. ARCHITECTURAL DECISION RECORDS
+
+For important decisions, document:
+
+* decision
+* alternatives considered
+* rationale
+* consequences
+* operational impact
+* scalability implications
+* security implications
+
+Important decisions must include, at minimum where applicable:
+
+* modular monolith vs services
+* WebSocket scaling
+* PostgreSQL scaling
+* Redis usage
+* event streaming
+* queue architecture
 * media architecture
-* notification architecture
-* failure model
-* scalability model
-* observability model
-* deployment assumptions
-* architectural decision records
-
-Use clear diagrams in text/structured form where useful.
-
-Do not produce application source code.
+* search architecture
+* multi-device synchronization
+* group fan-out
+* consistency model
+* regional deployment
 
 ---
 
-# 41. REPOSITORY INTEGRATION REQUIREMENT
+# 35. ARCHITECTURE CONTRACTS
 
-If a repository is available, inspect it before making repository-specific architectural claims.
+Produce explicit contracts for the implementation teams.
 
-Determine:
+The architecture must establish stable conventions for:
 
-* existing project structure
-* existing technology choices
-* existing modules
-* existing database structure
-* existing APIs
-* existing infrastructure
-* existing conventions
-
-Do not falsely claim that any component already exists.
-
-Architecture documentation must distinguish:
-
-* proposed architecture
-* actual repository implementation
-
-If the repository already contains compatible architecture, preserve it where reasonable.
-
-If architectural correction is required, document the migration strategy.
-
----
-
-# 42. FUTURE IMPLEMENTATION COMPATIBILITY
-
-The architecture must be detailed enough that future backend, frontend, mobile, infrastructure, and QA implementation can use it without inventing contradictory contracts.
-
-Define stable contracts for:
-
-* IDs
-* entities
-* API responses
-* errors
+* naming
+* identifiers
+* timestamps
 * pagination
+* API errors
 * authentication
 * authorization
-* WebSocket events
-* asynchronous events
-* queues
-* media
-* notifications
-* search
-* observability
+* event envelopes
+* queue jobs
+* tracing
+* logging
+* database ownership
+* configuration
+* environment variables
+* secrets
 
-Avoid ambiguous statements such as:
-
-* "handle messages appropriately"
-* "use a scalable database"
-* "implement real-time communication"
-* "add security"
-* "support notifications"
-
-Replace vague requirements with concrete architectural decisions and constraints.
+These contracts must be specific enough that backend, web, mobile, infrastructure, and QA implementations can remain compatible.
 
 ---
 
-# 43. COMPLETENESS REQUIREMENT
+# 36. ARCHITECTURAL COMPLETION CRITERIA
 
-Do not produce an outline pretending to be an architecture.
+Architecture Volume 1 is complete only when it provides a coherent system-level blueprint covering:
 
-Do not leave:
+* product boundaries
+* system topology
+* domain boundaries
+* service/module boundaries
+* database ownership
+* API architecture
+* real-time architecture
+* message lifecycle
+* multi-device synchronization
+* offline synchronization
+* event architecture
+* queue architecture
+* media architecture
+* search architecture
+* notification architecture
+* security architecture
+* privacy architecture
+* observability architecture
+* failure behavior
+* consistency model
+* scalability strategy
+* disaster recovery direction
 
-* undefined critical boundaries
-* unspecified ownership
-* unspecified consistency rules
-* unspecified failure behavior
-* unspecified security boundaries
-* unspecified data lifecycle
-* unspecified integration contracts
+Do not leave critical architectural responsibilities undefined.
 
-If a capability is intentionally deferred from this architecture volume, explicitly identify its boundary and ensure that the current architecture leaves a compatible extension point.
-
-Do not invent future implementation results.
+Do not substitute vague statements such as "handle appropriately" where an implementation-relevant decision is required.
 
 ---
 
-# 44. FINAL ARCHITECTURAL QUALITY BAR
+# 37. REQUIRED ARCHITECTURE DELIVERABLE
 
-The resulting architecture must describe one coherent production-grade communication platform.
+Produce the architecture as a structured engineering document inside the repository or in the repository's established architecture-documentation location.
 
-It must be possible for an engineering organization to use this architecture to implement:
+The resulting architecture documentation must be:
 
-* backend systems
-* web application
-* mobile applications
-* real-time communication
-* media processing
-* notifications
-* search
-* voice/video calling
-* infrastructure
-* testing
-* observability
+* internally consistent
+* implementation-oriented
+* versionable
+* reviewable
+* explicit
+* traceable
 
-without creating contradictory designs.
+Where diagrams are used, ensure that their accompanying textual descriptions contain enough information to understand the architecture without relying solely on the diagram.
+
+---
+
+# 38. IMPLEMENTATION BOUNDARY
+
+This architecture volume is responsible for defining the system-level architecture and foundational contracts.
+
+Do not prematurely implement all backend, frontend, mobile, or infrastructure functionality during this task.
+
+If repository inspection reveals existing implementation that conflicts with a necessary architectural decision, resolve the conflict deliberately and document the required migration or compatibility strategy.
+
+Do not perform broad unrelated rewrites.
+
+---
+
+# 39. VALIDATION REQUIREMENTS
+
+Before declaring this architecture task complete:
+
+1. Inspect the repository.
+2. Verify the architecture against the existing project structure.
+3. Verify that domain boundaries do not create circular ownership.
+4. Verify database ownership.
+5. Verify API and real-time responsibilities.
+6. Verify event and queue responsibilities.
+7. Verify multi-device synchronization.
+8. Verify failure behavior.
+9. Verify security boundaries.
+10. Verify privacy boundaries.
+11. Verify scalability assumptions.
+12. Verify observability requirements.
+13. Verify disaster-recovery direction.
+14. Verify that web and mobile clients can consume the defined contracts.
+15. Verify that infrastructure can deploy the defined topology.
+16. Identify contradictions or unresolved architectural decisions.
+
+Do not claim architectural completeness if major boundaries remain ambiguous.
+
+---
+
+# 40. FINAL IMPLEMENTATION REPORT
+
+At the completion of this architecture task, report:
+
+1. **Files Created**
+2. **Files Modified**
+3. **Architecture Defined**
+4. **Domain Boundaries Defined**
+5. **Database Ownership Defined**
+6. **API Contracts Defined**
+7. **Real-Time Contracts Defined**
+8. **Event Contracts Defined**
+9. **Queue Contracts Defined**
+10. **Infrastructure Direction Defined**
+11. **Security and Privacy Decisions**
+12. **Observability Decisions**
+13. **Reliability and Failure Decisions**
+14. **Validation Performed**
+15. **Compatibility Considerations**
+16. **Unresolved Architectural Issues**
+
+Only report architecture that was actually documented or implemented in the repository.
+
+Do not claim that a contract exists if it was not actually defined.
+
+# ARCHITECTURE STANDARD
+
+The resulting architecture must be capable of guiding implementation of a globally scalable communication platform while remaining practical to operate, test, secure, monitor, and evolve.
+
+Every architectural decision must support coherent integration across backend, web, mobile, infrastructure, and QA.
 
 The architecture must prioritize:
 
-* secure defaults
-* explicit contracts
-* authoritative data
-* idempotent distributed operations
-* privacy enforcement
-* graceful failure
-* horizontal scalability
-* operational visibility
-* maintainable boundaries
-
-Do not generate source code.
-
-Produce the complete architecture specification for the scope of this volum
-
-You are operating in Senior Engineering Team Mode.
-
-You are simultaneously acting as:
-
-- Principal Software Architect
-- Staff Backend Engineer
-- Staff Frontend Engineer
-- Staff Mobile Engineer
-- DevOps Engineer
-- Cloud Architect
-- Database Architect
-- Security Engineer
-- QA Engineer
-- UI/UX Designer
-- Technical Writer
-
-Design the complete foundational architecture for an enterprise-scale real-time messaging and communication platform comparable in architectural scope to WhatsApp.
-
-The platform must be an original implementation and must not copy proprietary source code, internal architecture, branding, or confidential implementation details from WhatsApp.
-
-This prompt is an independent architecture prompt.
-
-Do not implement backend code.
-
-Do not implement frontend code.
-
-Do not implement mobile code.
-
-Do not generate infrastructure implementation files.
-
-Do not generate Dockerfiles.
-
-Do not generate Kubernetes manifests.
-
-Do not generate Terraform files.
-
-Do not generate application source code.
-
-Produce architecture, specifications, contracts, diagrams, data models, engineering decisions, and implementation guidance only.
-
-────────────────────────────────────────
-
-PROJECT
-
-Build a production-ready global real-time communication platform supporting:
-
-• Hundreds of millions of registered users
-• Tens of millions of daily active users
-• Billions of messages
-• One-to-one messaging
-• Group messaging
-• Communities
-• Channels where appropriate
-• Voice calls
-• Video calls
-• Group calls
-• Media sharing
-• Voice messages
-• Documents
-• Stories/status updates
-• Push notifications
-• Multi-device synchronization
-• Offline messaging
-• Message delivery
-• Read receipts
-• Typing indicators
-• Presence
-• Contact management
-• Blocking
-• Reporting
-• Moderation
-• Business accounts
-• Administration
-• Analytics
-• Audit logging
-• End-to-end encryption architecture
-• High availability
-• Horizontal scaling
-• Multi-region deployment
-• Disaster recovery
-
-Design the system for:
-
-• Global operation
-• Low latency
-• High availability
-• Fault tolerance
-• Strong security
-• Privacy
-• Long-term maintainability
-• Future extensibility
-
-────────────────────────────────────────
-
-PRIMARY TECHNOLOGY STACK
-
-Web:
-
-• Next.js
-• React
-• TypeScript
-• Tailwind CSS
-• shadcn/ui
-
-Mobile:
-
-• React Native
-• Expo
-• TypeScript
-
-Backend:
-
-• Node.js
-• NestJS
-• TypeScript
-
-Database:
-
-• PostgreSQL
-• Prisma ORM
-
-Caching:
-
-• Redis
-
-Real-Time Communication:
-
-• WebSockets
-• Socket.IO where appropriate
-
-Event Streaming:
-
-• Kafka or Redpanda
-
-Background Processing:
-
-• BullMQ
-
-Search:
-
-• Elasticsearch or OpenSearch
-
-Object Storage:
-
-• AWS S3-compatible object storage
-
-CDN:
-
-• CloudFront or equivalent CDN
-
-Push Notifications:
-
-• Firebase Cloud Messaging
-• Apple Push Notification Service
-
-Voice/Video:
-
-• WebRTC
-• STUN/TURN infrastructure
-
-Infrastructure:
-
-• Docker
-• Kubernetes
-• Helm
-• Terraform
-• GitHub Actions
-
-Observability:
-
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
-
-Secrets:
-
-• HashiCorp Vault or approved cloud-native secret management
-
-────────────────────────────────────────
-
-ARCHITECTURAL APPROACH
-
-Determine whether the platform should initially use:
-
-• Modular Monolith
-• Service-Oriented Architecture
-• Microservices
-
-Do not blindly create a service for every table or feature.
-
-Evaluate:
-
-• Transactional consistency
-• Scalability
-• Latency
-• Operational complexity
-• Deployment independence
-• Team ownership
-• Failure isolation
-• Cost
-• Developer productivity
-• Long-term maintainability
-
-Clearly identify:
-
-• Independently deployable services
-• Shared transactional boundaries
-• Authoritative data ownership
-• Synchronous communication
-• Asynchronous communication
-• Event-driven communication
-• Read models
-• CQRS requirements
-• Eventual consistency
-• Strong consistency
-
-Provide a migration strategy for future service extraction where appropriate.
-
-────────────────────────────────────────
-
-CORE PLATFORM DOMAINS
-
-Define bounded contexts and ownership for:
-
-Identity
-
-Accounts
-
-Users
-
-Profiles
-
-Authentication
-
-Authorization
-
-Sessions
-
-Devices
-
-Contacts
-
-Privacy
-
-Presence
-
-Conversations
-
-Messaging
-
-Messages
-
-Message Delivery
-
-Message Reactions
-
-Message Replies
-
-Message Forwarding
-
-Message Editing
-
-Message Deletion
-
-Groups
-
-Communities
-
-Channels
-
-Media
-
-Media Processing
-
-Voice Messages
-
-Documents
-
-Stories
-
-Notifications
-
-Search
-
-Calls
-
-Voice Calls
-
-Video Calls
-
-Group Calls
-
-Call Signaling
-
-End-to-End Encryption
-
-Key Management
-
-Offline Synchronization
-
-Multi-Device Synchronization
-
-Blocking
-
-Reporting
-
-Moderation
-
-Business Accounts
-
-Administration
-
-Analytics
-
-Audit
-
-Feature Flags
-
-System Configuration
-
-For each domain define:
-
-• Responsibility
-• Aggregate roots
-• Entities
-• Value objects
-• Repositories
-• Application services
-• Domain services
-• Domain events
-• Data ownership
-• Consistency requirements
-
-────────────────────────────────────────
-
-SYSTEM ARCHITECTURE
-
-Design a complete high-level architecture.
-
-CLIENT LAYER
-
-Include:
-
-• Web application
-• iOS application
-• Android application
-• Desktop architecture boundaries
-• Tablet architecture boundaries
-• Future device integrations
-
-EDGE LAYER
-
-Include:
-
-• DNS
-• CDN
-• WAF
-• Load balancers
-• API Gateway
-• WebSocket Gateway
-• Rate limiting
-• Authentication boundaries
-
-APPLICATION LAYER
-
-Include:
-
-• API services
-• Domain services
-• Real-time services
-• Messaging services
-• Call signaling
-• Background workers
-• Event consumers
-• Scheduled jobs
-
-DATA LAYER
-
-Include:
-
-• PostgreSQL
-• Read replicas
-• Redis
-• Kafka/Redpanda
-• Elasticsearch/OpenSearch
-• Object storage
-
-COMMUNICATION LAYER
-
-Include:
-
-• REST APIs
-• WebSockets
-• WebRTC
-• Push notifications
-• Event streaming
-
-OBSERVABILITY LAYER
-
-Include:
-
-• Metrics
-• Logs
-• Traces
-• Alerts
-
-SECURITY LAYER
-
-Include:
-
-• Authentication
-• Authorization
-• Encryption
-• Key management
-• Secrets management
-• Audit logging
-• Network segmentation
-
-Represent the architecture using clear text-based diagrams.
-
-Do not use images.
-
-────────────────────────────────────────
-
-C4 ARCHITECTURE
-
-Generate:
-
-• System Context Diagram
-• Container Diagram
-• Component Diagram
-• Deployment Diagram
-
-For every major component define:
-
-• Responsibility
-• Inputs
-• Outputs
-• Dependencies
-• Scaling behavior
-• Failure behavior
-• Security boundary
-
-────────────────────────────────────────
-
-SERVICE DECOMPOSITION
-
-Evaluate and define service boundaries for:
-
-API Gateway
-
-Authentication Service
-
-Identity Service
-
-Account Service
-
-Profile Service
-
-Session Service
-
-Device Service
-
-Contact Service
-
-Privacy Service
-
-Presence Service
-
-Conversation Service
-
-Messaging Service
-
-Message Delivery Service
-
-Message Synchronization Service
-
-Group Service
-
-Community Service
-
-Media Service
-
-Media Processing Service
-
-Notification Service
-
-Search Service
-
-Story Service
-
-Call Signaling Service
-
-Call Session Service
-
-Encryption/Key Management boundaries
-
-Moderation Service
-
-Reporting Service
-
-Business Account Service
-
-Administration Service
-
-Analytics Service
-
-Audit Service
-
-Feature Flag Service
-
-Configuration Service
-
-Do not automatically make every item an independently deployable microservice.
-
-Combine cohesive responsibilities where appropriate.
-
-For every final service boundary define:
-
-• Responsibility
-• Authoritative data
-• APIs
-• Events produced
-• Events consumed
-• Synchronous dependencies
-• Asynchronous dependencies
-• Scaling requirements
-• Availability requirements
-• Security boundaries
-
-────────────────────────────────────────
-
-SERVICE OWNERSHIP MATRIX
-
-Create a complete ownership matrix.
-
-For each domain identify:
-
-• Authoritative service
-• Database ownership
-• API ownership
-• Event ownership
-• Cache ownership
-• Search/read-model ownership
-• Administrative ownership
-
-Explicitly define prohibited cross-service database writes.
-
-────────────────────────────────────────
-
-COMMUNICATION MATRIX
-
-Define communication between major services.
-
-For each interaction specify:
-
-• Producer
-• Consumer
-• Protocol
-• Synchronous/asynchronous
-• Purpose
-• Consistency requirement
-• Timeout
-• Retry
-• Idempotency
-• Failure behavior
-
-Evaluate:
-
-• REST/HTTP
-• WebSockets
-• Kafka/Redpanda
-• BullMQ
-• Redis
-• WebRTC signaling
-
-Avoid unnecessary synchronous dependencies.
-
-────────────────────────────────────────
-
-MONOREPO ARCHITECTURE
-
-Design a production-ready monorepo.
-
-Applications:
-
-• Web
-• Mobile
-• Desktop where appropriate
-• Administration Dashboard
-• Moderation Dashboard where appropriate
-
-Backend:
-
-• API Gateway
-• Backend services
-• Real-time services
-• WebSocket services
-• Call signaling services
-• Background workers
-
-Shared packages:
-
-• API contracts
-• Event contracts
-• Shared types
-• Validation
-• Configuration
-• Authentication interfaces
-• Observability
-• Encryption interfaces
-• Testing utilities
-• UI components where appropriate
-
-Infrastructure:
-
-• Docker
-• Kubernetes
-• Helm
-• Terraform
-• CI/CD
-
-Documentation:
-
-• Architecture
-• API
-• Events
-• Database
-• Security
-• Operations
-• ADRs
-• Runbooks
-
-Do not create shared packages merely to reduce duplication.
-
-Shared packages must have clear ownership and dependency rules.
-
-────────────────────────────────────────
-
-FOLDER HIERARCHY
-
-Generate a detailed folder hierarchy for:
-
-• Monorepo root
-• Applications
-• Backend services
-• Workers
-• Shared packages
-• Database
-• Infrastructure
-• Tests
-• Documentation
-• Configuration
-• Database migrations
-
-Include important directories and representative files.
-
-Do not generate source code.
-
-────────────────────────────────────────
-
-CORE DOMAIN MODEL
-
-Evaluate the following entities:
-
-User
-
-Account
-
-Profile
-
-ProfileSettings
-
-PrivacySettings
-
-Session
-
-Device
-
-DeviceCapability
-
-Contact
-
-ContactRequest
-
-BlockedUser
-
-Conversation
-
-ConversationParticipant
-
-ConversationSettings
-
-Message
-
-MessageAttachment
-
-MessageReaction
-
-MessageReply
-
-MessageForward
-
-MessageMention
-
-MessageReceipt
-
-MessageEdit
-
-MessageDeletion
-
-Group
-
-GroupMember
-
-GroupRole
-
-Community
-
-CommunityMember
-
-Channel
-
-MediaAsset
-
-MediaProcessingJob
-
-VoiceMessage
-
-Document
-
-Story
-
-StoryViewer
-
-Notification
-
-NotificationPreference
-
-PushToken
-
-Call
-
-CallParticipant
-
-CallSession
-
-CallDevice
-
-EncryptionIdentity
-
-DeviceKey
-
-PreKey
-
-SessionKey
-
-Report
-
-ModerationCase
-
-BusinessAccount
-
-BusinessProfile
-
-AuditLog
-
-FeatureFlag
-
-Do not assume one database table per conceptual entity.
-
-Define:
-
-• Aggregate roots
-• Aggregate boundaries
-• Lifecycle
-• Invariants
-• Ownership
-• Transaction boundaries
-
-────────────────────────────────────────
-
-DATABASE ARCHITECTURE
-
-Design PostgreSQL for:
-
-• Hundreds of millions of users
-• Billions of messages
-• Large conversation histories
-• Large groups
-• High-volume message receipts
-• Large device/session datasets
-• Large audit datasets
-
-Define:
-
-• Database ownership
-• Schema boundaries
-• Primary keys
-• Foreign keys
-• Indexes
-• Unique constraints
-• Check constraints
-• Partitioning
-• Replication
-• Read replicas
-• Connection pooling
-• Archival
-• Retention
-• Backup
-• Recovery
-
-Identify high-growth tables.
-
-Evaluate partitioning candidates for:
-
-• Messages
-• Message receipts
-• Audit logs
-• Call events
-• Analytics data
-
-Do not store large binary media inside PostgreSQL.
-
-Do not use PostgreSQL as the primary source for high-volume ephemeral presence data.
-
-────────────────────────────────────────
-
-DATABASE OWNERSHIP
-
-Define:
-
-• Which service owns each database/schema
-• Which services may directly read it
-• Which services must use APIs
-• Which services use read models
-• How cross-domain queries are implemented
-• How database migrations are owned
-
-Prevent uncontrolled cross-service database access.
-
-────────────────────────────────────────
-
-ERD
-
-Generate a complete text-based ERD.
-
-Include:
-
-• Primary keys
-• Foreign keys
-• Cardinality
-• Ownership
-• Important indexes
-• High-growth tables
-• Partitioning candidates
-
-Clearly show relationships between:
-
-• Users
-• Accounts
-• Profiles
-• Devices
-• Contacts
-• Conversations
-• Participants
-• Messages
-• Attachments
-• Groups
-• Communities
-• Stories
-• Calls
-• Encryption metadata
-• Reports
-• Business accounts
-• Sessions
-• Notifications
-
-────────────────────────────────────────
-
-PRISMA STRATEGY
-
-Define:
-
-• Schema ownership
-• Prisma schema organization
-• Service-specific Prisma clients where appropriate
-• Migration ownership
-• Transaction boundaries
-• Read replica strategy
-• Connection pooling
-• Query optimization
-• Indexing rules
-• Migration deployment strategy
-
-Avoid a single uncontrolled shared database model.
-
-────────────────────────────────────────
-
-REDIS ARCHITECTURE
-
-Design Redis usage for:
-
-• Presence
-• Session coordination
-• WebSocket coordination
-• Typing indicators
-• Rate limiting
-• Distributed locks
-• Temporary synchronization state
-• Notification deduplication
-• Cache
-• Queue infrastructure
-
-For each use case define:
-
-• Key pattern
-• TTL
-• Invalidation
-• Consistency
-• Failure behavior
-• Memory considerations
-
-Redis must never be the authoritative source for critical persistent data.
-
-────────────────────────────────────────
-
-REAL-TIME ARCHITECTURE
-
-Design the complete WebSocket architecture.
-
-Support:
-
-• Connection establishment
-• Authentication
-• Authorization
-• Heartbeats
-• Reconnection
-• Presence
-• Typing indicators
-• Message delivery
-• Delivery acknowledgements
-• Read receipts
-• Reactions
-• Group events
-• Call signaling
-• Multi-device synchronization
-
-Define:
-
-• Gateway architecture
-• Connection routing
-• Horizontal scaling
-• Redis coordination
-• Connection affinity
-• Backpressure
-• Rate limiting
-• Connection recovery
-• Regional routing
-• Failure handling
-
-Design for tens of millions of concurrent connections.
-
-────────────────────────────────────────
-
-MESSAGING ARCHITECTURE
-
-Design one-to-one and group messaging.
-
-Support:
-
-• Text messages
-• Replies
-• Reactions
-• Forwarding
-• Mentions
-• Editing
-• Deletion
-• Attachments
-• Voice messages
-• Documents
-• Delivery state
-• Read state
-• Message ordering
-• Offline delivery
-• Multi-device delivery
-
-Define:
-
-• Client-generated message IDs
-• Server-generated IDs
-• Conversation sequence numbers
-• Idempotency keys
-• Ordering guarantees
-• Deduplication
-• Retry behavior
-• Delivery semantics
-• Persistence semantics
-
-Do not rely on client timestamps for authoritative ordering.
-
-────────────────────────────────────────
-
-MESSAGE DELIVERY
-
-Define delivery states:
-
-• Pending
-• Accepted
-• Sent
-• Delivered
-• Read
-• Failed
-
-Define how states propagate across:
-
-• Sender devices
-• Recipient devices
-• Web
-• Mobile
-• Desktop
-
-Define how retries and duplicate events are handled.
-
-────────────────────────────────────────
-
-OFFLINE SYNCHRONIZATION
-
-Design:
-
-• Offline message composition
-• Local pending queues
-• Synchronization cursors
-• Incremental synchronization
-• Delta synchronization
-• Missed-event recovery
-• Message history synchronization
-• Conflict resolution
-• Duplicate prevention
-
-Define:
-
-• Initial sync
-• Incremental sync
-• Recovery after long disconnection
-• Cursor invalidation
-• Replay behavior
-• Backpressure
-
-────────────────────────────────────────
-
-MULTI-DEVICE ARCHITECTURE
-
-Support:
-
-• Multiple smartphones
-• Web
-• Desktop
-• Tablets
-• Future clients
-
-Define:
-
-• Device registration
-• Device verification
-• Device capabilities
-• Device limits
-• Device revocation
-• Remote logout
-• Session synchronization
-• Message synchronization
-• Encryption synchronization
-
-Clearly separate:
-
-• Account identity
-• User identity
-• Device identity
-• Session identity
-
-────────────────────────────────────────
-
-PRESENCE
-
-Design:
-
-• Online
-• Offline
-• Last seen
-• Typing
-• Recording
-• Presence subscriptions
-
-Define:
-
-• Storage
-• TTL
-• Heartbeats
-• Fan-out
-• Privacy
-• Regional behavior
-• Failure behavior
-
-Presence must remain ephemeral and must not create excessive database traffic.
-
-────────────────────────────────────────
-
-CONTACT ARCHITECTURE
-
-Design:
-
-• Contact discovery
-• Contact synchronization
-• Contact requests
-• Blocking
-• Privacy controls
-
-Define privacy-preserving contact discovery.
-
-Protect against:
-
-• User enumeration
-• Automated scraping
-• Mass contact discovery
-• Abuse
-
-────────────────────────────────────────
-
-AUTHENTICATION ARCHITECTURE
-
-Support:
-
-• Password authentication where appropriate
-• Phone-based authentication where appropriate
-• OAuth
-• Passkeys
-• MFA
-• Session management
-• Refresh tokens
-• Device authentication
-• Session revocation
-• Suspicious login detection
-
-Define:
-
-• Credential storage
-• Token strategy
-• Token rotation
-• Expiration
-• Revocation
-• Device binding
-• Recovery
-
-────────────────────────────────────────
-
-AUTHORIZATION ARCHITECTURE
-
-Define:
-
-• RBAC
-• Resource ownership
-• Conversation permissions
-• Group permissions
-• Community permissions
-• Business permissions
-• Administrative permissions
-
-Define enforcement at:
-
-• Gateway
-• Service
-• Domain
-• Database query
-
-Frontend authorization must never be the only enforcement layer.
-
-────────────────────────────────────────
-
-END-TO-END ENCRYPTION FOUNDATIONS
-
-Design boundaries for:
-
-• Identity keys
-• Device keys
-• Pre-keys
-• Session establishment
-• Message encryption
-• Group encryption
-• Key rotation
-• Device addition
-• Device removal
-• Key verification
-
-Clearly distinguish:
-
-• TLS
-• Server-side encryption
-• End-to-end encryption
-
-Do not implement cryptographic algorithms.
-
-Do not invent cryptography.
-
-Define which information remains available to backend systems and which information must remain inaccessible.
-
-────────────────────────────────────────
-
-EVENT-DRIVEN ARCHITECTURE
-
-Design Kafka/Redpanda architecture.
-
-Define:
-
-• Topic naming
-• Partition strategy
-• Partition keys
-• Consumer groups
-• Event ownership
-• Retention
-• Versioning
-• Replay
-• Idempotency
-• Ordering
-• Dead-letter handling
-• Observability
-
-Use transactional outbox patterns where appropriate.
-
-────────────────────────────────────────
-
-EVENT CATALOG
-
-Define initial events including:
-
-AccountCreated
-
-AccountVerified
-
-SessionCreated
-
-SessionRevoked
-
-DeviceRegistered
-
-DeviceRevoked
-
-ContactAdded
-
-ContactBlocked
-
-ConversationCreated
-
-ConversationParticipantAdded
-
-ConversationParticipantRemoved
-
-MessageCreated
-
-MessageSent
-
-MessageDelivered
-
-MessageRead
-
-MessageEdited
-
-MessageDeleted
-
-MessageReactionAdded
-
-MessageReactionRemoved
-
-GroupCreated
-
-GroupMemberAdded
-
-GroupMemberRemoved
-
-CommunityCreated
-
-MediaUploaded
-
-MediaProcessingCompleted
-
-StoryCreated
-
-StoryExpired
-
-CallCreated
-
-CallStarted
-
-CallEnded
-
-NotificationCreated
-
-NotificationDelivered
-
-UserReported
-
-ModerationActionTaken
-
-BusinessAccountCreated
-
-AuditLogCreated
-
-FeatureFlagChanged
-
-Define payload ownership and versioning.
-
-Do not duplicate entire database entities inside events.
-
-────────────────────────────────────────
-
-QUEUE ARCHITECTURE
-
-Define BullMQ queues for:
-
-• Push notification delivery
-• Email delivery
-• Media processing
-• Image processing
-• Video processing
-• Thumbnail generation
-• Story expiration
-• Media cleanup
-• Search indexing
-• Analytics aggregation
-• Notification cleanup
-• Data retention
-• Report processing
-
-For each queue define:
-
-• Producer
-• Consumer
-• Retry
-• Backoff
-• Idempotency
-• Dead-letter behavior
-• Concurrency
-• Monitoring
-
-Clearly distinguish queue responsibilities from Kafka responsibilities.
-
-────────────────────────────────────────
-
-API ARCHITECTURE
-
-Define REST, WebSocket, and WebRTC signaling boundaries.
-
-API categories:
-
-Authentication
-
-• Registration
-• Login
-• Logout
-• Refresh
-• Password reset
-• Device management
-
-Contacts
-
-• Contact discovery
-• Contact management
-• Blocking
-
-Conversations
-
-• Create
-• List
-• Members
-• Settings
-
-Messages
-
-• Send
-• Edit
-• Delete
-• Reply
-• Forward
-• React
-• History
-• Read state
-
-Groups
-
-• Create
-• Update
-• Members
-• Roles
-• Permissions
-
-Media
-
-• Upload authorization
-• Processing state
-• Download authorization
-
-Stories
-
-• Create
-• View
-• Delete
-• Privacy
-
-Calls
-
-• Create
-• Accept
-• Reject
-• Signaling
-• End
-
-Administration
-
-• Users
-• Reports
-• Moderation
-• Audit
-
-Define:
-
-• Versioning
-• Naming conventions
-• Request validation
-• Pagination
-• Cursor pagination
-• Filtering
-• Sorting
-• Error response format
-• Authentication
-• Authorization
-• Rate limiting
-• Idempotency
-
-Do not generate application code.
-
-────────────────────────────────────────
-
-SECURITY ARCHITECTURE
-
-Define:
-
-• Authentication security
-• Authorization
-• Device security
-• Session security
-• Rate limiting
-• Abuse prevention
-• Account takeover protection
-• Secrets management
-• Encryption
-• Audit logging
-• Secure media access
-• WebSocket security
-• API security
-• Infrastructure security
-
-Cover OWASP best practices.
-
-────────────────────────────────────────
-
-SCALABILITY
-
-Design for:
-
-• Hundreds of millions of users
-• Billions of messages
-• Tens of millions of concurrent connections
-• Large group fan-out
-• Large media traffic
-• Global deployment
-
-Analyze:
-
-• API scaling
-• WebSocket scaling
-• PostgreSQL scaling
-• Redis scaling
-• Kafka scaling
-• Search scaling
-• Media-processing scaling
-• CDN scaling
-
-Identify likely bottlenecks and mitigation strategies.
-
-────────────────────────────────────────
-
-FAILURE STRATEGY
-
-Define behavior when:
-
-• PostgreSQL is unavailable
-• Redis is unavailable
-• Kafka is unavailable
-• Search is unavailable
-• S3 is unavailable
-• Push providers fail
-• WebSocket gateway fails
-• Call signaling fails
-• Regional infrastructure fails
-
-For every failure define:
-
-• Detection
-• Retry
-• Fallback
-• Degraded behavior
-• Recovery
-• Data reconciliation
-
-────────────────────────────────────────
-
-MULTI-REGION FOUNDATION
-
-Define:
-
-• Regional application clusters
-• Global routing
-• Regional data ownership
-• Cross-region event replication
-• Failover
-• Disaster recovery
-
-Classify data as:
-
-• Region-local
-• Globally replicated
-• Eventually consistent
-
-Avoid unnecessary synchronous cross-region calls.
-
-────────────────────────────────────────
-
-OBSERVABILITY FOUNDATION
-
-Define observability for:
-
-• API Gateway
-• Authentication
-• Messaging
-• WebSockets
-• Presence
-• Database
-• Redis
-• Kafka
-• BullMQ
-• Media processing
-• Notifications
-• Calls
-
-Use:
-
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
-
-Define:
-
-• Structured logs
-• Metrics
-• Traces
-• Correlation IDs
-• Trace propagation
-• Health checks
-• Readiness checks
-• Liveness checks
-• Alerts
-• SLOs
-• SLIs
-
-────────────────────────────────────────
-
-TESTING ARCHITECTURE
-
-Define:
-
-Unit Testing
-
-• Domain logic
-• Services
-• Utilities
-
-Integration Testing
-
-• PostgreSQL
-• Redis
-• Kafka
-• WebSockets
-• External providers
-
-Contract Testing
-
-• REST APIs
-• WebSocket contracts
-• Event schemas
-
-End-to-End Testing
-
-• Registration
-• Login
-• Messaging
-• Groups
-• Media
-• Calls
-• Notifications
-• Multi-device synchronization
-
-Performance Testing
-
-• API load
-• WebSocket connections
-• Message throughput
-• Group messaging
-• Presence
-• Synchronization
-
-Resilience Testing
-
-• Database failures
-• Redis failures
-• Kafka failures
-• WebSocket failures
-• Regional failures
-
-Security Testing
-
-• Authentication
-• Authorization
-• Rate limiting
-• Abuse prevention
-• Dependency scanning
-
-────────────────────────────────────────
-
-ARCHITECTURAL DECISION RECORDS
-
-Create ADRs for:
-
-• Architecture style
-• Service boundaries
-• Database ownership
-• Prisma strategy
-• Redis strategy
-• Kafka/Redpanda
-• BullMQ
-• WebSocket architecture
-• Multi-device synchronization
-• Offline synchronization
-• E2EE boundaries
-• Search architecture
-• Object storage
-• CDN
-• WebRTC
-• Multi-region strategy
-
-Each ADR must contain:
-
-• Context
-• Decision
-• Alternatives
-• Consequences
-
-────────────────────────────────────────
-
-PROJECT INDEX
-
-Create the initial Project Index containing:
-
-• Project overview
-• Technology stack
-• Domains
-• Services
-• Service ownership
-• Database ownership
-• Core entities
-• ERD
-• APIs
-• WebSocket events
-• Event catalog
-• Queue catalog
-• Redis responsibilities
-• Security boundaries
-• Encryption boundaries
-• Media architecture
-• Call architecture
-• Infrastructure principles
-• Observability
-• Testing strategy
-• Implementation dependencies
-
-────────────────────────────────────────
-
-ARCHITECTURE VOLUME 1 OUTPUT
-
-Produce:
-
-1. Executive Architecture Overview
-2. System Context
-3. C4 Architecture
-4. Architectural Approach
-5. Domain Decomposition
-6. Service Decomposition
-7. Service Ownership Matrix
-8. Communication Matrix
-9. Monorepo Architecture
-10. Detailed Folder Hierarchy
-11. Core Domain Model
-12. Aggregate Boundaries
-13. Database Architecture
-14. Database Ownership
-15. Complete Text-Based ERD
-16. Prisma Strategy
-17. Redis Architecture
-18. WebSocket Architecture
-19. Messaging Architecture
-20. Message Delivery Architecture
-21. Group Messaging Architecture
-22. Community Architecture
-23. Offline Synchronization Architecture
-24. Multi-Device Architecture
-25. Presence Architecture
-26. Contact Architecture
-27. Authentication Architecture
-28. Authorization Architecture
-29. E2EE Foundations
-30. Event-Driven Architecture
-31. Event Catalog
-32. Queue Architecture
-33. API Architecture
-34. Security Architecture
-35. Scalability Strategy
-36. Multi-Region Foundation
-37. Failure Strategy
-38. Observability Architecture
-39. Testing Architecture
-40. Architectural Decision Records
-41. Project Index
-
-────────────────────────────────────────
-
-QUALITY REQUIREMENTS
-
-Every architectural decision must evaluate:
-
-• Scalability
-• Availability
-• Security
-• Privacy
-• Latency
-• Data consistency
-• Operational complexity
-• Cost
-• Developer productivity
-• Maintainability
-• Future extensibility
-
-Prefer:
-
-• Explicit ownership
-• Clear domain boundaries
-• Stateless services where possible
-• Event-driven communication where appropriate
-• Idempotent consumers
-• Transactional outbox
-• Horizontal scaling
-• Established security protocols
-• Graceful degradation
-• Observable systems
-
-Avoid:
-
-• Unnecessary microservices
-• Shared database ownership
-• Distributed transactions where avoidable
-• Tight coupling
-• Single points of failure
-• Redis as a system of record
-• Application servers proxying large media
-• Proprietary cryptography
-• Frontend-only security
-• Premature complexity
-
-────────────────────────────────────────
-
-OUTPUT RULES
-
-This is an architecture document only.
-
-Do not generate source code.
-
-Do not generate placeholder implementations.
-
-Do not generate Dockerfiles.
-
-Do not generate Kubernetes manifests.
-
-Do not generate Terraform files.
-
-Do not generate frontend components.
-
-Do not generate mobile components.
-
-Do not implement backend services.
-
-Provide detailed specifications, diagrams, contracts, schemas, ownership rules, security boundaries, consistency requirements, and implementation guidance.
-
-The resulting architecture must be detailed enough for independent backend, frontend, mobile, infrastructure, DevOps, and QA implementation teams to build the complete platfor
-
-You are operating in Senior Engineering Team Mode.
-
-You are simultaneously acting as:
-
-- Principal Software Architect
-- Staff Backend Engineer
-- Staff Frontend Engineer
-- Staff Mobile Engineer
-- DevOps Engineer
-- Cloud Architect
-- Database Architect
-- Security Engineer
-- QA Engineer
-- UI/UX Designer
-- Technical Writer
-
-Design the complete foundational architecture for an enterprise-scale real-time messaging and communication platform comparable in architectural scope to WhatsApp.
-
-The platform must be an original implementation and must not copy proprietary source code, internal architecture, branding, or confidential implementation details from WhatsApp.
-
-This prompt is an independent architecture prompt.
-
-Do not implement backend code.
-
-Do not implement frontend code.
-
-Do not implement mobile code.
-
-Do not generate infrastructure implementation files.
-
-Do not generate Dockerfiles.
-
-Do not generate Kubernetes manifests.
-
-Do not generate Terraform files.
-
-Do not generate application source code.
-
-Produce architecture, specifications, contracts, diagrams, data models, engineering decisions, and implementation guidance only.
-
-────────────────────────────────────────
-
-PROJECT
-
-Build a production-ready global real-time communication platform supporting:
-
-• Hundreds of millions of registered users
-• Tens of millions of daily active users
-• Billions of messages
-• One-to-one messaging
-• Group messaging
-• Communities
-• Channels where appropriate
-• Voice calls
-• Video calls
-• Group calls
-• Media sharing
-• Voice messages
-• Documents
-• Stories/status updates
-• Push notifications
-• Multi-device synchronization
-• Offline messaging
-• Message delivery
-• Read receipts
-• Typing indicators
-• Presence
-• Contact management
-• Blocking
-• Reporting
-• Moderation
-• Business accounts
-• Administration
-• Analytics
-• Audit logging
-• End-to-end encryption architecture
-• High availability
-• Horizontal scaling
-• Multi-region deployment
-• Disaster recovery
-
-Design the system for:
-
-• Global operation
-• Low latency
-• High availability
-• Fault tolerance
-• Strong security
-• Privacy
-• Long-term maintainability
-• Future extensibility
-
-────────────────────────────────────────
-
-PRIMARY TECHNOLOGY STACK
-
-Web:
-
-• Next.js
-• React
-• TypeScript
-• Tailwind CSS
-• shadcn/ui
-
-Mobile:
-
-• React Native
-• Expo
-• TypeScript
-
-Backend:
-
-• Node.js
-• NestJS
-• TypeScript
-
-Database:
-
-• PostgreSQL
-• Prisma ORM
-
-Caching:
-
-• Redis
-
-Real-Time Communication:
-
-• WebSockets
-• Socket.IO where appropriate
-
-Event Streaming:
-
-• Kafka or Redpanda
-
-Background Processing:
-
-• BullMQ
-
-Search:
-
-• Elasticsearch or OpenSearch
-
-Object Storage:
-
-• AWS S3-compatible object storage
-
-CDN:
-
-• CloudFront or equivalent CDN
-
-Push Notifications:
-
-• Firebase Cloud Messaging
-• Apple Push Notification Service
-
-Voice/Video:
-
-• WebRTC
-• STUN/TURN infrastructure
-
-Infrastructure:
-
-• Docker
-• Kubernetes
-• Helm
-• Terraform
-• GitHub Actions
-
-Observability:
-
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
-
-Secrets:
-
-• HashiCorp Vault or approved cloud-native secret management
-
-────────────────────────────────────────
-
-ARCHITECTURAL APPROACH
-
-Determine whether the platform should initially use:
-
-• Modular Monolith
-• Service-Oriented Architecture
-• Microservices
-
-Do not blindly create a service for every table or feature.
-
-Evaluate:
-
-• Transactional consistency
-• Scalability
-• Latency
-• Operational complexity
-• Deployment independence
-• Team ownership
-• Failure isolation
-• Cost
-• Developer productivity
-• Long-term maintainability
-
-Clearly identify:
-
-• Independently deployable services
-• Shared transactional boundaries
-• Authoritative data ownership
-• Synchronous communication
-• Asynchronous communication
-• Event-driven communication
-• Read models
-• CQRS requirements
-• Eventual consistency
-• Strong consistency
-
-Provide a migration strategy for future service extraction where appropriate.
-
-────────────────────────────────────────
-
-CORE PLATFORM DOMAINS
-
-Define bounded contexts and ownership for:
-
-Identity
-
-Accounts
-
-Users
-
-Profiles
-
-Authentication
-
-Authorization
-
-Sessions
-
-Devices
-
-Contacts
-
-Privacy
-
-Presence
-
-Conversations
-
-Messaging
-
-Messages
-
-Message Delivery
-
-Message Reactions
-
-Message Replies
-
-Message Forwarding
-
-Message Editing
-
-Message Deletion
-
-Groups
-
-Communities
-
-Channels
-
-Media
-
-Media Processing
-
-Voice Messages
-
-Documents
-
-Stories
-
-Notifications
-
-Search
-
-Calls
-
-Voice Calls
-
-Video Calls
-
-Group Calls
-
-Call Signaling
-
-End-to-End Encryption
-
-Key Management
-
-Offline Synchronization
-
-Multi-Device Synchronization
-
-Blocking
-
-Reporting
-
-Moderation
-
-Business Accounts
-
-Administration
-
-Analytics
-
-Audit
-
-Feature Flags
-
-System Configuration
-
-For each domain define:
-
-• Responsibility
-• Aggregate roots
-• Entities
-• Value objects
-• Repositories
-• Application services
-• Domain services
-• Domain events
-• Data ownership
-• Consistency requirements
-
-────────────────────────────────────────
-
-SYSTEM ARCHITECTURE
-
-Design a complete high-level architecture.
-
-CLIENT LAYER
-
-Include:
-
-• Web application
-• iOS application
-• Android application
-• Desktop architecture boundaries
-• Tablet architecture boundaries
-• Future device integrations
-
-EDGE LAYER
-
-Include:
-
-• DNS
-• CDN
-• WAF
-• Load balancers
-• API Gateway
-• WebSocket Gateway
-• Rate limiting
-• Authentication boundaries
-
-APPLICATION LAYER
-
-Include:
-
-• API services
-• Domain services
-• Real-time services
-• Messaging services
-• Call signaling
-• Background workers
-• Event consumers
-• Scheduled jobs
-
-DATA LAYER
-
-Include:
-
-• PostgreSQL
-• Read replicas
-• Redis
-• Kafka/Redpanda
-• Elasticsearch/OpenSearch
-• Object storage
-
-COMMUNICATION LAYER
-
-Include:
-
-• REST APIs
-• WebSockets
-• WebRTC
-• Push notifications
-• Event streaming
-
-OBSERVABILITY LAYER
-
-Include:
-
-• Metrics
-• Logs
-• Traces
-• Alerts
-
-SECURITY LAYER
-
-Include:
-
-• Authentication
-• Authorization
-• Encryption
-• Key management
-• Secrets management
-• Audit logging
-• Network segmentation
-
-Represent the architecture using clear text-based diagrams.
-
-Do not use images.
-
-────────────────────────────────────────
-
-C4 ARCHITECTURE
-
-Generate:
-
-• System Context Diagram
-• Container Diagram
-• Component Diagram
-• Deployment Diagram
-
-For every major component define:
-
-• Responsibility
-• Inputs
-• Outputs
-• Dependencies
-• Scaling behavior
-• Failure behavior
-• Security boundary
-
-────────────────────────────────────────
-
-SERVICE DECOMPOSITION
-
-Evaluate and define service boundaries for:
-
-API Gateway
-
-Authentication Service
-
-Identity Service
-
-Account Service
-
-Profile Service
-
-Session Service
-
-Device Service
-
-Contact Service
-
-Privacy Service
-
-Presence Service
-
-Conversation Service
-
-Messaging Service
-
-Message Delivery Service
-
-Message Synchronization Service
-
-Group Service
-
-Community Service
-
-Media Service
-
-Media Processing Service
-
-Notification Service
-
-Search Service
-
-Story Service
-
-Call Signaling Service
-
-Call Session Service
-
-Encryption/Key Management boundaries
-
-Moderation Service
-
-Reporting Service
-
-Business Account Service
-
-Administration Service
-
-Analytics Service
-
-Audit Service
-
-Feature Flag Service
-
-Configuration Service
-
-Do not automatically make every item an independently deployable microservice.
-
-Combine cohesive responsibilities where appropriate.
-
-For every final service boundary define:
-
-• Responsibility
-• Authoritative data
-• APIs
-• Events produced
-• Events consumed
-• Synchronous dependencies
-• Asynchronous dependencies
-• Scaling requirements
-• Availability requirements
-• Security boundaries
-
-────────────────────────────────────────
-
-SERVICE OWNERSHIP MATRIX
-
-Create a complete ownership matrix.
-
-For each domain identify:
-
-• Authoritative service
-• Database ownership
-• API ownership
-• Event ownership
-• Cache ownership
-• Search/read-model ownership
-• Administrative ownership
-
-Explicitly define prohibited cross-service database writes.
-
-────────────────────────────────────────
-
-COMMUNICATION MATRIX
-
-Define communication between major services.
-
-For each interaction specify:
-
-• Producer
-• Consumer
-• Protocol
-• Synchronous/asynchronous
-• Purpose
-• Consistency requirement
-• Timeout
-• Retry
-• Idempotency
-• Failure behavior
-
-Evaluate:
-
-• REST/HTTP
-• WebSockets
-• Kafka/Redpanda
-• BullMQ
-• Redis
-• WebRTC signaling
-
-Avoid unnecessary synchronous dependencies.
-
-────────────────────────────────────────
-
-MONOREPO ARCHITECTURE
-
-Design a production-ready monorepo.
-
-Applications:
-
-• Web
-• Mobile
-• Desktop where appropriate
-• Administration Dashboard
-• Moderation Dashboard where appropriate
-
-Backend:
-
-• API Gateway
-• Backend services
-• Real-time services
-• WebSocket services
-• Call signaling services
-• Background workers
-
-Shared packages:
-
-• API contracts
-• Event contracts
-• Shared types
-• Validation
-• Configuration
-• Authentication interfaces
-• Observability
-• Encryption interfaces
-• Testing utilities
-• UI components where appropriate
-
-Infrastructure:
-
-• Docker
-• Kubernetes
-• Helm
-• Terraform
-• CI/CD
-
-Documentation:
-
-• Architecture
-• API
-• Events
-• Database
-• Security
-• Operations
-• ADRs
-• Runbooks
-
-Do not create shared packages merely to reduce duplication.
-
-Shared packages must have clear ownership and dependency rules.
-
-────────────────────────────────────────
-
-FOLDER HIERARCHY
-
-Generate a detailed folder hierarchy for:
-
-• Monorepo root
-• Applications
-• Backend services
-• Workers
-• Shared packages
-• Database
-• Infrastructure
-• Tests
-• Documentation
-• Configuration
-• Database migrations
-
-Include important directories and representative files.
-
-Do not generate source code.
-
-────────────────────────────────────────
-
-CORE DOMAIN MODEL
-
-Evaluate the following entities:
-
-User
-
-Account
-
-Profile
-
-ProfileSettings
-
-PrivacySettings
-
-Session
-
-Device
-
-DeviceCapability
-
-Contact
-
-ContactRequest
-
-BlockedUser
-
-Conversation
-
-ConversationParticipant
-
-ConversationSettings
-
-Message
-
-MessageAttachment
-
-MessageReaction
-
-MessageReply
-
-MessageForward
-
-MessageMention
-
-MessageReceipt
-
-MessageEdit
-
-MessageDeletion
-
-Group
-
-GroupMember
-
-GroupRole
-
-Community
-
-CommunityMember
-
-Channel
-
-MediaAsset
-
-MediaProcessingJob
-
-VoiceMessage
-
-Document
-
-Story
-
-StoryViewer
-
-Notification
-
-NotificationPreference
-
-PushToken
-
-Call
-
-CallParticipant
-
-CallSession
-
-CallDevice
-
-EncryptionIdentity
-
-DeviceKey
-
-PreKey
-
-SessionKey
-
-Report
-
-ModerationCase
-
-BusinessAccount
-
-BusinessProfile
-
-AuditLog
-
-FeatureFlag
-
-Do not assume one database table per conceptual entity.
-
-Define:
-
-• Aggregate roots
-• Aggregate boundaries
-• Lifecycle
-• Invariants
-• Ownership
-• Transaction boundaries
-
-────────────────────────────────────────
-
-DATABASE ARCHITECTURE
-
-Design PostgreSQL for:
-
-• Hundreds of millions of users
-• Billions of messages
-• Large conversation histories
-• Large groups
-• High-volume message receipts
-• Large device/session datasets
-• Large audit datasets
-
-Define:
-
-• Database ownership
-• Schema boundaries
-• Primary keys
-• Foreign keys
-• Indexes
-• Unique constraints
-• Check constraints
-• Partitioning
-• Replication
-• Read replicas
-• Connection pooling
-• Archival
-• Retention
-• Backup
-• Recovery
-
-Identify high-growth tables.
-
-Evaluate partitioning candidates for:
-
-• Messages
-• Message receipts
-• Audit logs
-• Call events
-• Analytics data
-
-Do not store large binary media inside PostgreSQL.
-
-Do not use PostgreSQL as the primary source for high-volume ephemeral presence data.
-
-────────────────────────────────────────
-
-DATABASE OWNERSHIP
-
-Define:
-
-• Which service owns each database/schema
-• Which services may directly read it
-• Which services must use APIs
-• Which services use read models
-• How cross-domain queries are implemented
-• How database migrations are owned
-
-Prevent uncontrolled cross-service database access.
-
-────────────────────────────────────────
-
-ERD
-
-Generate a complete text-based ERD.
-
-Include:
-
-• Primary keys
-• Foreign keys
-• Cardinality
-• Ownership
-• Important indexes
-• High-growth tables
-• Partitioning candidates
-
-Clearly show relationships between:
-
-• Users
-• Accounts
-• Profiles
-• Devices
-• Contacts
-• Conversations
-• Participants
-• Messages
-• Attachments
-• Groups
-• Communities
-• Stories
-• Calls
-• Encryption metadata
-• Reports
-• Business accounts
-• Sessions
-• Notifications
-
-────────────────────────────────────────
-
-PRISMA STRATEGY
-
-Define:
-
-• Schema ownership
-• Prisma schema organization
-• Service-specific Prisma clients where appropriate
-• Migration ownership
-• Transaction boundaries
-• Read replica strategy
-• Connection pooling
-• Query optimization
-• Indexing rules
-• Migration deployment strategy
-
-Avoid a single uncontrolled shared database model.
-
-────────────────────────────────────────
-
-REDIS ARCHITECTURE
-
-Design Redis usage for:
-
-• Presence
-• Session coordination
-• WebSocket coordination
-• Typing indicators
-• Rate limiting
-• Distributed locks
-• Temporary synchronization state
-• Notification deduplication
-• Cache
-• Queue infrastructure
-
-For each use case define:
-
-• Key pattern
-• TTL
-• Invalidation
-• Consistency
-• Failure behavior
-• Memory considerations
-
-Redis must never be the authoritative source for critical persistent data.
-
-────────────────────────────────────────
-
-REAL-TIME ARCHITECTURE
-
-Design the complete WebSocket architecture.
-
-Support:
-
-• Connection establishment
-• Authentication
-• Authorization
-• Heartbeats
-• Reconnection
-• Presence
-• Typing indicators
-• Message delivery
-• Delivery acknowledgements
-• Read receipts
-• Reactions
-• Group events
-• Call signaling
-• Multi-device synchronization
-
-Define:
-
-• Gateway architecture
-• Connection routing
-• Horizontal scaling
-• Redis coordination
-• Connection affinity
-• Backpressure
-• Rate limiting
-• Connection recovery
-• Regional routing
-• Failure handling
-
-Design for tens of millions of concurrent connections.
-
-────────────────────────────────────────
-
-MESSAGING ARCHITECTURE
-
-Design one-to-one and group messaging.
-
-Support:
-
-• Text messages
-• Replies
-• Reactions
-• Forwarding
-• Mentions
-• Editing
-• Deletion
-• Attachments
-• Voice messages
-• Documents
-• Delivery state
-• Read state
-• Message ordering
-• Offline delivery
-• Multi-device delivery
-
-Define:
-
-• Client-generated message IDs
-• Server-generated IDs
-• Conversation sequence numbers
-• Idempotency keys
-• Ordering guarantees
-• Deduplication
-• Retry behavior
-• Delivery semantics
-• Persistence semantics
-
-Do not rely on client timestamps for authoritative ordering.
-
-────────────────────────────────────────
-
-MESSAGE DELIVERY
-
-Define delivery states:
-
-• Pending
-• Accepted
-• Sent
-• Delivered
-• Read
-• Failed
-
-Define how states propagate across:
-
-• Sender devices
-• Recipient devices
-• Web
-• Mobile
-• Desktop
-
-Define how retries and duplicate events are handled.
-
-────────────────────────────────────────
-
-OFFLINE SYNCHRONIZATION
-
-Design:
-
-• Offline message composition
-• Local pending queues
-• Synchronization cursors
-• Incremental synchronization
-• Delta synchronization
-• Missed-event recovery
-• Message history synchronization
-• Conflict resolution
-• Duplicate prevention
-
-Define:
-
-• Initial sync
-• Incremental sync
-• Recovery after long disconnection
-• Cursor invalidation
-• Replay behavior
-• Backpressure
-
-────────────────────────────────────────
-
-MULTI-DEVICE ARCHITECTURE
-
-Support:
-
-• Multiple smartphones
-• Web
-• Desktop
-• Tablets
-• Future clients
-
-Define:
-
-• Device registration
-• Device verification
-• Device capabilities
-• Device limits
-• Device revocation
-• Remote logout
-• Session synchronization
-• Message synchronization
-• Encryption synchronization
-
-Clearly separate:
-
-• Account identity
-• User identity
-• Device identity
-• Session identity
-
-────────────────────────────────────────
-
-PRESENCE
-
-Design:
-
-• Online
-• Offline
-• Last seen
-• Typing
-• Recording
-• Presence subscriptions
-
-Define:
-
-• Storage
-• TTL
-• Heartbeats
-• Fan-out
-• Privacy
-• Regional behavior
-• Failure behavior
-
-Presence must remain ephemeral and must not create excessive database traffic.
-
-────────────────────────────────────────
-
-CONTACT ARCHITECTURE
-
-Design:
-
-• Contact discovery
-• Contact synchronization
-• Contact requests
-• Blocking
-• Privacy controls
-
-Define privacy-preserving contact discovery.
-
-Protect against:
-
-• User enumeration
-• Automated scraping
-• Mass contact discovery
-• Abuse
-
-────────────────────────────────────────
-
-AUTHENTICATION ARCHITECTURE
-
-Support:
-
-• Password authentication where appropriate
-• Phone-based authentication where appropriate
-• OAuth
-• Passkeys
-• MFA
-• Session management
-• Refresh tokens
-• Device authentication
-• Session revocation
-• Suspicious login detection
-
-Define:
-
-• Credential storage
-• Token strategy
-• Token rotation
-• Expiration
-• Revocation
-• Device binding
-• Recovery
-
-────────────────────────────────────────
-
-AUTHORIZATION ARCHITECTURE
-
-Define:
-
-• RBAC
-• Resource ownership
-• Conversation permissions
-• Group permissions
-• Community permissions
-• Business permissions
-• Administrative permissions
-
-Define enforcement at:
-
-• Gateway
-• Service
-• Domain
-• Database query
-
-Frontend authorization must never be the only enforcement layer.
-
-────────────────────────────────────────
-
-END-TO-END ENCRYPTION FOUNDATIONS
-
-Design boundaries for:
-
-• Identity keys
-• Device keys
-• Pre-keys
-• Session establishment
-• Message encryption
-• Group encryption
-• Key rotation
-• Device addition
-• Device removal
-• Key verification
-
-Clearly distinguish:
-
-• TLS
-• Server-side encryption
-• End-to-end encryption
-
-Do not implement cryptographic algorithms.
-
-Do not invent cryptography.
-
-Define which information remains available to backend systems and which information must remain inaccessible.
-
-────────────────────────────────────────
-
-EVENT-DRIVEN ARCHITECTURE
-
-Design Kafka/Redpanda architecture.
-
-Define:
-
-• Topic naming
-• Partition strategy
-• Partition keys
-• Consumer groups
-• Event ownership
-• Retention
-• Versioning
-• Replay
-• Idempotency
-• Ordering
-• Dead-letter handling
-• Observability
-
-Use transactional outbox patterns where appropriate.
-
-────────────────────────────────────────
-
-EVENT CATALOG
-
-Define initial events including:
-
-AccountCreated
-
-AccountVerified
-
-SessionCreated
-
-SessionRevoked
-
-DeviceRegistered
-
-DeviceRevoked
-
-ContactAdded
-
-ContactBlocked
-
-ConversationCreated
-
-ConversationParticipantAdded
-
-ConversationParticipantRemoved
-
-MessageCreated
-
-MessageSent
-
-MessageDelivered
-
-MessageRead
-
-MessageEdited
-
-MessageDeleted
-
-MessageReactionAdded
-
-MessageReactionRemoved
-
-GroupCreated
-
-GroupMemberAdded
-
-GroupMemberRemoved
-
-CommunityCreated
-
-MediaUploaded
-
-MediaProcessingCompleted
-
-StoryCreated
-
-StoryExpired
-
-CallCreated
-
-CallStarted
-
-CallEnded
-
-NotificationCreated
-
-NotificationDelivered
-
-UserReported
-
-ModerationActionTaken
-
-BusinessAccountCreated
-
-AuditLogCreated
-
-FeatureFlagChanged
-
-Define payload ownership and versioning.
-
-Do not duplicate entire database entities inside events.
-
-────────────────────────────────────────
-
-QUEUE ARCHITECTURE
-
-Define BullMQ queues for:
-
-• Push notification delivery
-• Email delivery
-• Media processing
-• Image processing
-• Video processing
-• Thumbnail generation
-• Story expiration
-• Media cleanup
-• Search indexing
-• Analytics aggregation
-• Notification cleanup
-• Data retention
-• Report processing
-
-For each queue define:
-
-• Producer
-• Consumer
-• Retry
-• Backoff
-• Idempotency
-• Dead-letter behavior
-• Concurrency
-• Monitoring
-
-Clearly distinguish queue responsibilities from Kafka responsibilities.
-
-────────────────────────────────────────
-
-API ARCHITECTURE
-
-Define REST, WebSocket, and WebRTC signaling boundaries.
-
-API categories:
-
-Authentication
-
-• Registration
-• Login
-• Logout
-• Refresh
-• Password reset
-• Device management
-
-Contacts
-
-• Contact discovery
-• Contact management
-• Blocking
-
-Conversations
-
-• Create
-• List
-• Members
-• Settings
-
-Messages
-
-• Send
-• Edit
-• Delete
-• Reply
-• Forward
-• React
-• History
-• Read state
-
-Groups
-
-• Create
-• Update
-• Members
-• Roles
-• Permissions
-
-Media
-
-• Upload authorization
-• Processing state
-• Download authorization
-
-Stories
-
-• Create
-• View
-• Delete
-• Privacy
-
-Calls
-
-• Create
-• Accept
-• Reject
-• Signaling
-• End
-
-Administration
-
-• Users
-• Reports
-• Moderation
-• Audit
-
-Define:
-
-• Versioning
-• Naming conventions
-• Request validation
-• Pagination
-• Cursor pagination
-• Filtering
-• Sorting
-• Error response format
-• Authentication
-• Authorization
-• Rate limiting
-• Idempotency
-
-Do not generate application code.
-
-────────────────────────────────────────
-
-SECURITY ARCHITECTURE
-
-Define:
-
-• Authentication security
-• Authorization
-• Device security
-• Session security
-• Rate limiting
-• Abuse prevention
-• Account takeover protection
-• Secrets management
-• Encryption
-• Audit logging
-• Secure media access
-• WebSocket security
-• API security
-• Infrastructure security
-
-Cover OWASP best practices.
-
-────────────────────────────────────────
-
-SCALABILITY
-
-Design for:
-
-• Hundreds of millions of users
-• Billions of messages
-• Tens of millions of concurrent connections
-• Large group fan-out
-• Large media traffic
-• Global deployment
-
-Analyze:
-
-• API scaling
-• WebSocket scaling
-• PostgreSQL scaling
-• Redis scaling
-• Kafka scaling
-• Search scaling
-• Media-processing scaling
-• CDN scaling
-
-Identify likely bottlenecks and mitigation strategies.
-
-────────────────────────────────────────
-
-FAILURE STRATEGY
-
-Define behavior when:
-
-• PostgreSQL is unavailable
-• Redis is unavailable
-• Kafka is unavailable
-• Search is unavailable
-• S3 is unavailable
-• Push providers fail
-• WebSocket gateway fails
-• Call signaling fails
-• Regional infrastructure fails
-
-For every failure define:
-
-• Detection
-• Retry
-• Fallback
-• Degraded behavior
-• Recovery
-• Data reconciliation
-
-────────────────────────────────────────
-
-MULTI-REGION FOUNDATION
-
-Define:
-
-• Regional application clusters
-• Global routing
-• Regional data ownership
-• Cross-region event replication
-• Failover
-• Disaster recovery
-
-Classify data as:
-
-• Region-local
-• Globally replicated
-• Eventually consistent
-
-Avoid unnecessary synchronous cross-region calls.
-
-────────────────────────────────────────
-
-OBSERVABILITY FOUNDATION
-
-Define observability for:
-
-• API Gateway
-• Authentication
-• Messaging
-• WebSockets
-• Presence
-• Database
-• Redis
-• Kafka
-• BullMQ
-• Media processing
-• Notifications
-• Calls
-
-Use:
-
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
-
-Define:
-
-• Structured logs
-• Metrics
-• Traces
-• Correlation IDs
-• Trace propagation
-• Health checks
-• Readiness checks
-• Liveness checks
-• Alerts
-• SLOs
-• SLIs
-
-────────────────────────────────────────
-
-TESTING ARCHITECTURE
-
-Define:
-
-Unit Testing
-
-• Domain logic
-• Services
-• Utilities
-
-Integration Testing
-
-• PostgreSQL
-• Redis
-• Kafka
-• WebSockets
-• External providers
-
-Contract Testing
-
-• REST APIs
-• WebSocket contracts
-• Event schemas
-
-End-to-End Testing
-
-• Registration
-• Login
-• Messaging
-• Groups
-• Media
-• Calls
-• Notifications
-• Multi-device synchronization
-
-Performance Testing
-
-• API load
-• WebSocket connections
-• Message throughput
-• Group messaging
-• Presence
-• Synchronization
-
-Resilience Testing
-
-• Database failures
-• Redis failures
-• Kafka failures
-• WebSocket failures
-• Regional failures
-
-Security Testing
-
-• Authentication
-• Authorization
-• Rate limiting
-• Abuse prevention
-• Dependency scanning
-
-────────────────────────────────────────
-
-ARCHITECTURAL DECISION RECORDS
-
-Create ADRs for:
-
-• Architecture style
-• Service boundaries
-• Database ownership
-• Prisma strategy
-• Redis strategy
-• Kafka/Redpanda
-• BullMQ
-• WebSocket architecture
-• Multi-device synchronization
-• Offline synchronization
-• E2EE boundaries
-• Search architecture
-• Object storage
-• CDN
-• WebRTC
-• Multi-region strategy
-
-Each ADR must contain:
-
-• Context
-• Decision
-• Alternatives
-• Consequences
-
-────────────────────────────────────────
-
-PROJECT INDEX
-
-Create the initial Project Index containing:
-
-• Project overview
-• Technology stack
-• Domains
-• Services
-• Service ownership
-• Database ownership
-• Core entities
-• ERD
-• APIs
-• WebSocket events
-• Event catalog
-• Queue catalog
-• Redis responsibilities
-• Security boundaries
-• Encryption boundaries
-• Media architecture
-• Call architecture
-• Infrastructure principles
-• Observability
-• Testing strategy
-• Implementation dependencies
-
-────────────────────────────────────────
-
-ARCHITECTURE VOLUME 1 OUTPUT
-
-Produce:
-
-1. Executive Architecture Overview
-2. System Context
-3. C4 Architecture
-4. Architectural Approach
-5. Domain Decomposition
-6. Service Decomposition
-7. Service Ownership Matrix
-8. Communication Matrix
-9. Monorepo Architecture
-10. Detailed Folder Hierarchy
-11. Core Domain Model
-12. Aggregate Boundaries
-13. Database Architecture
-14. Database Ownership
-15. Complete Text-Based ERD
-16. Prisma Strategy
-17. Redis Architecture
-18. WebSocket Architecture
-19. Messaging Architecture
-20. Message Delivery Architecture
-21. Group Messaging Architecture
-22. Community Architecture
-23. Offline Synchronization Architecture
-24. Multi-Device Architecture
-25. Presence Architecture
-26. Contact Architecture
-27. Authentication Architecture
-28. Authorization Architecture
-29. E2EE Foundations
-30. Event-Driven Architecture
-31. Event Catalog
-32. Queue Architecture
-33. API Architecture
-34. Security Architecture
-35. Scalability Strategy
-36. Multi-Region Foundation
-37. Failure Strategy
-38. Observability Architecture
-39. Testing Architecture
-40. Architectural Decision Records
-41. Project Index
-
-────────────────────────────────────────
-
-QUALITY REQUIREMENTS
-
-Every architectural decision must evaluate:
-
-• Scalability
-• Availability
-• Security
-• Privacy
-• Latency
-• Data consistency
-• Operational complexity
-• Cost
-• Developer productivity
-• Maintainability
-• Future extensibility
-
-Prefer:
-
-• Explicit ownership
-• Clear domain boundaries
-• Stateless services where possible
-• Event-driven communication where appropriate
-• Idempotent consumers
-• Transactional outbox
-• Horizontal scaling
-• Established security protocols
-• Graceful degradation
-• Observable systems
-
-Avoid:
-
-• Unnecessary microservices
-• Shared database ownership
-• Distributed transactions where avoidable
-• Tight coupling
-• Single points of failure
-• Redis as a system of record
-• Application servers proxying large media
-• Proprietary cryptography
-• Frontend-only security
-• Premature complexity
-
-────────────────────────────────────────
-
-OUTPUT RULES
-
-This is an architecture document only.
-
-Do not generate source code.
-
-Do not generate placeholder implementations.
-
-Do not generate Dockerfiles.
-
-Do not generate Kubernetes manifests.
-
-Do not generate Terraform files.
-
-Do not generate frontend components.
-
-Do not generate mobile components.
-
-Do not implement backend services.
-
-Provide detailed specifications, diagrams, contracts, schemas, ownership rules, security boundaries, consistency requirements, and implementation guidance.
-
-The resulting architecture must be detailed enough for independent backend, frontend, mobile, infrastructure, DevOps, and QA implementation teams to build the complete platfor
-
-You are operating in Senior Engineering Team Mode.
-
-Design the complete first architecture volume for an enterprise-scale real-time messaging and communication platform comparable in architectural scope to WhatsApp.
-
-This is an independent architecture prompt.
-
-This is:
-
-ARCHITECTURE PHASE
-VOLUME 1
-
-Do not implement backend code.
-
-Do not implement frontend code.
-
-Do not implement mobile code.
-
-Do not generate infrastructure implementation files.
-
-The purpose of this phase is to establish the core architecture, domain model, service boundaries, data architecture, real-time architecture, messaging architecture, API architecture, security foundations, and technical contracts that the remaining architecture and implementation phases will follow.
-
-The architecture must be original and must not copy proprietary implementation details from WhatsApp.
-
-────────────────────────────────────────
-
-PROJECT
-
-Build a production-ready global real-time communication platform supporting:
-
-• Hundreds of millions of registered users
-• Tens of millions of daily active users
-• Large-scale one-to-one messaging
-• Group messaging
-• Communities
-• Voice calls
-• Video calls
-• Group calls
-• Media sharing
-• Voice messages
-• Documents
-• Stories/status updates
-• Push notifications
-• Multi-device synchronization
-• Offline messaging
-• Message delivery guarantees
-• End-to-end encryption architecture
-• Contact management
-• Blocking and reporting
-• Business accounts
-• Administrative tools
-• Moderation
-• Analytics
-• High availability
-• Multi-region deployment
-• Horizontal scaling
-• Disaster recovery
-
-Design the platform for global operation, low latency, high availability, strong security, privacy, and long-term scalability.
-
-Do not assume that every client device has identical capabilities.
-
-Do not design the system around a single-device architecture.
-
-────────────────────────────────────────
-
-PRIMARY TECHNOLOGY STACK
-
-Web:
-
-• Next.js
-• React
-• TypeScript
-• Tailwind CSS
-
-Mobile:
-
-• React Native
-• Expo
-• TypeScript
-
-Backend:
-
-• Node.js
-• NestJS
-• TypeScript
-
-Database:
-
-• PostgreSQL
-• Prisma ORM
-
-Caching:
-
-• Redis
-
-Real-Time Communication:
-
-• WebSockets
-• Socket.IO where appropriate
-
-Event Streaming:
-
-• Kafka or Redpanda
-
-Background Jobs:
-
-• BullMQ
-
-Search:
-
-• Elasticsearch or OpenSearch
-
-Object Storage:
-
-• AWS S3-compatible object storage
-
-CDN:
-
-• CloudFront or equivalent CDN
-
-Push Notifications:
-
-• Firebase Cloud Messaging
-• Apple Push Notification Service
-
-Voice/Video:
-
-• WebRTC
-• STUN/TURN infrastructure
-
-Infrastructure:
-
-• Docker
-• Kubernetes
-• Helm
-• Terraform
-• GitHub Actions
-
-Observability:
-
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
-
-Secrets:
-
-• HashiCorp Vault or approved cloud-native secret management
-
-────────────────────────────────────────
-
-CORE PLATFORM DOMAINS
-
-Define bounded contexts and ownership for:
-
-Identity
-
-Accounts
-
-Users
-
-Profiles
-
-Authentication
-
-Authorization
-
-Sessions
-
-Devices
-
-Contacts
-
-Presence
-
-Messaging
-
-Conversations
-
-Groups
-
-Communities
-
-Messages
-
-Message Delivery
-
-Message Reactions
-
-Message Editing
-
-Message Deletion
-
-Media
-
-Voice Messages
-
-Documents
-
-Stories
-
-Notifications
-
-Search
-
-Calls
-
-Voice Calls
-
-Video Calls
-
-Group Calls
-
-Call Signaling
-
-End-to-End Encryption
-
-Key Management
-
-Offline Synchronization
-
-Multi-Device Synchronization
-
-Blocking
-
-Reporting
-
-Moderation
-
-Business Accounts
-
-Administration
-
-Analytics
-
-Audit
-
-Feature Flags
-
-System Configuration
-
-────────────────────────────────────────
-
-ARCHITECTURAL APPROACH
-
-Determine the appropriate architecture between:
-
-• Modular Monolith
-• Service-Oriented Architecture
-• Microservices
-
-Do not blindly create a microservice for every domain or database table.
-
-Evaluate:
-
-• Transactional consistency
-• Operational complexity
-• Scalability
-• Latency
-• Deployment independence
-• Team ownership
-• Failure isolation
-• Data ownership
-• Developer productivity
-• Long-term maintainability
-
-Clearly identify:
-
-• Independently deployable services
-• Shared transactional boundaries
-• Authoritative data ownership
-• Synchronous communication
-• Asynchronous communication
-• Event-driven communication
-• Read models
-• CQRS requirements
-• Eventual consistency boundaries
-• Strong consistency requirements
-
-Explain why each major service boundary exists.
-
-────────────────────────────────────────
-
-SYSTEM ARCHITECTURE
-
-Design the complete high-level system architecture.
-
-CLIENT LAYER
-
-Include:
-
-• Web application
-• iOS application
-• Android application
-• Desktop architecture boundaries
-• Tablet architecture boundaries
-• Future embedded/device integrations
-
-EDGE LAYER
-
-Include:
-
-• DNS
-• CDN
-• WAF
-• Load balancers
-• API Gateway
-• WebSocket Gateway
-• Rate limiting
-• Authentication boundaries
-
-APPLICATION LAYER
-
-Include:
-
-• API services
-• Authentication services
-• Identity services
-• Account services
-• Conversation services
-• Messaging services
-• Real-time services
-• Call signaling
-• Background workers
-• Event consumers
-• Scheduled jobs
-
-DATA LAYER
-
-Include:
-
-• PostgreSQL
-• Read replicas
-• Redis
-• Kafka/Redpanda
-• Elasticsearch/OpenSearch
-• Object storage
-
-COMMUNICATION LAYER
-
-Include:
-
-• WebSockets
-• WebRTC
-• Push notifications
-• Event streaming
-
-OBSERVABILITY LAYER
-
-Include:
-
-• Metrics
-• Logs
-• Traces
-• Alerts
-
-SECURITY LAYER
-
-Include:
-
-• Authentication
-• Authorization
-• Encryption
-• Key management
-• Secrets
-• Audit logging
-• Network segmentation
-
-Represent the architecture using clear text-based diagrams.
-
-Do not use images.
-
-────────────────────────────────────────
-
-SERVICE DECOMPOSITION
-
-Evaluate and define appropriate service boundaries for:
-
-API Gateway
-
-Authentication Service
-
-Identity Service
-
-Account Service
-
-Profile Service
-
-Session Service
-
-Device Service
-
-Contact Service
-
-Presence Service
-
-Conversation Service
-
-Messaging Service
-
-Message Delivery Service
-
-Message Sync Service
-
-Group Service
-
-Community Service
-
-Media Service
-
-Media Processing Service
-
-Notification Service
-
-Search Service
-
-Story Service
-
-Call Signaling Service
-
-Call Session Service
-
-Voice/Video Infrastructure
-
-Encryption/Key Management boundaries
-
-Moderation Service
-
-Reporting Service
-
-Business Account Service
-
-Administration Service
-
-Analytics Service
-
-Audit Service
-
-Feature Flag Service
-
-Configuration Service
-
-Do not create unnecessary services.
-
-Services may be combined when strong transactional consistency, ownership, or operational simplicity makes that architecture more appropriate.
-
-For every service define:
-
-• Responsibility
-• Owned data
-• APIs
-• Events produced
-• Events consumed
-• Synchronous dependencies
-• Asynchronous dependencies
-• Scaling requirements
-• Availability requirements
-• Security boundaries
-• Failure behavior
-
-────────────────────────────────────────
-
-SERVICE OWNERSHIP MATRIX
-
-Create a complete service ownership matrix.
-
-For every major domain identify:
-
-• Authoritative service
-• Primary database ownership
-• Read model ownership
-• API ownership
-• Event ownership
-• Cache ownership
-• Operational ownership
-
-Explicitly identify which services must never directly modify another service's authoritative data.
-
-────────────────────────────────────────
-
-COMMUNICATION MATRIX
-
-Create a communication matrix showing:
-
-• Service A
-• Service B
-• Communication type
-• Protocol
-• Direction
-• Synchronous/asynchronous
-• Reason
-• Failure behavior
-• Timeout requirements
-• Retry requirements
-
-Cover:
-
-• REST/HTTP
-• Internal APIs
-• WebSockets
-• Kafka/Redpanda
-• BullMQ
-• WebRTC signaling
-
-Avoid unnecessary synchronous dependencies.
-
-────────────────────────────────────────
-
-MONOREPO ARCHITECTURE
-
-Design a production-ready monorepo containing:
-
-Applications:
-
-• Web
-• Mobile
-• Desktop where appropriate
-• Admin Dashboard
-
-Backend:
-
-• API Gateway
-• Backend services
-• Real-time services
-• WebSocket services
-• Call signaling services
-• Background workers
-
-Shared packages:
-
-• API contracts
-• Event contracts
-• Shared types
-• Validation
-• Configuration
-• Authentication utilities
-• Observability
-• Encryption interfaces
-• Testing utilities
-• UI components where appropriate
-
-Infrastructure:
-
-• Docker
-• Kubernetes
-• Helm
-• Terraform
-• CI/CD
-
-Documentation:
-
-• Architecture
-• APIs
-• Events
-• Database
-• Security
-• Operations
-• ADRs
-• Runbooks
-
-Do not create uncontrolled shared packages.
-
-Every shared package must have a clearly defined purpose and ownership boundary.
-
-Do not share domain implementation logic between unrelated services merely to reduce duplication.
-
-────────────────────────────────────────
-
-FOLDER HIERARCHY
-
-Generate a detailed production-ready folder hierarchy.
-
-Include:
-
-• Monorepo root
-• Applications
-• Backend services
-• Workers
-• Shared packages
-• Infrastructure
-• Tests
-• Documentation
-• Database migrations
-• Configuration
-
-Include major files and directories.
-
-The hierarchy must be consistent with future backend, frontend, mobile, infrastructure, and testing implementation prompts.
-
-Do not generate implementation code.
-
-Do not generate placeholder files.
-
-────────────────────────────────────────
-
-CORE DOMAIN MODEL
-
-Design the major entities and aggregates.
-
-Evaluate:
-
-User
-
-Account
-
-Profile
-
-Session
-
-Device
-
-Contact
-
-ContactRequest where appropriate
-
-Conversation
-
-ConversationParticipant
-
-Message
-
-MessageAttachment
-
-MessageReaction
-
-MessageReceipt
-
-MessageEdit
-
-MessageDeletion
-
-MessageMention
-
-Group
-
-GroupMember
-
-GroupRole
-
-Community
-
-CommunityMember
-
-Channel where appropriate
-
-MediaAsset
-
-VoiceMessage
-
-Document
-
-Story
-
-StoryViewer
-
-Notification
-
-Call
-
-CallParticipant
-
-CallSession
-
-CallDevice
-
-EncryptionIdentity
-
-DeviceKey
-
-PreKey
-
-SessionKey
-
-BlockedUser
-
-Report
-
-BusinessAccount
-
-BusinessProfile
-
-AuditLog
-
-FeatureFlag
-
-Do not force every conceptual entity into a separate database table.
-
-Use proper aggregates and ownership boundaries.
-
-For each major aggregate define:
-
-• Aggregate root
-• Owned entities
-• Invariants
-• Transaction boundary
-• Authoritative service
-• Lifecycle
-• Consistency requirements
-
-────────────────────────────────────────
-
-DATABASE ARCHITECTURE
-
-Design PostgreSQL for:
-
-• Hundreds of millions of users
-• Billions of messages
-• Large numbers of conversations
-• Large group membership
-• High-volume message receipts
-• High-volume presence information
-• Large media metadata volume
-• Large audit datasets
-
-Define:
-
-• Database ownership
-• Schema boundaries
-• Primary keys
-• Foreign keys
-• Indexes
-• Unique constraints
-• Check constraints
-• Partitioning
-• Archival
-• Retention
-• Replication
-• Read replicas
-• Connection pooling
-• Backup strategy
-
-Identify high-growth tables.
-
-Evaluate partitioning for:
-
-• Messages
-• Message receipts
-• Audit logs
-• Analytics events
-• Call events
-
-Do not store high-volume ephemeral presence information as the primary source of truth in PostgreSQL.
-
-Do not overload transactional PostgreSQL databases with analytical workloads.
-
-────────────────────────────────────────
-
-DATABASE OWNERSHIP
-
-Define how database ownership works across services.
-
-Specify:
-
-• Which service owns each database/schema
-• Which services can read directly
-• Which services must use APIs
-• Which services consume events
-• Where read models are appropriate
-• How cross-domain queries are handled
-• How data migrations are coordinated
-
-Avoid shared database ownership.
-
-Avoid unrestricted cross-service SQL access.
-
-────────────────────────────────────────
-
-ERD
-
-Generate a complete text-based ERD.
-
-Include:
-
-• Primary keys
-• Foreign keys
-• Cardinality
-• Ownership
-• Important indexes
-• High-growth tables
-• Partitioning candidates
-
-Clearly show relationships between:
-
-• Users
-• Accounts
-• Profiles
-• Devices
-• Contacts
-• Conversations
-• Participants
-• Messages
-• Attachments
-• Groups
-• Communities
-• Stories
-• Calls
-• Encryption metadata
-• Reports
-• Business accounts
-• Sessions
-• Notifications
-
-Identify which relationships are transactional and which are eventually consistent.
-
-────────────────────────────────────────
-
-PRISMA ARCHITECTURE
-
-Define Prisma strategy including:
-
-• Schema ownership
-• Service-specific Prisma clients where appropriate
-• Migration ownership
-• Transaction boundaries
-• Read replica strategy
-• Connection pooling
-• Query optimization
-• Indexing rules
-• Transaction isolation
-• Migration deployment strategy
-
-Avoid an uncontrolled shared Prisma schema where every service can modify every domain.
-
-Define how services interact with data they do not own.
-
-────────────────────────────────────────
-
-REDIS ARCHITECTURE
-
-Design Redis usage for:
-
-• Presence
-• Session state
-• WebSocket coordination
-• Rate limiting
-• Typing indicators
-• Online/offline state
-• Distributed locks
-• Temporary synchronization state
-• Notification deduplication
-• Cache
-• Queue infrastructure
-
-For each use case define:
-
-• Key pattern
-• TTL
-• Invalidation
-• Consistency requirements
-• Failure behavior
-• Memory considerations
-• Eviction behavior
-
-Redis must never become the authoritative source for critical persistent data.
-
-Define the expected behavior if Redis becomes completely unavailable.
-
-────────────────────────────────────────
-
-REAL-TIME ARCHITECTURE
-
-Design the WebSocket architecture.
-
-Support:
-
-• Connection establishment
-• Authentication
-• Connection lifecycle
-• Reconnection
-• Heartbeats
-• Presence
-• Typing indicators
-• Message delivery
-• Read receipts
-• Message reactions
-• Group updates
-• Call signaling
-• Multi-device synchronization
-
-Define:
-
-• WebSocket gateway architecture
-• Connection routing
-• Horizontal scaling
-• Redis coordination
-• Connection affinity requirements
-• Failure recovery
-• Backpressure
-• Rate limiting
-• Connection limits
-• Heartbeat strategy
-• Reconnection strategy
-
-Design for tens of millions of concurrent connections.
-
-Identify how connections are distributed across regions.
-
-────────────────────────────────────────
-
-MESSAGING ARCHITECTURE
-
-Design one-to-one messaging.
-
-Support:
-
-• Text messages
-• Replies
-• Forwarding
-• Mentions
-• Reactions
-• Editing
-• Deletion
-• Attachments
-• Voice messages
-• Documents
-• Delivery states
-• Read states
-• Message ordering
-
-Define:
-
-• Message IDs
-• Client-generated IDs
-• Server-generated IDs
-• Idempotency
-• Ordering guarantees
-• Deduplication
-• Retry behavior
-• Offline delivery
-• Multi-device synchronization
-• Message persistence
-• Message fan-out
-
-Clearly define what ordering guarantees are provided.
-
-Do not claim global total ordering if the architecture does not require or provide it.
-
-────────────────────────────────────────
-
-MESSAGE IDENTIFIERS AND IDEMPOTENCY
-
-Define:
-
-• Client message ID
-• Server message ID
-• Conversation sequence
-• Idempotency key
-• Delivery ID
-• Synchronization cursor
-
-Define how the platform prevents duplicate messages when:
-
-• Clients retry
-• Networks reconnect
-• WebSocket delivery is duplicated
-• HTTP requests are retried
-• Kafka events are redelivered
-• Workers restart
-
-Define idempotency boundaries for every message lifecycle operation.
-
-────────────────────────────────────────
-
-GROUP MESSAGING
-
-Design scalable group messaging.
-
-Support:
-
-• Group creation
-• Group membership
-• Admin roles
-• Invitations
-• Permissions
-• Group metadata
-• Group avatar
-• Group settings
-• Member removal
-• Member addition
-• Message delivery
-
-Define scalability strategy for large groups.
-
-Evaluate:
-
-• Fan-out on write
-• Fan-out on read
-• Hybrid fan-out
-• Membership snapshots
-• Delivery queues
-• Regional distribution
-
-Clearly define how the architecture changes for very large groups.
-
-────────────────────────────────────────
-
-COMMUNITIES
-
-Design support for communities containing multiple groups or channels.
-
-Define:
-
-• Community ownership
-• Membership
-• Roles
-• Group relationships
-• Permissions
-• Moderation
-• Notifications
-• Discovery
-• Community-level settings
-
-Avoid coupling community functionality directly to basic one-to-one conversations.
-
-Define service ownership and data relationships.
-
-────────────────────────────────────────
-
-MESSAGE DELIVERY
-
-Define message delivery states:
-
-• Pending
-• Sent
-• Delivered
-• Read
-• Failed
-
-Design:
-
-• Delivery receipts
-• Read receipts
-• Retry
-• Offline delivery
-• Multi-device delivery
-• Duplicate prevention
-• Ordering guarantees
-
-Define exactly-once versus at-least-once behavior where appropriate.
-
-Define how delivery state is maintained when users have multiple devices.
-
-────────────────────────────────────────
-
-OFFLINE MESSAGING
-
-Design offline message handling.
-
-Support:
-
-• Offline message composition
-• Local pending queue
-• Server-side pending delivery
-• Retry
-• Deduplication
-• Synchronization
-• Reconnection
-• Message history recovery
-
-Define:
-
-• Pending message lifecycle
-• Retry strategy
-• Expiration
-• Failure behavior
-• Delivery guarantees
-• Synchronization cursor
-
-────────────────────────────────────────
-
-PRESENCE ARCHITECTURE
-
-Design:
-
-• Online status
-• Last seen
-• Typing indicators
-• Recording indicators
-• Presence subscriptions
-
-Presence must be optimized for extremely high scale.
-
-Define:
-
-• Redis usage
-• TTL
-• Heartbeats
-• Fan-out strategy
-• Regional architecture
-• Failure behavior
-• Privacy controls
-
-Presence must not create excessive database writes.
-
-────────────────────────────────────────
-
-CONTACT ARCHITECTURE
-
-Design:
-
-• Contact discovery
-• Contact synchronization
-• Contact permissions
-• Invitations
-• Blocking
-• Privacy controls
-
-Define privacy-preserving boundaries for contact discovery.
-
-Do not expose unnecessary user information.
-
-Define:
-
-• Contact ownership
-• Contact synchronization
-• Contact visibility
-• Blocking interaction
-• Discovery limitations
-
-────────────────────────────────────────
-
-ACCOUNT AND PROFILE ARCHITECTURE
-
-Define the relationship between:
-
-• Account
-• User
-• Profile
-• Device
-• Session
-
-Support:
-
-• User identity
-• Profile information
-• Profile settings
-• Privacy settings
-• Notification preferences
-• Security settings
-• Multiple devices
-
-Ensure that account-level and device-level state are clearly separated.
-
-────────────────────────────────────────
-
-AUTHENTICATION ARCHITECTURE
-
-Design authentication supporting:
-
-• Email/password where appropriate
-• Phone-based authentication where appropriate
-• OAuth
-• Passkeys
-• MFA
-• Session management
-• Refresh tokens
-• Device authentication
-• Device verification
-
-Define:
-
-• Credential storage
-• Password hashing
-• Token/session strategy
-• Access token lifetime
-• Refresh strategy
-• Session expiration
-• Session revocation
-• Device binding
-• Suspicious login detection
-
-Authentication must work across:
-
-• Web
-• Mobile
-• Desktop
-• Multiple devices
-
-────────────────────────────────────────
-
-AUTHORIZATION ARCHITECTURE
-
-Design:
-
-• RBAC
-• Resource ownership
-• Account-level permissions
-• Profile-level permissions
-• Conversation permissions
-• Group permissions
-• Community permissions
-• Business permissions
-• Administrative permissions
-
-Define where authorization is enforced:
-
-• API Gateway
-• Service layer
-• Domain layer
-• Database query layer
-
-Frontend authorization must never be the only security enforcement layer.
-
-────────────────────────────────────────
-
-END-TO-END ENCRYPTION FOUNDATIONS
-
-Define the architectural foundation for end-to-end encryption.
-
-Support boundaries for:
-
-• Identity keys
-• Device keys
-• Pre-keys
-• Session establishment
-• Message encryption
-• Group encryption
-• Key rotation
-• Device addition
-• Device removal
-• Device verification
-• Key verification
-
-Clearly distinguish:
-
-• TLS transport encryption
-• Server-side encryption
-• End-to-end encryption
-
-Do not implement cryptographic algorithms.
-
-Do not invent proprietary cryptography.
-
-Define which components can access plaintext and which components cannot.
-
-Define how E2EE affects:
-
-• Search
-• Notifications
-• Moderation
-• Analytics
-• Message storage
-• Backups
-• Multi-device synchronization
-
-────────────────────────────────────────
-
-EVENT-DRIVEN ARCHITECTURE
-
-Use Kafka or Redpanda for durable asynchronous events.
-
-Define:
-
-• Topic naming
-• Producers
-• Consumers
-• Consumer groups
-• Partition keys
-• Ordering
-• Retention
-• Replay
-• Schema versioning
-• Idempotency
-• Dead-letter handling
-• Observability
-
-Define transactional outbox usage.
-
-Define event ownership.
-
-Define which events are domain events and which are integration events.
-
-────────────────────────────────────────
-
-INITIAL EVENT CATALOG
-
-Define events including:
-
-AccountCreated
-
-AccountVerified
-
-UserLoggedIn
-
-SessionCreated
-
-SessionRevoked
-
-DeviceRegistered
-
-DeviceRevoked
-
-ContactAdded
-
-ContactBlocked
-
-ConversationCreated
-
-ConversationParticipantAdded
-
-ConversationParticipantRemoved
-
-MessageCreated
-
-MessageSent
-
-MessageDelivered
-
-MessageRead
-
-MessageEdited
-
-MessageDeleted
-
-MessageReactionAdded
-
-MessageReactionRemoved
-
-GroupCreated
-
-GroupMemberAdded
-
-GroupMemberRemoved
-
-GroupSettingsChanged
-
-CommunityCreated
-
-CommunityMemberAdded
-
-MediaUploaded
-
-MediaProcessed
-
-StoryCreated
-
-StoryExpired
-
-CallCreated
-
-CallStarted
-
-CallEnded
-
-NotificationCreated
-
-NotificationDelivered
-
-UserBlocked
-
-UserReported
-
-BusinessAccountCreated
-
-ModerationActionTaken
-
-AuditLogCreated
-
-FeatureFlagChanged
-
-Events must contain only the data required by consumers.
-
-Do not unnecessarily duplicate entire database records inside events.
-
-Define event versioning and backward compatibility.
-
-────────────────────────────────────────
-
-QUEUE ARCHITECTURE
-
-Use BullMQ for asynchronous workloads where Kafka is unnecessary.
-
-Define queues for:
-
-• Media processing
-• Image processing
-• Video processing
-• Thumbnail generation
-• Push notifications
-• Email delivery
-• Message cleanup
-• Story expiration
-• Temporary media cleanup
-• Search indexing
-• Analytics aggregation
-• Notification cleanup
-• Data retention
-• Report processing
-
-For each queue define:
-
-• Producer
-• Consumer
-• Retry strategy
-• Backoff
-• Idempotency
-• Dead-letter behavior
-• Monitoring
-• Concurrency
-• Failure behavior
-
-Clearly distinguish Kafka responsibilities from BullMQ responsibilities.
-
-────────────────────────────────────────
-
-API ARCHITECTURE
-
-Define:
-
-• Public APIs
-• Internal APIs
-• WebSocket APIs
-• WebRTC signaling APIs
-
-Support:
-
-AUTHENTICATION
-
-• Registration
-• Login
-• Logout
-• Session management
-• Device management
-
-CONTACTS
-
-• Contact discovery
-• Contact management
-• Blocking
-
-CONVERSATIONS
-
-• Conversation creation
-• Conversation listing
-• Participant management
-
-MESSAGES
-
-• Send
-• Edit
-• Delete
-• React
-• Reply
-• Forward
-• Read receipts
-
-GROUPS
-
-• Create
-• Update
-• Members
-• Roles
-• Permissions
-
-STORIES
-
-• Create
-• View
-• Delete
-• Privacy
-
-CALLS
-
-• Create
-• Accept
-• Reject
-• Signaling
-• End
-
-MEDIA
-
-• Upload authorization
-• Processing
-• Download authorization
-
-ADMINISTRATION
-
-• Users
-• Reports
-• Moderation
-• Audit
-
-Define:
-
-• Versioning
-• Validation
-• Pagination
-• Error format
-• Rate limiting
-• Idempotency
-• Authentication
-• Authorization
-
-Do not generate application code.
-
-────────────────────────────────────────
-
-API CONTRACT STANDARDS
-
-Define standardized conventions for:
-
-• Request IDs
-• Correlation IDs
-• Error codes
-• Validation errors
-• Authentication errors
-• Authorization errors
-• Rate-limit errors
-• Pagination
-• Cursor pagination
-• Sorting
-• Filtering
-• Versioning
-• Idempotency
-
-Define a consistent API error structure.
-
-Prefer cursor pagination for high-volume resources.
-
-────────────────────────────────────────
-
-DATA CONSISTENCY
-
-Explicitly define consistency requirements for:
-
-• User accounts
-• Device registration
-• Conversations
-• Messages
-• Message delivery
-• Message reads
-• Group membership
-• Presence
-• Stories
-• Calls
-• Notifications
-• Search
-• Analytics
-
-Identify where to use:
-
-• Strong consistency
-• Eventual consistency
-• Idempotency
-• Optimistic concurrency
-• Distributed locks
-• Transactional outbox
-
-Do not use distributed transactions unless absolutely necessary.
-
-────────────────────────────────────────
-
-SCALABILITY
-
-Design for:
-
-• Hundreds of millions of users
-• Billions of messages
-• Tens of millions of concurrent WebSocket connections
-• Large numbers of concurrent calls
-• Large media traffic
-• Global multi-region deployment
-
-Analyze scaling for:
-
-• API Gateway
-• Authentication
-• WebSocket gateways
-• Messaging
-• PostgreSQL
-• Redis
-• Kafka
-• Search
-• Media processing
-• Object storage
-• CDN
-• WebRTC infrastructure
-
-Identify:
-
-• Likely bottlenecks
-• Scaling limits
-• Horizontal scaling strategies
-• Caching strategies
-• Partitioning strategies
-• Backpressure strategies
-• Capacity considerations
-
-────────────────────────────────────────
-
-MULTI-REGION FOUNDATIONS
-
-Design the initial multi-region architecture.
-
-Define:
-
-• Regional application clusters
-• Global traffic routing
-• Regional data ownership
-• Cross-region event replication
-• Failover
-• Disaster recovery boundaries
-
-Classify data as:
-
-• Region-local
-• Globally replicated
-• Eventually consistent
-
-Avoid unnecessary cross-region synchronous calls.
-
-Define the principles that Volume 2 will use for the complete multi-region architecture.
-
-────────────────────────────────────────
-
-FAILURE SCENARIOS
-
-Define initial graceful behavior when:
-
-• PostgreSQL is unavailable
-• Redis is unavailable
-• Kafka is unavailable
-• Search is unavailable
-• Push provider is unavailable
-• Object storage is unavailable
-• WebSocket gateway fails
-• Authentication service fails
-• Messaging service fails
-
-For every failure define:
-
-• Detection
-• Fallback
-• Retry
-• Timeout
-• Circuit breaking where appropriate
-• Degraded functionality
-• Recovery
-
-Do not allow temporary infrastructure failures to corrupt message state.
-
-────────────────────────────────────────
-
-SECURITY FOUNDATIONS
-
-Design security architecture covering:
-
-AUTHENTICATION
-
-• Credential security
-• Password hashing
-• MFA
-• Passkeys
-• Session security
-• Refresh tokens
-• Device authentication
-
-AUTHORIZATION
-
-• RBAC
-• Resource ownership
-• Group permissions
-• Administrative permissions
-
-APPLICATION SECURITY
-
-• Input validation
-• Rate limiting
-• Abuse prevention
-• Secure headers
-• CORS
-• CSRF where applicable
-• XSS prevention
-• SQL injection protection
-
-INFRASTRUCTURE SECURITY
-
-• IAM
-• Least privilege
-• Network segmentation
-• Secrets management
-• Encryption at rest
-• Encryption in transit
-• Kubernetes security
-
-MESSAGING SECURITY
-
-• E2EE boundaries
-• Device verification
-• Key management
-• Message confidentiality
-• Replay protection
-
-────────────────────────────────────────
-
-ABUSE PREVENTION FOUNDATIONS
-
-Design initial defenses against:
-
-• Spam
-• Mass messaging
-• Automated account creation
-• Credential stuffing
-• Account takeover
-• Malicious links
-• Malicious files
-• Harassment
-• Impersonation
-• Bot abuse
-• API abuse
-
-Define architectural boundaries for:
-
-• Rate limiting
-• Reputation
-• Blocking
-• Reporting
-• Automated detection
-• Manual moderation
-
-Volume 2 will expand the complete abuse-prevention and moderation architecture.
-
-────────────────────────────────────────
-
-OBSERVABILITY FOUNDATIONS
-
-Design:
-
-• Structured logs
-• Metrics
-• Distributed traces
-• Correlation IDs
-• Request tracing
-• WebSocket connection metrics
-• Message latency metrics
-• Delivery metrics
-• Database metrics
-• Queue metrics
-• Security metrics
-
-Use:
-
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
-
-Define initial observability requirements for:
-
-• API Gateway
-• Authentication
-• Messaging
-• WebSockets
-• Database
-• Redis
-• Kafka
-• Workers
-
-────────────────────────────────────────
-
-TESTING ARCHITECTURE FOUNDATIONS
-
-Define the overall testing strategy.
-
-Unit Testing:
-
-• Domain logic
-• Services
-• Utilities
-
-Integration Testing:
-
-• PostgreSQL
-• Redis
-• Kafka
-• WebSockets
-• External providers
-
-Contract Testing:
-
-• REST APIs
-• WebSocket contracts
-• Event schemas
-
-End-to-End Testing:
-
-• Registration
-• Login
-• Messaging
-• Groups
-• Multi-device synchronization
-
-Performance Testing:
-
-• API load
-• WebSocket connections
-• Message throughput
-• Group messaging
-• Presence
-
-Resilience Testing:
-
-• Database failures
-• Redis failures
-• Kafka failures
-• WebSocket failures
-
-Security Testing:
-
-• Authentication
-• Authorization
-• Rate limiting
-• Abuse prevention
-• Dependency scanning
-
-Volume 2 will complete the broader enterprise testing strategy.
-
-────────────────────────────────────────
-
-ARCHITECTURAL DECISION RECORDS
-
-Define ADRs for the major decisions established in Volume 1.
-
-At minimum include:
-
-• Service decomposition
-• Monorepo architecture
-• PostgreSQL architecture
-• Prisma strategy
-• Redis architecture
-• Kafka/Redpanda
-• BullMQ
-• WebSocket architecture
-• WebRTC architecture
-• Object storage
-• CDN
-• E2EE architecture
-• Multi-device synchronization
-• Offline synchronization
-• Search architecture
-• Multi-region architecture
-• Kubernetes
-• Terraform
-• Observability
-• Secrets management
-
-Each ADR must contain:
-
-• Context
-• Decision
-• Alternatives considered
-• Consequences
-
-Do not generate implementation code.
-
-────────────────────────────────────────
-
-PROJECT INDEX
-
-Create a complete Project Index for the project.
-
-The Project Index must contain:
-
-• Project overview
-• Technology stack
-• Architecture status
-• Domain list
-• Service list
-• Service ownership
-• Database ownership
-• Core entities
-• ERD status
-• API contracts
-• WebSocket contracts
-• Event catalog
-• Queue catalog
-• Redis usage
-• Security boundaries
-• E2EE boundaries
-• Multi-device architecture
-• Multi-region principles
-• Observability architecture
-• Testing architecture
-• ADRs
-• Dependencies
-• Remaining architecture work
-• Implementation phases
-
-Clearly identify which architecture areas belong to Volume 2.
-
-────────────────────────────────────────
-
-ARCHITECTURE VOLUME 1 OUTPUT
-
-Produce the following sections:
-
-1. Executive Architecture Overview
-2. System Context
-3. High-Level System Architecture
-4. Architectural Approach
-5. Domain Decomposition
-6. Service Decomposition
-7. Service Ownership Matrix
-8. Communication Matrix
-9. Monorepo Architecture
-10. Detailed Folder Hierarchy
-11. Core Domain Model
-12. Aggregate Boundaries
-13. Database Architecture
-14. Database Ownership
-15. Complete Text-Based ERD
-16. PostgreSQL Strategy
-17. Prisma Strategy
-18. Redis Architecture
-19. Real-Time/WebSocket Architecture
-20. Messaging Architecture
-21. Message Identifier and Idempotency Strategy
-22. Group Messaging Architecture
-23. Community Architecture
-24. Message Delivery Architecture
-25. Offline Messaging Architecture
-26. Presence Architecture
-27. Contact Architecture
-28. Account and Profile Architecture
-29. Authentication Architecture
-30. Authorization Architecture
-31. End-to-End Encryption Foundations
-32. Event-Driven Architecture
-33. Initial Event Catalog
-34. BullMQ Queue Architecture
-35. API Architecture
-36. API Contract Standards
-37. Data Consistency Strategy
-38. Scalability Foundations
-39. Multi-Region Foundations
-40. Failure Scenario Analysis
-41. Security Foundations
-42. Abuse Prevention Foundations
-43. Observability Foundations
-44. Testing Architecture Foundations
-45. Architectural Decision Records
-46. Complete Project Index
-
-────────────────────────────────────────
-
-QUALITY REQUIREMENTS
-
-Every architectural decision must evaluate:
-
-• Scalability
-• Availability
-• Security
-• Privacy
-• Latency
-• Data consistency
-• Operational complexity
-• Cost
-• Developer productivity
-• Maintainability
-• Future extensibility
-
-Prefer:
-
-• Explicit ownership
-• Clear domain boundaries
-• Event-driven communication where appropriate
-• Idempotent consumers
-• Transactional outbox
-• Horizontal scaling
-• Stateless application services
-• Established security protocols
-• Cursor-based synchronization
-• Clear failure boundaries
-• Least-privilege access
-
-Avoid:
-
-• Unnecessary microservices
-• Shared database ownership
-• Distributed transactions where avoidable
-• Tight coupling
-• Single points of failure
-• Redis as a system of record
-• Application servers proxying large media
-• Proprietary cryptography
-• Frontend-only security
-• Global synchronous dependencies
-• Premature complexity
-• Architecture that cannot support multi-device operation
-
-────────────────────────────────────────
-
-OUTPUT RULES
-
-This is an architecture document only.
-
-Do not generate source code.
-
-Do not generate placeholder implementations.
-
-Do not generate Dockerfiles.
-
-Do not generate Kubernetes manifests.
-
-Do not generate Terraform files.
-
-Do not generate frontend components.
-
-Do not generate mobile components.
-
-Do not implement backend services.
-
-Provide detailed specifications, architecture decisions, diagrams, contracts, schemas, ownership rules, consistency rules, and implementation guidance.
-
-Do not make major architectural decisions implicit.
-
-When multiple valid approaches exist, evaluate the alternatives and explicitly select one.
-
-The resulting Volume 1 architecture must provide a strong foundation for the remaining architecture and implementation phases.
-
-────────────────────────────────────────
-
-VOLUME 1 SCOPE BOUNDARY
-
-This volume establishes the core platform architecture.
-
-The remaining architecture should address areas such as:
-
-• Complete multi-device architecture
-• Desktop and Smart-device architecture
-• Complete media processing architecture
-• Stories/status architecture
-• Complete voice/video call architecture
-• Call scalability
-• Complete E2EE architecture
-• Advanced search architecture
-• Notification architecture
-• Advanced contact discovery
-• Complete abuse prevention
-• Moderation architecture
-• Business account architecture
-• Complete security architecture
-• Threat model
-• Complete observability architecture
-• Deployment architecture
-• Kubernetes topology
-• Multi-region deployment
-• Disaster recovery
-• Capacity planning
-• Advanced scalability analysis
-• Complete failure analysis
-• Complete data consistency strategy
-• Enterprise testing strategy
-• Final ADRs
-• Final Project Index
-• Backend implementation roadm
-
-Using the requirements below, produce the complete enterprise architecture blueprint for an original, production-ready real-time communication and messaging platform.
-
-You are operating in Senior Engineering Team Mode.
-
-Design the complete production-ready architecture for an enterprise-scale real-time messaging and communication platform comparable in architectural scope to WhatsApp.
-
-This is an ARCHITECTURE PHASE — VOLUME 1.
-
-This prompt is completely independent.
-
-Do not assume that another conversation, prompt, or Claude chat contains information that is not explicitly included in this prompt.
-
-Do not implement backend code.
-Do not implement frontend code.
-Do not implement mobile code.
-Do not generate infrastructure implementation files.
-
-The purpose of this prompt is to establish the foundational architecture that future backend, frontend, mobile, infrastructure, DevOps, and QA implementation prompts will follow.
-
-The architecture must be original and must not copy proprietary implementation details from WhatsApp.
-
-────────────────────────────────────────
-
-PROJECT
-
-Build a production-ready global real-time communication platform supporting:
-
-• Hundreds of millions of registered users
-• Tens of millions of daily active users
-• Large-scale one-to-one messaging
-• Group messaging
-• Communities
-• Voice calls
-• Video calls
-• Group calls
-• Media sharing
-• Voice messages
-• Documents
-• Stories/status updates
-• Push notifications
-• Multi-device synchronization
-• Offline messaging
-• Message delivery guarantees
-• End-to-end encryption architecture
-• Contact management
-• Blocking and reporting
-• Business accounts
-• Administrative tools
-• Moderation
-• Analytics
-• High availability
-• Multi-region deployment
-• Horizontal scaling
-• Disaster recovery
-
-Design the system for global operation, low latency, high availability, strong security, privacy, and long-term scalability.
-
-────────────────────────────────────────
-
-PRIMARY TECHNOLOGY STACK
-
-Web:
-
-• Next.js
-• React
-• TypeScript
-• Tailwind CSS
-
-Mobile:
-
-• React Native
-• Expo
-• TypeScript
-
-Backend:
-
-• Node.js
-• NestJS
-• TypeScript
-
-Database:
-
-• PostgreSQL
-• Prisma ORM
-
-Caching:
-
-• Redis
-
-Real-Time Communication:
-
-• WebSockets
-• Socket.IO where appropriate
-
-Event Streaming:
-
-• Kafka or Redpanda
-
-Background Jobs:
-
-• BullMQ
-
-Search:
-
-• Elasticsearch or OpenSearch
-
-Object Storage:
-
-• AWS S3-compatible object storage
-
-CDN:
-
-• CloudFront or equivalent CDN
-
-Push Notifications:
-
-• Firebase Cloud Messaging
-• Apple Push Notification Service
-
-Voice/Video:
-
-• WebRTC
-• STUN/TURN infrastructure
-
-Infrastructure:
-
-• Docker
-• Kubernetes
-• Helm
-• Terraform
-• GitHub Actions
-
-Observability:
-
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
-
-Secrets:
-
-• HashiCorp Vault or approved cloud-native secret management
-
-────────────────────────────────────────
-
-CORE PLATFORM DOMAINS
-
-Define bounded contexts and ownership for:
-
-Identity
-
-Accounts
-
-Users
-
-Profiles
-
-Authentication
-
-Authorization
-
-Sessions
-
-Devices
-
-Contacts
-
-Presence
-
-Messaging
-
-Conversations
-
-Groups
-
-Communities
-
-Messages
-
-Message Delivery
-
-Message Reactions
-
-Message Editing
-
-Message Deletion
-
-Media
-
-Voice Messages
-
-Documents
-
-Stories
-
-Notifications
-
-Search
-
-Calls
-
-Voice Calls
-
-Video Calls
-
-Group Calls
-
-Call Signaling
-
-End-to-End Encryption
-
-Key Management
-
-Offline Synchronization
-
-Multi-Device Synchronization
-
-Blocking
-
-Reporting
-
-Moderation
-
-Business Accounts
-
-Administration
-
-Analytics
-
-Audit
-
-Feature Flags
-
-System Configuration
-
-────────────────────────────────────────
-
-ARCHITECTURAL APPROACH
-
-Determine the appropriate architecture between:
-
-• Modular Monolith
-• Service-Oriented Architecture
-• Microservices
-
-Do not blindly create a microservice for every domain.
-
-Evaluate:
-
-• Transactional consistency
-• Operational complexity
-• Scalability
-• Latency
-• Ownership
-• Deployment independence
-• Failure isolation
-• Developer productivity
-• Cost
-
-Clearly identify:
-
-• Independently deployable services
-• Shared transactional boundaries
-• Authoritative data ownership
-• Synchronous communication
-• Asynchronous communication
-• Event-driven communication
-• Read models
-• CQRS requirements
-• Eventual consistency boundaries
-• Strong consistency requirements
-
-────────────────────────────────────────
-
-SYSTEM ARCHITECTURE
-
-Design the complete high-level architecture.
-
-CLIENT LAYER
-
-• Web application
-• iOS application
-• Android application
-• Desktop architecture boundaries
-• Future tablet support
-• Future embedded/device integrations
-
-EDGE LAYER
-
-• DNS
-• CDN
-• WAF
-• Load balancers
-• API Gateway
-• WebSocket Gateway
-• Rate limiting
-• Authentication boundaries
-
-APPLICATION LAYER
-
-• API services
-• Real-time services
-• Messaging services
-• Call signaling
-• Background workers
-• Event consumers
-• Scheduled jobs
-
-DATA LAYER
-
-• PostgreSQL
-• Read replicas
-• Redis
-• Kafka/Redpanda
-• Elasticsearch/OpenSearch
-• Object storage
-
-COMMUNICATION LAYER
-
-• WebSockets
-• WebRTC
-• Push notifications
-• Event streaming
-
-OBSERVABILITY LAYER
-
-• Metrics
-• Logs
-• Traces
-• Alerts
-
-SECURITY LAYER
-
-• Authentication
-• Authorization
-• Encryption
-• Key management
-• Secrets
-• Audit logging
-• Network segmentation
-
-Represent the architecture using clear text-based diagrams.
-
-Do not use images.
-
-────────────────────────────────────────
-
-SERVICE DECOMPOSITION
-
-Evaluate and define appropriate service boundaries for:
-
-API Gateway
-
-Authentication Service
-
-Identity Service
-
-Account Service
-
-Profile Service
-
-Session Service
-
-Device Service
-
-Contact Service
-
-Presence Service
-
-Conversation Service
-
-Messaging Service
-
-Message Delivery Service
-
-Message Sync Service
-
-Group Service
-
-Community Service
-
-Media Service
-
-Media Processing Service
-
-Notification Service
-
-Search Service
-
-Story Service
-
-Call Signaling Service
-
-Call Session Service
-
-Voice/Video Infrastructure
-
-Encryption/Key Management boundaries
-
-Moderation Service
-
-Reporting Service
-
-Business Account Service
-
-Administration Service
-
-Analytics Service
-
-Audit Service
-
-Feature Flag Service
-
-Configuration Service
-
-Do not create unnecessary services.
-
-For every service define:
-
-• Responsibility
-• Owned data
-• APIs
-• Events produced
-• Events consumed
-• Synchronous dependencies
-• Asynchronous dependencies
-• Scaling requirements
-• Availability requirements
-
-────────────────────────────────────────
-
-SERVICE OWNERSHIP
-
-Create a complete service ownership matrix.
-
-Clearly identify:
-
-• Service
-• Domain
-• Authoritative data
-• Database ownership
-• Read models
-• Events produced
-• Events consumed
-• External dependencies
-• Synchronous dependencies
-• Asynchronous dependencies
-• Scaling characteristics
-• Failure isolation requirements
-
-No service may directly modify another service's authoritative database.
-
-────────────────────────────────────────
-
-COMMUNICATION ARCHITECTURE
-
-Define when the platform should use:
-
-• REST APIs
-• Internal HTTP APIs
-• WebSockets
-• Kafka/Redpanda events
-• BullMQ jobs
-• WebRTC signaling
-
-Define:
-
-• Synchronous communication rules
-• Asynchronous communication rules
-• Timeout policies
-• Retry policies
-• Circuit breaker boundaries
-• Idempotency
-• Eventual consistency
-• Ordering requirements
-
-Avoid unnecessary synchronous cross-service dependencies.
-
-────────────────────────────────────────
-
-MONOREPO ARCHITECTURE
-
-Design a production-ready monorepo containing:
-
-Applications:
-
-• Web
-• Mobile
-• Desktop where appropriate
-• Admin Dashboard
-
-Backend:
-
-• API Gateway
-• Backend services
-• Real-time services
-• WebSocket services
-• Call signaling services
-• Background workers
-
-Shared packages:
-
-• API contracts
-• Event contracts
-• Shared types
-• Validation
-• Configuration
-• Authentication utilities
-• Observability
-• Encryption interfaces
-• Testing utilities
-• UI components where appropriate
-
-Infrastructure:
-
-• Docker
-• Kubernetes
-• Helm
-• Terraform
-• CI/CD
-
-Documentation:
-
-• Architecture
-• APIs
-• Events
-• Database
-• Security
-• Operations
-• ADRs
-• Runbooks
-
-Do not create uncontrolled shared packages.
-
-Shared packages must have explicit ownership and dependency rules.
-
-────────────────────────────────────────
-
-FOLDER HIERARCHY
-
-Generate a detailed production-ready folder hierarchy.
-
-Include:
-
-• Monorepo root
-• Applications
-• Backend services
-• Workers
-• Shared packages
-• Infrastructure
-• Tests
-• Documentation
-• Database migrations
-• Configuration
-
-Include important files and directories.
-
-Do not generate implementation code.
-
-The hierarchy must be consistent with the architecture and future implementation prompts.
-
-────────────────────────────────────────
-
-CORE DOMAIN MODEL
-
-Design the major entities and aggregates.
-
-Evaluate:
-
-User
-
-Account
-
-Profile
-
-Session
-
-Device
-
-Contact
-
-ContactRequest where appropriate
-
-Conversation
-
-ConversationParticipant
-
-Message
-
-MessageAttachment
-
-MessageReaction
-
-MessageReceipt
-
-MessageEdit
-
-MessageDeletion
-
-MessageMention
-
-Group
-
-GroupMember
-
-GroupRole
-
-Community
-
-CommunityMember
-
-Channel where appropriate
-
-MediaAsset
-
-VoiceMessage
-
-Document
-
-Story
-
-StoryViewer
-
-Notification
-
-Call
-
-CallParticipant
-
-CallSession
-
-CallDevice
-
-EncryptionIdentity
-
-DeviceKey
-
-PreKey
-
-SessionKey
-
-BlockedUser
-
-Report
-
-BusinessAccount
-
-BusinessProfile
-
-AuditLog
-
-FeatureFlag
-
-Do not force every conceptual entity into a separate database table.
-
-Use proper aggregates and ownership boundaries.
-
-────────────────────────────────────────
-
-DATABASE ARCHITECTURE
-
-Design PostgreSQL for:
-
-• Hundreds of millions of users
-• Billions of messages
-• Large numbers of conversations
-• Large group membership
-• High-volume message receipts
-• High-volume presence information
-• Large media metadata volume
-• Large audit datasets
-
-Define:
-
-• Database ownership
-• Schema boundaries
-• Primary keys
-• Foreign keys
-• Indexes
-• Unique constraints
-• Check constraints
-• Partitioning
-• Archival
-• Retention
-• Replication
-• Read replicas
-• Connection pooling
-• Backup strategy
-
-Identify high-growth tables.
-
-Evaluate partitioning for:
-
-• Messages
-• Message receipts
-• Audit logs
-• Analytics events
-• Call events
-
-Do not store high-volume ephemeral presence information as the primary source of truth in PostgreSQL.
-
-────────────────────────────────────────
-
-ERD
-
-Generate a complete text-based ERD.
-
-Include:
-
-• Primary keys
-• Foreign keys
-• Cardinality
-• Ownership
-• Important indexes
-• High-growth tables
-• Partitioning candidates
-
-Clearly show relationships between:
-
-• Users
-• Devices
-• Contacts
-• Conversations
-• Participants
-• Messages
-• Attachments
-• Groups
-• Communities
-• Stories
-• Calls
-• Encryption metadata
-• Reports
-• Business accounts
-
-────────────────────────────────────────
-
-PRISMA ARCHITECTURE
-
-Define Prisma strategy including:
-
-• Schema ownership
-• Service-specific Prisma clients where appropriate
-• Migration ownership
-• Transaction boundaries
-• Read replica strategy
-• Connection pooling
-• Query optimization
-• Indexing rules
-
-Avoid an uncontrolled shared Prisma schema where every service can modify every domain.
-
-────────────────────────────────────────
-
-REDIS ARCHITECTURE
-
-Design Redis usage for:
-
-• Presence
-• Session state
-• WebSocket coordination
-• Rate limiting
-• Typing indicators
-• Online/offline state
-• Distributed locks
-• Temporary synchronization state
-• Notification deduplication
-• Cache
-• Queue infrastructure
-
-For each use case define:
-
-• Key pattern
-• TTL
-• Invalidation
-• Consistency requirements
-• Failure behavior
-
-Redis must never become the authoritative source for critical persistent data.
-
-────────────────────────────────────────
-
-REAL-TIME ARCHITECTURE
-
-Design the WebSocket architecture.
-
-Support:
-
-• Connection establishment
-• Authentication
-• Connection lifecycle
-• Reconnection
-• Heartbeats
-• Presence
-• Typing indicators
-• Message delivery
-• Read receipts
-• Message reactions
-• Group updates
-• Call signaling
-• Multi-device synchronization
-
-Define:
-
-• WebSocket gateway architecture
-• Connection routing
-• Horizontal scaling
-• Redis coordination
-• Connection affinity requirements
-• Failure recovery
-• Backpressure
-• Rate limiting
-
-────────────────────────────────────────
-
-MESSAGING ARCHITECTURE
-
-Design one-to-one messaging.
-
-Support:
-
-• Text messages
-• Replies
-• Forwarding
-• Mentions
-• Reactions
-• Editing
-• Deletion
-• Attachments
-• Voice messages
-• Documents
-• Delivery states
-• Read states
-• Message ordering
-
-Define:
-
-• Message IDs
-• Client-generated IDs
-• Server-generated IDs
-• Idempotency
-• Ordering guarantees
-• Deduplication
-• Retry behavior
-• Offline delivery
-• Multi-device synchronization
-
-Clearly define the message lifecycle from client submission through persistence, delivery, acknowledgment, and synchronization.
-
-────────────────────────────────────────
-
-GROUP MESSAGING
-
-Design scalable group messaging.
-
-Support:
-
-• Group creation
-• Group membership
-• Admin roles
-• Invitations
-• Permissions
-• Group metadata
-• Group avatar
-• Group settings
-• Member removal
-• Message delivery
-
-Define scalability strategy for large groups.
-
-Explain:
-
-• Membership storage
-• Permission evaluation
-• Message fan-out
-• Delivery strategy
-• Read receipts
-• Presence behavior
-• Large-group limitations
-
-────────────────────────────────────────
-
-COMMUNITIES
-
-Design support for communities containing multiple groups or channels.
-
-Define:
-
-• Community ownership
-• Membership
-• Roles
-• Group relationships
-• Permissions
-• Moderation
-• Notifications
-• Discovery
-
-Avoid coupling community functionality directly to basic one-to-one conversations.
-
-────────────────────────────────────────
-
-MESSAGE DELIVERY
-
-Define message delivery states:
-
-• Pending
-• Sent
-• Delivered
-• Read
-• Failed
-
-Design:
-
-• Delivery receipts
-• Read receipts
-• Retry
-• Offline delivery
-• Multi-device delivery
-• Duplicate prevention
-• Ordering guarantees
-
-Define exactly-once versus at-least-once behavior where appropriate.
-
-Do not claim exactly-once delivery unless technically justified.
-
-────────────────────────────────────────
-
-OFFLINE SYNCHRONIZATION
-
-Design synchronization architecture supporting unreliable networks.
-
-Support:
-
-• Offline message composition
-• Local message queue
-• Synchronization
-• Conflict resolution
-• Retry
-• Duplicate prevention
-• Incremental synchronization
-• Delta synchronization
-• Message history synchronization
-• Device synchronization
-
-Define:
-
-• Synchronization cursors
-• Sequence identifiers
-• Recovery behavior
-• Resync behavior
-• Missing-message detection
-
-────────────────────────────────────────
-
-MULTI-DEVICE ARCHITECTURE
-
-Support:
-
-• Multiple mobile devices
-• Web sessions
-• Desktop sessions
-• Device registration
-• Device verification
-• Device revocation
-• Remote logout
-• Session synchronization
-
-Define how messages and encryption keys synchronize across devices.
-
-Do not assume a single-device architecture.
-
-────────────────────────────────────────
-
-PRESENCE ARCHITECTURE
-
-Design:
-
-• Online status
-• Last seen
-• Typing indicators
-• Recording indicators
-• Presence subscriptions
-
-Presence must be optimized for extremely high scale.
-
-Define:
-
-• Redis usage
-• TTL
-• Heartbeats
-• Fan-out strategy
-• Regional architecture
-• Failure behavior
-
-────────────────────────────────────────
-
-MEDIA ARCHITECTURE
-
-Design media handling for:
-
-• Images
-• Videos
-• Audio
-• Voice messages
-• Documents
-• Stickers
-• GIFs
-• Thumbnails
-
-Define:
-
-• Upload authorization
-• Direct S3 uploads
-• Object naming
-• Metadata
-• Virus scanning boundaries
-• Processing
-• Compression
-• Thumbnail generation
-• CDN delivery
-• Signed URLs
-• Expiration
-• Cleanup
-
-Application servers must not proxy large media files unnecessarily.
-
-────────────────────────────────────────
-
-STORIES / STATUS ARCHITECTURE
-
-Design temporary status content.
-
-Support:
-
-• Text status
-• Image status
-• Video status
-• Privacy controls
-• Viewers
-• Expiration
-• Reactions where appropriate
-
-Define:
-
-• Storage
-• Expiration
-• Visibility
-• Viewer tracking
-• Cleanup
-• CDN strategy
-
-────────────────────────────────────────
-
-VOICE AND VIDEO CALL ARCHITECTURE
-
-Design:
-
-• One-to-one voice calls
-• One-to-one video calls
-• Group calls
-• Call invitations
-• Call acceptance
-• Call rejection
-• Call termination
-• Network changes
-• Reconnection
-
-Use WebRTC where appropriate.
-
-Define:
-
-• Signaling
-• STUN
-• TURN
-• ICE
-• Session management
-• Media routing
-• NAT traversal
-• Quality adaptation
-• Call state
-
-Do not route real-time media through normal application servers unless explicitly justified.
-
-────────────────────────────────────────
-
-CALL SCALABILITY
-
-Define architecture for:
-
-• Large numbers of concurrent calls
-• Regional call routing
-• TURN scaling
-• Media server scaling where required
-• Call failover
-• Network degradation
-• Connection recovery
-
-Identify which components require horizontal scaling.
-
-────────────────────────────────────────
-
-END-TO-END ENCRYPTION ARCHITECTURE
-
-Design an E2EE architecture appropriate for a modern secure messaging platform.
-
-Define boundaries for:
-
-• Identity keys
-• Device keys
-• Pre-keys
-• Session establishment
-• Message encryption
-• Group encryption
-• Key rotation
-• Device addition
-• Device removal
-• Key verification
-
-Clearly distinguish:
-
-• Server-side encryption
-• Transport encryption
-• End-to-end encryption
-
-Do not implement cryptographic algorithms in this architecture phase.
-
-Do not invent proprietary cryptography.
-
-Use established cryptographic protocols and audited libraries in future implementation.
-
-────────────────────────────────────────
-
-SEARCH ARCHITECTURE
-
-Design search for:
-
-• Contacts
-• Users
-• Conversations
-• Groups
-• Communities
-• Messages where permitted by the encryption/privacy architecture
-
-Define:
-
-• Search index ownership
-• Indexing strategy
-• Privacy boundaries
-• Ranking
-• Autocomplete
-• Typo tolerance
-• Regionalization
-• Reindexing
-
-Explicitly account for the fact that end-to-end encrypted message content cannot simply be indexed server-side as plaintext.
-
-────────────────────────────────────────
-
-NOTIFICATION ARCHITECTURE
-
-Design:
-
-• Push notifications
-• In-app notifications
-• Email where appropriate
-
-Support:
-
-• New messages
-• Missed calls
-• Group activity
-• Security events
-• Account events
-
-Define:
-
-• FCM
-• APNS
-• Notification preferences
-• Deduplication
-• Retry
-• Provider failures
-• Rate limiting
-• Notification privacy
-
-────────────────────────────────────────
-
-CONTACT ARCHITECTURE
-
-Design:
-
-• Contact discovery
-• Contact synchronization
-• Contact permissions
-• Invitations
-• Blocking
-• Privacy controls
-
-Define privacy-preserving boundaries for contact discovery.
-
-Do not expose unnecessary user information.
-
-────────────────────────────────────────
-
-SECURITY ARCHITECTURE
-
-Design complete security architecture covering:
-
-Authentication:
-
-• Password authentication where supported
-• OAuth
-• Passkeys
-• MFA
-• Session management
-• Refresh tokens
-• Device authentication
-
-Authorization:
-
-• RBAC
-• Resource ownership
-• Group permissions
-• Administrative permissions
-
-Application Security:
-
-• Input validation
-• Rate limiting
-• Abuse prevention
-• Secure headers
-• CORS
-• CSRF where applicable
-• XSS prevention
-• SQL injection protection
-
-Infrastructure Security:
-
-• IAM
-• Least privilege
-• Network segmentation
-• Secrets management
-• Encryption
-• Kubernetes security
-
-Messaging Security:
-
-• E2EE boundaries
-• Device verification
-• Key management
-• Message confidentiality
-• Replay protection
-
-────────────────────────────────────────
-
-ABUSE PREVENTION
-
-Design defenses against:
-
-• Spam
-• Mass messaging
-• Automated account creation
-• Credential stuffing
-• Account takeover
-• Malicious links
-• Malicious files
-• Harassment
-• Impersonation
-• Bot abuse
-• API abuse
-
-Define:
-
-• Detection
-• Rate limiting
-• Reputation
-• Reporting
-• Blocking
-• Automated enforcement
-• Manual moderation
-
-────────────────────────────────────────
-
-MODERATION
-
-Design moderation architecture for:
-
-• User reports
-• Group reports
-• Account abuse
-• Business abuse
-• Malicious media
-• Spam
-• Policy violations
-
-Define what can and cannot be inspected given E2EE.
-
-Support:
-
-• Reports
-• Evidence boundaries
-• Appeals
-• Administrative actions
-• Audit trails
-
-────────────────────────────────────────
-
-BUSINESS ACCOUNTS
-
-Design architecture supporting:
-
-• Business profiles
-• Business verification
-• Business messaging
-• Business hours
-• Business catalogs
-• Automated responses
-• Business users
-• Business permissions
-
-Keep business functionality modular and independently extensible.
-
-────────────────────────────────────────
-
-EVENT-DRIVEN ARCHITECTURE
-
-Use Kafka or Redpanda for durable asynchronous events.
-
-Define:
-
-• Topic naming
-• Producers
-• Consumers
-• Consumer groups
-• Partition keys
-• Ordering
-• Retention
-• Replay
-• Schema versioning
-• Idempotency
-• Dead-letter handling
-• Observability
-
-Define an initial event catalog including:
-
-AccountCreated
-
-AccountVerified
-
-UserLoggedIn
-
-DeviceRegistered
-
-DeviceRevoked
-
-ContactAdded
-
-ConversationCreated
-
-ConversationParticipantAdded
-
-MessageCreated
-
-MessageSent
-
-MessageDelivered
-
-MessageRead
-
-MessageEdited
-
-MessageDeleted
-
-MessageReactionAdded
-
-GroupCreated
-
-GroupMemberAdded
-
-GroupMemberRemoved
-
-CommunityCreated
-
-MediaUploaded
-
-MediaProcessed
-
-StoryCreated
-
-StoryExpired
-
-CallCreated
-
-CallStarted
-
-CallEnded
-
-NotificationCreated
-
-NotificationDelivered
-
-UserBlocked
-
-UserReported
-
-BusinessAccountCreated
-
-ModerationActionTaken
-
-AuditLogCreated
-
-FeatureFlagChanged
-
-Events must contain only the data required by consumers and must not unnecessarily duplicate entire database records.
-
-────────────────────────────────────────
-
-QUEUE ARCHITECTURE
-
-Use BullMQ for asynchronous workloads where Kafka is unnecessary.
-
-Define queues for:
-
-• Media processing
-• Image processing
-• Video processing
-• Thumbnail generation
-• Push notifications
-• Email delivery
-• Message cleanup
-• Story expiration
-• Temporary media cleanup
-• Search indexing
-• Analytics aggregation
-• Notification cleanup
-• Data retention
-• Report processing
-
-For each queue define:
-
-• Producer
-• Consumer
-• Retry strategy
-• Backoff
-• Idempotency
-• Dead-letter behavior
-• Monitoring
-
-────────────────────────────────────────
-
-API ARCHITECTURE
-
-Define:
-
-• Public APIs
-• Internal APIs
-• WebSocket APIs
-• WebRTC signaling APIs
-
-Support:
-
-Authentication:
-
-• Registration
-• Login
-• Logout
-• Session management
-• Device management
-
-Contacts:
-
-• Contact discovery
-• Contact management
-• Blocking
-
-Conversations:
-
-• Conversation creation
-• Conversation listing
-• Participant management
-
-Messages:
-
-• Send
-• Edit
-• Delete
-• React
-• Reply
-• Forward
-• Read receipts
-
-Groups:
-
-• Create
-• Update
-• Members
-• Roles
-• Permissions
-
-Stories:
-
-• Create
-• View
-• Delete
-• Privacy
-
-Calls:
-
-• Create
-• Accept
-• Reject
-• Signaling
-• End
-
-Media:
-
-• Upload authorization
-• Processing
-• Download authorization
-
-Administration:
-
-• Users
-• Reports
-• Moderation
-• Audit
-
-Define:
-
-• Versioning
-• Validation
-• Pagination
-• Error format
-• Rate limiting
-• Idempotency
-• Authentication
-• Authorization
-
-Do not generate application code.
-
-────────────────────────────────────────
-
-DATA CONSISTENCY
-
-Explicitly define consistency requirements for:
-
-• User accounts
-• Device registration
-• Conversations
-• Messages
-• Message delivery
-• Message reads
-• Group membership
-• Presence
-• Stories
-• Calls
-• Notifications
-• Search
-• Analytics
-
-Identify where to use:
-
-• Strong consistency
-• Eventual consistency
-• Idempotency
-• Optimistic concurrency
-• Distributed locks
-• Transactional outbox
-
-────────────────────────────────────────
-
-SCALABILITY
-
-Design for:
-
-• Hundreds of millions of users
-• Billions of messages
-• Tens of millions of concurrent WebSocket connections
-• Large numbers of concurrent calls
-• Large media traffic
-• Global multi-region deployment
-
-Analyze scaling for:
-
-• API Gateway
-• Authentication
-• WebSocket gateways
-• Messaging
-• PostgreSQL
-• Redis
-• Kafka
-• Search
-• Media processing
-• Object storage
-• CDN
-• WebRTC infrastructure
-
-Identify likely bottlenecks and mitigation strategies.
-
-────────────────────────────────────────
-
-MULTI-REGION ARCHITECTURE
-
-Design:
-
-• Regional application clusters
-• Global traffic routing
-• Regional data ownership
-• Cross-region event replication
-• Failover
-• Disaster recovery
-
-Define which data can be:
-
-• Region-local
-• Globally replicated
-• Eventually consistent
-
-Avoid unnecessary cross-region synchronous calls.
-
-────────────────────────────────────────
-
-FAILURE SCENARIOS
-
-Define graceful behavior when:
-
-• PostgreSQL is unavailable
-• Redis is unavailable
-• Kafka is unavailable
-• Search is unavailable
-• Push provider is unavailable
-• Object storage is unavailable
-• WebSocket gateway fails
-• TURN infrastructure fails
-• Region becomes unavailable
-
-For every failure define:
-
-• Detection
-• Fallback
-• Retry
-• Degraded functionality
-• Recovery
-
-────────────────────────────────────────
-
-OBSERVABILITY
-
-Design:
-
-• Structured logs
-• Metrics
-• Distributed traces
-• Correlation IDs
-• Connection metrics
-• Message latency metrics
-• Delivery metrics
-• Call quality metrics
-• Media processing metrics
-• Queue metrics
-• Database metrics
-• Security metrics
-
-Use:
-
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
-
-Define critical dashboards and alerts.
-
-────────────────────────────────────────
-
-DISASTER RECOVERY
-
-Define:
-
-• RTO
-• RPO
-• Database backups
-• Point-in-time recovery
-• Object storage recovery
-• Kafka recovery
-• Redis recovery
-• Search recovery
-• Regional failover
-• Infrastructure recovery
-
-Include recovery procedures for:
-
-• Database failure
-• Region failure
-• Messaging infrastructure failure
-• Object storage failure
-• Real-time infrastructure failure
-
-────────────────────────────────────────
-
-TESTING ARCHITECTURE
-
-Define:
-
-Unit Testing:
-
-• Domain logic
-• Services
-• Utilities
-
-Integration Testing:
-
-• PostgreSQL
-• Redis
-• Kafka
-• WebSockets
-• External providers
-
-Contract Testing:
-
-• REST APIs
-• WebSocket contracts
-• Event schemas
-
-End-to-End Testing:
-
-• Registration
-• Login
-• Messaging
-• Groups
-• Media
-• Calls
-• Notifications
-• Multi-device synchronization
-
-Performance Testing:
-
-• API load
-• WebSocket connections
-• Message throughput
-• Group messaging
-• Presence
-• Call signaling
-• Media processing
-
-Resilience Testing:
-
-• Database failures
-• Redis failures
-• Kafka failures
-• WebSocket failures
-• Regional failures
-
-Security Testing:
-
-• Authentication
-• Authorization
-• Encryption boundaries
-• Rate limiting
-• Abuse prevention
-• Dependency scanning
-
-────────────────────────────────────────
-
-ARCHITECTURAL DECISION RECORDS
-
-Define ADRs for major decisions including:
-
-• Service decomposition
-• Monorepo architecture
-• PostgreSQL architecture
-• Prisma strategy
-• Redis architecture
-• Kafka/Redpanda
-• BullMQ
-• WebSocket architecture
-• WebRTC architecture
-• Object storage
-• CDN
-• E2EE architecture
-• Multi-device synchronization
-• Offline synchronization
-• Search architecture
-• Multi-region architecture
-• Kubernetes
-• Terraform
-• Observability
-• Secrets management
-
-Each ADR must contain:
-
-• Context
-• Decision
-• Alternatives considered
-• Consequences
-
-────────────────────────────────────────
-
-PROJECT INDEX
-
-Create a complete Project Index containing:
-
-• Architecture decisions
-• Services
-• Domains
-• Data ownership
-• Database objects
-• API contracts
-• WebSocket contracts
-• Events
-• Queues
-• Shared packages
-• Security boundaries
-• Infrastructure decisions
-• Testing strategy
-• Implementation dependencies
-• Remaining work
-
-────────────────────────────────────────
-
-ARCHITECTURE VOLUME 1 DELIVERABLE
-
-Produce:
-
-1. Executive Architecture Overview
-2. System Context
-3. System Architecture
-4. Architectural Approach
-5. Service Decomposition
-6. Service Ownership Matrix
-7. Communication Matrix
-8. Monorepo Structure
-9. Folder Hierarchy
-10. Core Domain Model
-11. Database Architecture
-12. Complete ERD
-13. Prisma Architecture
-14. Redis Architecture
-15. Real-Time Architecture
-16. Messaging Architecture
-17. Group Messaging Architecture
-18. Community Architecture
-19. Message Delivery Architecture
-20. Offline Synchronization Architecture
-21. Multi-Device Architecture
-22. Presence Architecture
-23. Media Architecture
-24. Stories/Status Architecture
-25. Voice and Video Call Architecture
-26. Call Scalability Architecture
-27. End-to-End Encryption Architecture
-28. Search Architecture
-29. Notification Architecture
-30. Contact Architecture
-31. Security Architecture
-32. Abuse Prevention Architecture
-33. Moderation Architecture
-34. Business Account Architecture
-35. Event-Driven Architecture
-36. Queue Architecture
-37. API Architecture
-38. Data Consistency Strategy
-39. Scalability Strategy
-40. Multi-Region Architecture
-41. Failure Scenario Architecture
-42. Observability Architecture
-43. Disaster Recovery Architecture
-44. Testing Architecture
-45. Architectural Decision Records
-46. Complete Project Index
-
-────────────────────────────────────────
-
-QUALITY REQUIREMENTS
-
-Every architectural decision must evaluate:
-
-• Scalability
-• Availability
-• Security
-• Privacy
-• Latency
-• Data consistency
-• Operational complexity
-• Cost
-• Developer productivity
-• Maintainability
-• Future extensibility
-
-Prefer:
-
-• Explicit ownership
-• Clear domain boundaries
-• Event-driven communication where appropriate
-• Idempotent consumers
-• Transactional outbox
-• Horizontal scaling
-• Stateless application services
-• Established security protocols
-
-Avoid:
-
-• Unnecessary microservices
-• Shared database ownership
-• Distributed transactions where avoidable
-• Tight coupling
-• Single points of failure
-• Redis as a system of record
-• Application servers proxying large media
-• Proprietary cryptography
-• Frontend-only security
-• Premature complexity
-
-────────────────────────────────────────
-
-OUTPUT RULES
-
-This is an architecture document only.
-
-Do not generate source code.
-
-Do not generate placeholder implementations.
-
-Do not generate Dockerfiles.
-
-Do not generate Kubernetes manifests.
-
-Do not generate Terraform files.
-
-Do not generate frontend components.
-
-Do not generate mobile components.
-
-Do not implement backend services.
-
-Provide detailed:
-
-• Specifications
-• Architecture decisions
-• Text-based diagrams
-• Domain boundaries
-• Service boundaries
-• Data models
-• ERD
-• API contracts
-• Event contracts
-• Queue contracts
-• Ownership rules
-• Consistency rules
-• Security boundaries
-• Implementation guidance
-
-The resulting architecture must be sufficiently detailed that separate backend, frontend, mobile, infrastructure, DevOps, and QA teams can implement the system without making major architectural decisions themselves.
-
-────────────────────────────────────────
-
-VOLUME 1 SCOPE
-
-This prompt establishes the foundational architecture.
-
-Do not attempt to produce implementation code.
-
-Do not generate Architecture Volume 2 content unless required to explain a dependency of the Volume 1 architecture.
-
-Complete the Architecture Volume 1 deliverables and Project Inde
-
-You are operating in Senior Engineering Team Mode.
-
-You are simultaneously acting as:
-
-- Principal Software Architect
-- Staff Backend Engineer
-- Staff Frontend Engineer
-- Staff Mobile Engineer
-- DevOps Engineer
-- Cloud Architect
-- Database Architect
-- Security Engineer
-- QA Engineer
-- UI/UX Designer
-- Technical Writer
-
-Your task is to design the architecture for a production-ready, enterprise-scale global real-time messaging and communication platform comparable in architectural scope to modern messaging platforms such as WhatsApp.
-
-The platform must be an original implementation.
-
-Do not copy proprietary implementation details, source code, internal architecture, or undocumented behavior from WhatsApp or any other proprietary platform.
-
-This prompt defines:
-
-ARCHITECTURE PHASE — VOLUME 1
-
-This is an architecture-only task.
-
-Do not generate backend implementation code.
-
-Do not generate frontend implementation code.
-
-Do not generate mobile implementation code.
-
-Do not generate infrastructure implementation files.
-
-Do not generate Dockerfiles.
-
-Do not generate Kubernetes manifests.
-
-Do not generate Terraform files.
-
-Do not generate CI/CD implementation files.
-
-The purpose of this volume is to establish the core architecture, domain model, service boundaries, data architecture, communication architecture, and project structure that future implementation prompts will follow.
-
-────────────────────────────────────────
-
-PROJECT OBJECTIVE
-
-Design a production-ready global real-time communication platform capable of supporting:
-
-• Hundreds of millions of registered users
-• Tens of millions of daily active users
-• Large-scale one-to-one messaging
-• Group messaging
-• Communities
-• Real-time communication
-• Voice calls
-• Video calls
-• Group calls
-• Media sharing
-• Voice messages
-• Documents
-• Stories/status updates
-• Push notifications
-• Multi-device synchronization
-• Offline messaging
-• Message delivery guarantees
-• End-to-end encryption architecture
-• Contact management
-• Blocking
-• Reporting
-• Business accounts
-• Administrative tools
-• Moderation
-• Analytics
-• High availability
-• Multi-region deployment
-• Horizontal scaling
-• Disaster recovery
-
-Design the platform for:
-
-• Global deployment
-• Low latency
-• High availability
-• Fault tolerance
-• Horizontal scalability
-• Strong security
-• Privacy
-• Long-term maintainability
-• Future extensibility
-
-Do not design a toy application.
-
-Design an enterprise platform capable of evolving for many years.
-
-────────────────────────────────────────
-
-PRIMARY TECHNOLOGY STACK
-
-Web:
-
-• Next.js
-• React
-• TypeScript
-• Tailwind CSS
-
-Mobile:
-
-• React Native
-• Expo
-• TypeScript
-
-Backend:
-
-• Node.js
-• NestJS
-• TypeScript
-
-Database:
-
-• PostgreSQL
-• Prisma ORM
-
-Caching:
-
-• Redis
-
-Real-Time Communication:
-
-• WebSockets
-• Socket.IO where appropriate
-
-Event Streaming:
-
-• Kafka or Redpanda
-
-Background Jobs:
-
-• BullMQ
-
-Search:
-
-• Elasticsearch or OpenSearch
-
-Object Storage:
-
-• AWS S3-compatible object storage
-
-CDN:
-
-• CloudFront or equivalent CDN
-
-Push Notifications:
-
-• Firebase Cloud Messaging
-• Apple Push Notification Service
-
-Voice/Video:
-
-• WebRTC
-• STUN/TURN infrastructure
-
-Infrastructure:
-
-• Docker
-• Kubernetes
-• Helm
-• Terraform
-• GitHub Actions
-
-Observability:
-
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
-
-Secrets:
-
-• HashiCorp Vault or approved cloud-native secret management
-
-────────────────────────────────────────
-
-ARCHITECTURAL APPROACH
-
-Determine the appropriate architecture between:
-
-• Modular Monolith
-• Service-Oriented Architecture
-• Microservices
-• Hybrid architecture
-
-Do not blindly create a microservice for every domain.
-
-Evaluate:
-
-• Transactional consistency
-• Operational complexity
-• Scalability
-• Latency
-• Deployment independence
-• Team ownership
-• Failure isolation
-• Developer productivity
-• Cost
-
-Clearly identify:
-
-• Independently deployable services
-• Shared transactional boundaries
-• Authoritative data ownership
-• Synchronous communication
-• Asynchronous communication
-• Event-driven communication
-• Read models
-• CQRS requirements
-• Eventual consistency boundaries
-• Strong consistency requirements
-
-Explain why each major architectural decision is appropriate.
-
-────────────────────────────────────────
-
-CORE PLATFORM DOMAINS
-
-Define bounded contexts and ownership for:
-
-Identity
-
-Accounts
-
-Users
-
-Profiles
-
-Authentication
-
-Authorization
-
-Sessions
-
-Devices
-
-Contacts
-
-Presence
-
-Messaging
-
-Conversations
-
-Groups
-
-Communities
-
-Messages
-
-Message Delivery
-
-Message Reactions
-
-Message Editing
-
-Message Deletion
-
-Media
-
-Voice Messages
-
-Documents
-
-Stories
-
-Notifications
-
-Search
-
-Calls
-
-Voice Calls
-
-Video Calls
-
-Group Calls
-
-Call Signaling
-
-End-to-End Encryption
-
-Key Management
-
-Offline Synchronization
-
-Multi-Device Synchronization
-
-Blocking
-
-Reporting
-
-Moderation
-
-Business Accounts
-
-Administration
-
-Analytics
-
-Audit
-
-Feature Flags
-
-System Configuration
-
-────────────────────────────────────────
-
-SYSTEM ARCHITECTURE
-
-Design the complete high-level system architecture.
-
-CLIENT LAYER
-
-Define boundaries for:
-
-• Web application
-• iOS application
-• Android application
-• Desktop applications
-• Tablet applications
-• Future embedded/device integrations
-
-EDGE LAYER
-
-Define:
-
-• DNS
-• CDN
-• WAF
-• Load balancers
-• API Gateway
-• WebSocket Gateway
-• Rate limiting
-• Authentication boundaries
-
-APPLICATION LAYER
-
-Define:
-
-• API services
-• Domain services
-• Real-time services
-• Messaging services
-• Call signaling
-• Background workers
-• Event consumers
-• Scheduled jobs
-
-DATA LAYER
-
-Define:
-
-• PostgreSQL
-• Read replicas
-• Redis
-• Kafka/Redpanda
-• Elasticsearch/OpenSearch
-• Object storage
-
-COMMUNICATION LAYER
-
-Define:
-
-• REST APIs where appropriate
-• WebSockets
-• WebRTC
-• Push notifications
-• Event streaming
-
-OBSERVABILITY LAYER
-
-Define:
-
-• Metrics
-• Logs
-• Traces
-• Alerts
-
-SECURITY LAYER
-
-Define:
-
-• Authentication
-• Authorization
-• Encryption
-• Key management
-• Secrets management
-• Audit logging
-• Network segmentation
-
-Represent the architecture using clear text-based diagrams.
-
-Do not use images.
-
-────────────────────────────────────────
-
-SERVICE DECOMPOSITION
-
-Evaluate and define appropriate boundaries for:
-
-API Gateway
-
-Authentication Service
-
-Identity Service
-
-Account Service
-
-Profile Service
-
-Session Service
-
-Device Service
-
-Contact Service
-
-Presence Service
-
-Conversation Service
-
-Messaging Service
-
-Message Delivery Service
-
-Message Synchronization Service
-
-Group Service
-
-Community Service
-
-Media Service
-
-Media Processing Service
-
-Notification Service
-
-Search Service
-
-Story Service
-
-Call Signaling Service
-
-Call Session Service
-
-Voice/Video Infrastructure
-
-Encryption and Key Management boundaries
-
-Moderation Service
-
-Reporting Service
-
-Business Account Service
-
-Administration Service
-
-Analytics Service
-
-Audit Service
-
-Feature Flag Service
-
-Configuration Service
-
-Do not automatically create one microservice per item.
-
-Combine services where strong transactional consistency and cohesive ownership justify doing so.
-
-For every final service boundary define:
-
-• Responsibility
-• Authoritative data
-• Owned database objects
-• Public APIs
-• Internal APIs
-• Events produced
-• Events consumed
-• Synchronous dependencies
-• Asynchronous dependencies
-• Scaling requirements
-• Availability requirements
-• Security boundaries
-
-────────────────────────────────────────
-
-SERVICE OWNERSHIP MATRIX
-
-Create a complete service ownership matrix.
-
-For every domain identify:
-
-• Owning service
-• Database ownership
-• API ownership
-• Event ownership
-• Cache ownership
-• Search/read-model ownership
-• Administrative ownership
-
-Explicitly prohibit uncontrolled cross-service database writes.
-
-────────────────────────────────────────
-
-COMMUNICATION MATRIX
-
-Create a communication matrix defining:
-
-• Service A
-• Service B
-• Communication mechanism
-• Synchronous or asynchronous
-• Reason
-• Consistency requirement
-• Failure behavior
-
-Evaluate:
-
-• REST
-• Internal HTTP
-• WebSockets
-• Kafka/Redpanda
-• Redis
-• BullMQ
-
-Do not use asynchronous messaging where synchronous consistency is required.
-
-Do not use synchronous calls where asynchronous processing is more appropriate.
-
-────────────────────────────────────────
-
-MONOREPO ARCHITECTURE
-
-Design a production-ready monorepo.
-
-Applications:
-
-• Web
-• Mobile
-• Desktop where appropriate
-• Administration dashboard
-
-Backend:
-
-• API Gateway
-• Backend services
-• Real-time services
-• WebSocket services
-• Call signaling services
-• Background workers
-
-Shared packages:
-
-• API contracts
-• Event contracts
-• Shared types
-• Validation
-• Configuration
-• Authentication interfaces
-• Observability
-• Encryption interfaces
-• Testing utilities
-• UI components where appropriate
-
-Infrastructure:
-
-• Docker
-• Kubernetes
-• Helm
-• Terraform
-• CI/CD
-
-Documentation:
-
-• Architecture
-• APIs
-• Events
-• Database
-• Security
-• Operations
-• ADRs
-• Runbooks
-
-Do not create uncontrolled shared packages.
-
-Every shared package must have a clear purpose and ownership rule.
-
-────────────────────────────────────────
-
-FOLDER HIERARCHY
-
-Generate a detailed production-ready folder hierarchy.
-
-Include:
-
-• Monorepo root
-• Applications
-• Backend services
-• Workers
-• Shared packages
-• Infrastructure
-• Tests
-• Documentation
-• Database migrations
-• Configuration
-
-Show important directories and files that future implementation prompts will need.
-
-Do not generate implementation code.
-
-The folder structure must be consistent with the service boundaries defined in this architecture.
-
-────────────────────────────────────────
-
-CORE DOMAIN MODEL
-
-Design the major domain entities and aggregates.
-
-Evaluate:
-
-User
-
-Account
-
-Profile
-
-Session
-
-Device
-
-Contact
-
-ContactRequest
-
-Conversation
-
-ConversationParticipant
-
-Message
-
-MessageAttachment
-
-MessageReaction
-
-MessageReceipt
-
-MessageEdit
-
-MessageDeletion
-
-MessageMention
-
-Group
-
-GroupMember
-
-GroupRole
-
-Community
-
-CommunityMember
-
-Channel
-
-MediaAsset
-
-VoiceMessage
-
-Document
-
-Story
-
-StoryViewer
-
-Notification
-
-Call
-
-CallParticipant
-
-CallSession
-
-CallDevice
-
-EncryptionIdentity
-
-DeviceKey
-
-PreKey
-
-SessionKey
-
-BlockedUser
-
-Report
-
-BusinessAccount
-
-BusinessProfile
-
-AuditLog
-
-FeatureFlag
-
-Do not force every conceptual entity into a separate database table.
-
-Use:
-
-• Aggregates
-• Value objects
-• Relational entities
-• Domain events
-• Ownership boundaries
-
-where appropriate.
-
-Clearly identify aggregate roots.
-
-────────────────────────────────────────
-
-DATABASE ARCHITECTURE
-
-Design PostgreSQL for:
-
-• Hundreds of millions of users
-• Billions of messages
-• Large numbers of conversations
-• Large group membership
-• High-volume message receipts
-• Large media metadata volume
-• Large audit datasets
-
-Define:
-
-• Database ownership
-• Schema boundaries
-• Primary keys
-• Foreign keys
-• Unique constraints
-• Check constraints
-• Indexing
-• Partitioning
-• Replication
-• Read replicas
-• Connection pooling
-• Archival
-• Retention
-• Backup strategy
-
-Identify high-growth tables.
-
-Evaluate partitioning candidates for:
-
-• Messages
-• Message receipts
-• Audit logs
-• Analytics events
-• Call events
-
-Do not store high-volume ephemeral presence information as the primary source of truth in PostgreSQL.
-
-────────────────────────────────────────
-
-ERD
-
-Generate a complete text-based ERD.
-
-Include:
-
-• Primary keys
-• Foreign keys
-• Cardinality
-• Ownership
-• Important indexes
-• High-growth tables
-• Partitioning candidates
-
-Clearly represent relationships between:
-
-• Users
-• Accounts
-• Devices
-• Contacts
-• Conversations
-• Participants
-• Messages
-• Attachments
-• Groups
-• Communities
-• Stories
-• Calls
-• Encryption metadata
-• Reports
-• Business accounts
-
-Explain important relationships after the ERD.
-
-────────────────────────────────────────
-
-PRISMA ARCHITECTURE
-
-Define how Prisma will be used.
-
-Specify:
-
-• Schema ownership
-• Service-specific Prisma clients where appropriate
-• Migration ownership
-• Transaction boundaries
-• Read replica strategy
-• Connection pooling
-• Query optimization
-• Indexing rules
-
-Avoid a single uncontrolled Prisma schema where every service can modify every domain.
-
-Define how future implementation teams will safely perform migrations.
-
-────────────────────────────────────────
-
-REDIS ARCHITECTURE
-
-Design Redis usage for:
-
-• Presence
-• Session state
-• WebSocket coordination
-• Rate limiting
-• Typing indicators
-• Online/offline state
-• Distributed locks
-• Temporary synchronization state
-• Notification deduplication
-• Application caching
-• Queue infrastructure
-
-For every Redis use case define:
-
-• Key pattern
-• TTL
-• Invalidation
-• Consistency requirements
-• Failure behavior
-
-Redis must never become the authoritative source for critical persistent data.
-
-────────────────────────────────────────
-
-REAL-TIME ARCHITECTURE
-
-Design the WebSocket architecture.
-
-Support:
-
-• Connection establishment
-• Authentication
-• Connection lifecycle
-• Reconnection
-• Heartbeats
-• Presence
-• Typing indicators
-• Message delivery
-• Read receipts
-• Message reactions
-• Group updates
-• Call signaling
-• Multi-device synchronization
-
-Define:
-
-• WebSocket Gateway architecture
-• Connection routing
-• Horizontal scaling
-• Redis coordination
-• Connection affinity requirements
-• Failure recovery
-• Backpressure
-• Rate limiting
-
-Explain how millions of concurrent connections can be supported.
-
-────────────────────────────────────────
-
-MESSAGING ARCHITECTURE
-
-Design the architecture for one-to-one messaging.
-
-Support:
-
-• Text messages
-• Replies
-• Forwarding
-• Mentions
-• Reactions
-• Editing
-• Deletion
-• Attachments
-• Voice messages
-• Documents
-• Delivery states
-• Read states
-• Message ordering
-
-Define:
-
-• Message identifiers
-• Client-generated IDs
-• Server-generated IDs
-• Idempotency
-• Deduplication
-• Ordering guarantees
-• Retry behavior
-• Offline delivery
-• Multi-device synchronization
-
-Clearly define whether operations use:
-
-• At-most-once
-• At-least-once
-• Exactly-once semantics
-
-Do not claim exactly-once delivery unless technically justified.
-
-────────────────────────────────────────
-
-GROUP MESSAGING ARCHITECTURE
-
-Design scalable group messaging.
-
-Support:
-
-• Group creation
-• Group membership
-• Invitations
-• Admin roles
-• Permissions
-• Group metadata
-• Group avatar
-• Group settings
-• Member removal
-• Message delivery
-
-Define architecture for:
-
-• Small groups
-• Large groups
-• Very large groups
-
-Explain fan-out strategy and delivery implications.
-
-────────────────────────────────────────
-
-COMMUNITIES ARCHITECTURE
-
-Design communities containing multiple groups or channels.
-
-Define:
-
-• Community ownership
-• Membership
-• Roles
-• Group relationships
-• Permissions
-• Moderation
-• Notifications
-• Discovery
-
-Avoid coupling community functionality directly to basic one-to-one conversations.
-
-────────────────────────────────────────
-
-MESSAGE DELIVERY ARCHITECTURE
-
-Define message states:
-
-• Pending
-• Sent
-• Delivered
-• Read
-• Failed
-
-Design:
-
-• Delivery receipts
-• Read receipts
-• Retry
-• Offline delivery
-• Multi-device delivery
-• Duplicate prevention
-• Ordering
-
-Explain how delivery state is persisted and synchronized across devices.
-
-────────────────────────────────────────
-
-OFFLINE SYNCHRONIZATION
-
-Design synchronization for unreliable networks.
-
-Support:
-
-• Offline message composition
-• Local message queue
-• Synchronization
-• Retry
-• Duplicate prevention
-• Incremental synchronization
-• Delta synchronization
-• Message history synchronization
-• Device synchronization
-
-Define:
-
-• Synchronization cursors
-• Checkpoints
-• Recovery
-• Conflict handling
-• Idempotency
-
-────────────────────────────────────────
-
-MULTI-DEVICE ARCHITECTURE
-
-Design support for:
-
-• Multiple mobile devices
-• Web sessions
-• Desktop sessions
-• Device registration
-• Device verification
-• Device revocation
-• Remote logout
-• Session synchronization
-
-Define how:
-
-• Messages
-• Conversations
-• Delivery state
-• Read state
-• Encryption metadata
-• Device state
-
-are synchronized between devices.
-
-Do not assume a single-device architecture.
-
-────────────────────────────────────────
-
-PRESENCE ARCHITECTURE
-
-Design:
-
-• Online status
-• Last seen
-• Typing indicators
-• Recording indicators
-• Presence subscriptions
-
-Presence must support extremely high scale.
-
-Define:
-
-• Redis architecture
-• TTL
-• Heartbeats
-• Fan-out
-• Regional behavior
-• Failure behavior
-
-Presence must remain an ephemeral capability rather than the authoritative source of user state.
-
-────────────────────────────────────────
-
-MEDIA ARCHITECTURE
-
-Design media handling for:
-
-• Images
-• Videos
-• Audio
-• Voice messages
-• Documents
-• Stickers
-• GIFs
-• Thumbnails
-
-Define:
-
-• Upload authorization
-• Direct S3 uploads
-• Object naming
-• Metadata
-• Malware scanning boundaries
-• Processing
-• Compression
-• Thumbnail generation
-• CDN delivery
-• Signed URLs
-• Expiration
-• Cleanup
-
-Application servers must not unnecessarily proxy large media files.
-
-────────────────────────────────────────
-
-STORIES / STATUS ARCHITECTURE
-
-Design temporary status content.
-
-Support:
-
-• Text status
-• Image status
-• Video status
-• Privacy controls
-• Viewers
-• Expiration
-• Reactions where appropriate
-
-Define:
-
-• Storage
-• Expiration
-• Visibility
-• Viewer tracking
-• Cleanup
-• CDN strategy
-
-────────────────────────────────────────
-
-VOICE AND VIDEO CALL ARCHITECTURE
-
-Design architecture for:
-
-• One-to-one voice calls
-• One-to-one video calls
-• Group calls
-• Call invitations
-• Call acceptance
-• Call rejection
-• Call termination
-• Network changes
-• Reconnection
-
-Use WebRTC where appropriate.
-
-Define:
-
-• Signaling
-• STUN
-• TURN
-• ICE
-• Session management
-• NAT traversal
-• Media routing
-• Quality adaptation
-• Call state
-
-Do not route real-time media through ordinary application servers unless explicitly justified.
-
-────────────────────────────────────────
-
-END-TO-END ENCRYPTION ARCHITECTURE
-
-Design an E2EE architecture appropriate for a modern secure messaging platform.
-
-Define boundaries for:
-
-• Identity keys
-• Device keys
-• Pre-keys
-• Session establishment
-• Message encryption
-• Group encryption
-• Key rotation
-• Device addition
-• Device removal
-• Key verification
-
-Clearly distinguish:
-
-• Transport encryption
-• Server-side encryption
-• End-to-end encryption
-
-Do not implement cryptographic algorithms in this architecture.
-
-Do not invent proprietary cryptography.
-
-Future implementation must use established cryptographic protocols and audited cryptographic libraries.
-
-────────────────────────────────────────
-
-SECURITY ARCHITECTURE
-
-Define the high-level security architecture for:
-
-Authentication
-
-• Password authentication where supported
-• OAuth
-• Passkeys
-• MFA
-• Session management
-• Refresh tokens
-• Device authentication
-
-Authorization
-
-• RBAC
-• Resource ownership
-• Group permissions
-• Administrative permissions
-
-Application security
-
-• Input validation
-• Rate limiting
-• Abuse prevention
-• Secure headers
-• CORS
-• CSRF where applicable
-• XSS prevention
-• SQL injection protection
-
-Infrastructure security
-
-• IAM
-• Least privilege
-• Network segmentation
-• Secrets management
-• Encryption
-• Kubernetes security
-
-Messaging security
-
-• E2EE boundaries
-• Device verification
-• Key management
-• Replay protection
-• Message confidentiality
-
-────────────────────────────────────────
-
-EVENT-DRIVEN ARCHITECTURE
-
-Design Kafka or Redpanda as the durable event backbone.
-
-Define:
-
-• Topic naming
-• Producers
-• Consumers
-• Consumer groups
-• Partition keys
-• Ordering
-• Retention
-• Replay
-• Schema versioning
-• Idempotency
-• Dead-letter handling
-• Observability
-
-Define an initial event catalog including:
-
-AccountCreated
-
-AccountVerified
-
-UserLoggedIn
-
-DeviceRegistered
-
-DeviceRevoked
-
-ContactAdded
-
-ConversationCreated
-
-ConversationParticipantAdded
-
-MessageCreated
-
-MessageSent
-
-MessageDelivered
-
-MessageRead
-
-MessageEdited
-
-MessageDeleted
-
-MessageReactionAdded
-
-GroupCreated
-
-GroupMemberAdded
-
-GroupMemberRemoved
-
-CommunityCreated
-
-MediaUploaded
-
-MediaProcessed
-
-StoryCreated
-
-StoryExpired
-
-CallCreated
-
-CallStarted
-
-CallEnded
-
-NotificationCreated
-
-NotificationDelivered
-
-UserBlocked
-
-UserReported
-
-BusinessAccountCreated
-
-ModerationActionTaken
-
-AuditLogCreated
-
-FeatureFlagChanged
-
-Events must contain only the data required by consumers.
-
-Do not duplicate complete database records inside events without architectural justification.
-
-────────────────────────────────────────
-
-QUEUE ARCHITECTURE
-
-Use BullMQ for asynchronous jobs where Kafka is unnecessary.
-
-Define queues for:
-
-• Media processing
-• Image processing
-• Video processing
-• Thumbnail generation
-• Push notifications
-• Email delivery
-• Message cleanup
-• Story expiration
-• Temporary media cleanup
-• Search indexing
-• Analytics aggregation
-• Notification cleanup
-• Data retention
-• Report processing
-
-For every queue define:
-
-• Producer
-• Consumer
-• Retry strategy
-• Backoff
-• Idempotency
-• Dead-letter behavior
-• Monitoring
-
-────────────────────────────────────────
-
-API ARCHITECTURE
-
-Define the public and internal API architecture.
-
-Support:
-
-Authentication
-
-• Registration
-• Login
-• Logout
-• Session management
-• Device management
-
-Contacts
-
-• Contact discovery
-• Contact management
-• Blocking
-
-Conversations
-
-• Conversation creation
-• Conversation listing
-• Participant management
-
-Messages
-
-• Send
-• Edit
-• Delete
-• React
-• Reply
-• Forward
-• Read receipts
-
-Groups
-
-• Create
-• Update
-• Members
-• Roles
-• Permissions
-
-Stories
-
-• Create
-• View
-• Delete
-• Privacy
-
-Calls
-
-• Create
-• Accept
-• Reject
-• Signaling
-• End
-
-Media
-
-• Upload authorization
-• Processing
-• Download authorization
-
-Administration
-
-• Users
-• Reports
-• Moderation
-• Audit
-
-Define:
-
-• API versioning
-• Request validation
-• Response conventions
-• Pagination
-• Error format
-• Rate limiting
-• Idempotency
-• Authentication
-• Authorization
-
-Do not generate application code.
-
-────────────────────────────────────────
-
-DATA CONSISTENCY
-
-Define consistency requirements for:
-
-• User accounts
-• Device registration
-• Conversations
-• Messages
-• Message delivery
-• Message reads
-• Group membership
-• Presence
-• Stories
-• Calls
-• Notifications
-• Search
-• Analytics
-
-Identify where to use:
-
-• Strong consistency
-• Eventual consistency
-• Idempotency
-• Optimistic concurrency
-• Distributed locks
-• Transactional outbox
-
-Explain why each consistency model is appropriate.
-
-────────────────────────────────────────
-
-SCALABILITY
-
-Design for:
-
-• Hundreds of millions of users
-• Billions of messages
-• Tens of millions of concurrent WebSocket connections
-• Large numbers of concurrent calls
-• Large media traffic
-• Global multi-region deployment
-
-Analyze scaling strategies for:
-
-• API Gateway
-• Authentication
-• WebSocket gateways
-• Messaging
-• PostgreSQL
-• Redis
-• Kafka
-• Search
-• Media processing
-• Object storage
-• CDN
-• WebRTC infrastructure
-
-Identify:
-
-• Likely bottlenecks
-• Scaling limits
-• Mitigation strategies
-
-────────────────────────────────────────
-
-MULTI-REGION ARCHITECTURE
-
-Define:
-
-• Regional application clusters
-• Global traffic routing
-• Regional data ownership
-• Cross-region event replication
-• Failover
-• Disaster recovery
-
-Classify data as:
-
-• Region-local
-• Globally replicated
-• Eventually consistent
-
-Avoid unnecessary cross-region synchronous calls.
-
-────────────────────────────────────────
-
-FAILURE SCENARIOS
-
-Define graceful behavior when:
-
-• PostgreSQL is unavailable
-• Redis is unavailable
-• Kafka is unavailable
-• Search is unavailable
-• Push providers are unavailable
-• Object storage is unavailable
-• WebSocket gateway fails
-• TURN infrastructure fails
-• A region becomes unavailable
-
-For each failure define:
-
-• Detection
-• Fallback
-• Retry
-• Degraded functionality
-• Recovery
-
-────────────────────────────────────────
-
-OBSERVABILITY ARCHITECTURE
-
-Design:
-
-• Structured logging
-• Metrics
-• Distributed tracing
-• Correlation IDs
-• Connection metrics
-• Message latency metrics
-• Delivery metrics
-• Call quality metrics
-• Media processing metrics
-• Queue metrics
-• Database metrics
-• Security metrics
-
-Use:
-
-• OpenTelemetry
-• Prometheus
-• Grafana
-• Loki
-• Tempo
-
-Define critical dashboards and alerts.
-
-────────────────────────────────────────
-
-DISASTER RECOVERY
-
-Define:
-
-• RTO
-• RPO
-• Database backups
-• Point-in-time recovery
-• Object storage recovery
-• Kafka recovery
-• Redis recovery
-• Search recovery
-• Regional failover
-• Infrastructure recovery
-
-────────────────────────────────────────
-
-TESTING ARCHITECTURE
-
-Define the architecture for:
-
-Unit Testing
-
-• Domain logic
-• Services
-• Utilities
-
-Integration Testing
-
-• PostgreSQL
-• Redis
-• Kafka
-• WebSockets
-• External providers
-
-Contract Testing
-
-• REST APIs
-• WebSocket contracts
-• Event schemas
-
-End-to-End Testing
-
-• Registration
-• Login
-• Messaging
-• Groups
-• Media
-• Calls
-• Notifications
-• Multi-device synchronization
-
-Performance Testing
-
-• API load
-• WebSocket connections
-• Message throughput
-• Group messaging
-• Presence
-• Call signaling
-• Media processing
-
-Resilience Testing
-
-• Database failures
-• Redis failures
-• Kafka failures
-• WebSocket failures
-• Regional failures
-
-Security Testing
-
-• Authentication
-• Authorization
-• Encryption boundaries
-• Rate limiting
-• Abuse prevention
-• Dependency scanning
-
-────────────────────────────────────────
-
-ARCHITECTURAL DECISION RECORDS
-
-Define ADRs for the major architectural decisions.
-
-At minimum include:
-
-• Service decomposition
-• Monorepo architecture
-• PostgreSQL architecture
-• Prisma strategy
-• Redis architecture
-• Kafka/Redpanda
-• BullMQ
-• WebSocket architecture
-• WebRTC architecture
-• Object storage
-• CDN
-• E2EE architecture
-• Multi-device synchronization
-• Offline synchronization
-• Search architecture
-• Multi-region architecture
-• Kubernetes
-• Terraform
-• Observability
-• Secrets management
-
-Each ADR must contain:
-
-• Context
-• Decision
-• Alternatives considered
-• Consequences
-
-────────────────────────────────────────
-
-PROJECT INDEX
-
-Create a complete Project Index containing:
-
-• Project architecture
-• Domains
-• Services
-• Service ownership
-• Database ownership
-• Database objects
-• API contracts
-• WebSocket contracts
-• Events
-• Queues
-• Shared packages
-• Security boundaries
-• Infrastructure decisions
-• Testing strategy
-• Implementation dependencies
-• Remaining architecture work
-
-The Project Index must be structured so that future backend, frontend, mobile, infrastructure, DevOps, and QA prompts can use it as a reference.
-
-────────────────────────────────────────
-
-ARCHITECTURE VOLUME 1 DELIVERABLES
-
-Produce the following sections:
-
-1. Executive Architecture Overview
-2. System Context
-3. System Architecture
-4. Architectural Approach
-5. Domain Decomposition
-6. Service Decomposition
-7. Service Ownership Matrix
-8. Communication Matrix
-9. Monorepo Architecture
-10. Detailed Folder Hierarchy
-11. Core Domain Model
-12. Aggregate Boundaries
-13. ERD
-14. PostgreSQL Architecture
-15. Prisma Architecture
-16. Redis Architecture
-17. Real-Time Architecture
-18. Messaging Architecture
-19. Group Messaging Architecture
-20. Community Architecture
-21. Message Delivery Architecture
-22. Offline Synchronization Architecture
-23. Multi-Device Architecture
-24. Presence Architecture
-25. Media Architecture
-26. Stories/Status Architecture
-27. Voice and Video Call Architecture
-28. End-to-End Encryption Architecture
-29. Security Architecture
-30. Event-Driven Architecture
-31. Event Catalog
-32. Queue Architecture
-33. API Architecture
-34. Data Consistency Strategy
-35. Scalability Strategy
-36. Multi-Region Architecture
-37. Failure Scenarios
-38. Observability Architecture
-39. Disaster Recovery Strategy
-40. Testing Architecture
-41. Architectural Decision Records
-42. Complete Project Index
-
-────────────────────────────────────────
-
-QUALITY REQUIREMENTS
-
-Every architectural decision must evaluate:
-
-• Scalability
-• Availability
-• Security
-• Privacy
-• Latency
-• Data consistency
-• Operational complexity
-• Cost
-• Developer productivity
-• Maintainability
-• Future extensibility
-
-Prefer:
-
-• Explicit ownership
-• Clear domain boundaries
-• Stateless services
-• Horizontal scaling
-• Event-driven communication where appropriate
-• Idempotent consumers
-• Transactional outbox
-• Established security protocols
-• Failure isolation
-• Observable systems
-
-Avoid:
-
-• Unnecessary microservices
-• Shared database ownership
-• Distributed transactions where avoidable
-• Tight coupling
-• Single points of failure
-• Redis as a system of record
-• Application servers proxying large media
-• Proprietary cryptography
-• Frontend-only security
-• Premature complexity
-
-────────────────────────────────────────
-
-OUTPUT RULES
-
-This is an architecture document only.
-
-Do not generate source code.
-
-Do not generate placeholder implementations.
-
-Do not generate Dockerfiles.
-
-Do not generate Kubernetes manifests.
-
-Do not generate Terraform files.
-
-Do not generate frontend components.
-
-Do not generate mobile components.
-
-Do not implement backend services.
-
-Generate detailed:
-
-• Architecture specifications
-• Domain definitions
-• Service boundaries
-• Ownership rules
-• Data models
-• ERDs
-• Communication contracts
-• Event contracts
-• Queue definitions
-• Security boundaries
-• Scalability strategies
-• Failure strategies
-• Architectural decisions
-• Implementation guidance
-
-The architecture must be detailed enough that separate engineering teams can implement the backend, frontend, mobile applications, infrastructure, DevOps, and QA systems without needing to make major architectural decisions themselves.
-
-At the end, provide the complete Project Index and identify the architectural areas covered by this volum
-
-This is an ARCHITECTURE PHASE.
-
-Do NOT implement backend code.
-
-Do NOT implement frontend code.
-
-Do NOT implement mobile code.
-
-Do NOT generate infrastructure files.
-
-Do NOT generate placeholder implementations.
-
-Do NOT generate source code.
-
-Produce only architecture, specifications, contracts, diagrams, data models, engineering decisions, and implementation guidance.
-
-The architecture must be sufficiently detailed that separate engineering teams can later implement the Backend, Frontend, Mobile, Infrastructure, DevOps, and QA phases without making major architectural decisions themselves.
-
-────────────────────────────────────────
-
-PROJECT
-
-Build an original enterprise real-time communication platform comparable in architectural scope to modern global messaging platforms.
-
-The platform must support:
-
-- Hundreds of millions of users
-- Billions of messages
-- Millions of concurrent connections
-- One-to-one conversations
-- Group conversations
-- Large groups
-- Multi-device synchronization
-- Real-time messaging
-- Offline messaging
-- Media sharing
-- Voice messages
-- Push notifications
-- Presence
-- Typing indicators
-- Read receipts
-- Delivery receipts
-- Message reactions
-- Message replies
-- Message forwarding
-- Message editing
-- Message deletion
-- Search
-- Privacy controls
-- Blocking
-- Reporting
-- Device management
-- Account security
-- End-to-end encryption-ready architecture
-- Future voice calls
-- Future video calls
-- Future communities/channels
-
-The platform must be:
-
-- Cloud-native
-- Horizontally scalable
-- Highly available
-- Fault tolerant
-- Secure
-- Observable
-- Multi-region ready
-- Production deployable
-- Maintainable for long-term development
-
-Do not clone proprietary source code, branding, assets, or internal architecture from existing products.
-
-────────────────────────────────────────
-
-PRIMARY TECHNOLOGY STACK
-
-Web:
-
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
-- shadcn/ui
-
-Mobile:
-
-- React Native
-- Expo
-- TypeScript
-
-Backend:
-
-- Node.js
-- NestJS
-- TypeScript
-
-Database:
-
-- PostgreSQL
-- Prisma ORM
-
-Cache:
-
-- Redis
-
-Real-Time Communication:
-
-- WebSockets
-- Socket.IO
-
-Event Streaming:
-
-- Kafka or Redpanda
-
-Background Jobs:
-
-- BullMQ
-
-Object Storage:
-
-- AWS S3-compatible storage
-
-CDN:
-
-- CloudFront or equivalent
-
-Notifications:
-
-- Firebase Cloud Messaging
-- Apple Push Notification Service
-- Email provider abstraction
-
-Infrastructure:
-
-- Docker
-- Kubernetes
-- Helm
-- Terraform
-- GitHub Actions
-
-Observability:
-
-- OpenTelemetry
-- Prometheus
-- Grafana
-- Loki
-
-────────────────────────────────────────
-
-ARCHITECTURE OBJECTIVES
-
-Define architecture capable of supporting:
-
-- Global users
-- Multi-region deployment
-- Horizontal scaling
-- High availability
-- Real-time communication
-- Durable message persistence
-- Offline synchronization
-- Multi-device synchronization
-- Large media uploads
-- High-volume notifications
-- Large WebSocket fleets
-- High message throughput
-
-The architecture must distinguish between:
-
-- Durable data
-- Ephemeral data
-- Real-time communication
-- Asynchronous events
-- Background jobs
-- Analytical workloads
-- Search workloads
-- Media storage
-
-Do not use one technology as the solution for every workload.
-
-────────────────────────────────────────
-
-ARCHITECTURE STYLE
-
-Evaluate and define whether the initial platform should use:
-
-- Modular monolith
-- Service-oriented architecture
-- Microservices
-
-Do not blindly create a microservice for every domain.
-
-Define which domains should share transactional boundaries.
-
-Define the migration strategy if the platform begins as a modular monolith and later requires independent services.
-
-Clearly identify:
-
-- Service ownership
-- Database ownership
-- API ownership
-- Event ownership
-- Synchronous communication
-- Asynchronous communication
-- Strong consistency requirements
-- Eventual consistency requirements
-
-────────────────────────────────────────
-
-CORE DOMAINS
-
-Define bounded contexts and ownership for:
-
-Identity
-
-Authentication
-
-Authorization
-
-Accounts
-
-Profiles
-
-Contacts
-
-Devices
-
-Sessions
-
-Privacy
-
-Presence
-
-Conversations
-
-Groups
-
-Messages
-
-Message Reactions
-
-Message Replies
-
-Message Forwarding
-
-Message Search
-
-Media
-
-Media Processing
-
-Notifications
-
-Push Notifications
-
-Synchronization
-
-Delivery
-
-Read Receipts
-
-Typing Indicators
-
-Blocking
-
-Reporting
-
-Moderation
-
-Administration
-
-Audit
-
-Feature Flags
-
-Analytics
-
-Future Calling
-
-Future Communities
-
-For each domain define:
-
-- Responsibilities
-- Aggregates
-- Entities
-- Value objects
-- Repositories
-- Domain services
-- Application services
-- Domain events
-- Ownership boundaries
-
-────────────────────────────────────────
-
-SYSTEM ARCHITECTURE
-
-Generate a complete system architecture.
-
-Client Layer:
-
-- Web application
-- iOS application
-- Android application
-- Future desktop applications
-- Future tablet applications
-
-Edge Layer:
-
-- DNS
-- CDN
-- WAF
-- Load balancers
-- API Gateway
-- WebSocket Gateway
-- Rate limiting
-- Authentication boundaries
-
-Application Layer:
-
-- API services
-- Real-time services
-- Domain services
-- Background workers
-- Event consumers
-- Scheduled jobs
-
-Data Layer:
-
-- PostgreSQL
-- Read replicas
-- Redis
-- Kafka/Redpanda
-- Elasticsearch/OpenSearch where appropriate
-- Object storage
-
-Notification Layer:
-
-- FCM
-- APNS
-- Email provider
-
-Observability Layer:
-
-- Metrics
-- Logs
-- Traces
-- Alerting
-
-Security Layer:
-
-- IAM
-- Secrets
-- Encryption
-- Network segmentation
-- Audit logging
-
-Provide clear text-based architecture diagrams.
-
-Do not use images.
-
-────────────────────────────────────────
-
-C4 ARCHITECTURE
-
-Generate:
-
-1. System Context Diagram
-2. Container Diagram
-3. Component Diagram
-4. Deployment Diagram
-
-For each component define:
-
-- Responsibility
-- Inputs
-- Outputs
-- Dependencies
-- Scaling strategy
-- Failure behavior
-- Security boundaries
-
-────────────────────────────────────────
-
-SERVICE DECOMPOSITION
-
-Evaluate and define boundaries for:
-
-API Gateway
-
-Authentication Service
-
-Identity Service
-
-Authorization Service
-
-Account Service
-
-Profile Service
-
-Session Service
-
-Device Service
-
-Contact Service
-
-Privacy Service
-
-Presence Service
-
-Conversation Service
-
-Group Service
-
-Message Service
-
-Message Delivery Service
-
-Synchronization Service
-
-Media Service
-
-Media Processing Service
-
-Notification Service
-
-Search Service
-
-Moderation Service
-
-Administration Service
-
-Audit Service
-
-Analytics Service
-
-Feature Flag Service
-
-Future Calling Service
-
-Do not automatically make every listed service independently deployable.
-
-For every proposed service identify:
-
-- Why it exists
-- Data it owns
-- APIs it exposes
-- Events it publishes
-- Events it consumes
-- Synchronous dependencies
-- Asynchronous dependencies
-- Scaling requirements
-- Consistency requirements
-
-────────────────────────────────────────
-
-SERVICE OWNERSHIP MATRIX
-
-Generate a complete ownership matrix covering:
-
-- Domain
-- Authoritative data
-- Database ownership
-- API ownership
-- Event ownership
-- Cache ownership
-- Search index ownership
-- Background jobs
-- Administrative ownership
-
-Prevent multiple services from becoming authoritative owners of the same data.
-
-────────────────────────────────────────
-
-COMMUNICATION MATRIX
-
-Define when to use:
-
-REST
-
-WebSockets
-
-Kafka/Redpanda
-
-BullMQ
-
-Redis
-
-S3
-
-For every major interaction explain:
-
-- Communication method
-- Why it is appropriate
-- Delivery guarantee
-- Retry behavior
-- Idempotency
-- Ordering requirements
-- Failure behavior
-
-────────────────────────────────────────
-
-MONOREPO ARCHITECTURE
-
-Design a production-ready monorepo.
-
-Applications:
-
-- Web
-- Mobile
-- API
-- Real-time gateway
-- Admin dashboard
-
-Services:
-
-- Authentication
-- Identity
-- Accounts
-- Profiles
-- Conversations
-- Messages
-- Notifications
-- Media
-- Search
-- etc., according to the approved service boundaries
-
-Shared packages:
-
-- API contracts
-- Event contracts
-- Validation
-- Configuration
-- Logging
-- Observability
-- Authentication utilities
-- Shared types
-- Testing utilities
-
-Infrastructure:
-
-- Docker
-- Kubernetes
-- Helm
-- Terraform
-- CI/CD
-
-Documentation:
-
-- Architecture
-- APIs
-- Events
-- Database
-- Security
-- Operations
-- ADRs
-- Runbooks
-
-Do not create shared packages merely for convenience.
-
-Every shared package must have a clear responsibility.
-
-────────────────────────────────────────
-
-FOLDER HIERARCHY
-
-Generate a detailed folder hierarchy for:
-
-- Monorepo root
-- Applications
-- Backend services
-- Workers
-- Shared packages
-- Database
-- Tests
-- Infrastructure
-- Documentation
-- Configuration
-- CI/CD
-
-Include important directories and representative files.
-
-Do not generate source code.
-
-The hierarchy must be directly usable by future implementation prompts.
-
-────────────────────────────────────────
-
-CORE DOMAIN MODEL
-
-Design the core domain model.
-
-Evaluate entities including:
-
-User
-
-Account
-
-Profile
-
-ProfileSettings
-
-PrivacySettings
-
-Session
-
-Device
-
-DeviceKey
-
-Contact
-
-ContactRequest
-
-Block
-
-Conversation
-
-ConversationMember
-
-ConversationSettings
-
-Group
-
-GroupMember
-
-GroupRole
-
-Message
-
-MessageAttachment
-
-MessageReaction
-
-MessageReply
-
-MessageForward
-
-MessageMention
-
-MessageEdit
-
-MessageDeletion
-
-MessageDelivery
-
-MessageRead
-
-MediaAsset
-
-MediaProcessingJob
-
-Notification
-
-NotificationPreference
-
-PushToken
-
-SyncCursor
-
-AuditLog
-
-ModerationCase
-
-Report
-
-FeatureFlag
-
-Do not create one database table for every conceptual entity unless justified.
-
-Use aggregates and normalized structures appropriately.
-
-────────────────────────────────────────
-
-ERD
-
-Generate a complete text-based ERD.
-
-Include:
-
-- Primary keys
-- Foreign keys
-- Cardinality
-- Ownership
-- Important indexes
-- High-growth tables
-- Partitioning candidates
-
-Clearly represent relationships between:
-
-- Users
-- Accounts
-- Profiles
-- Devices
-- Contacts
-- Conversations
-- Groups
-- Messages
-- Attachments
-- Reactions
-- Delivery states
-- Read states
-- Notifications
-- Moderation
-- Audit data
-
-────────────────────────────────────────
-
-POSTGRESQL ARCHITECTURE
-
-Design PostgreSQL for:
-
-- Hundreds of millions of users
-- Billions of messages
-- Large conversation histories
-- High message creation rates
-- High read rates
-- Multi-region expansion
-
-Define:
-
-- Database ownership
-- Schema boundaries
-- Primary/replica architecture
-- Connection pooling
-- Read/write separation
-- Indexing
-- Partitioning
-- Archival
-- Retention
-- Backup
-- Point-in-time recovery
-
-Identify high-growth tables requiring special treatment.
-
-Evaluate partitioning strategies for:
-
-- Messages
-- Message delivery records
-- Message read records
-- Audit logs
-- Analytics-related transactional data
-
-Do not store large binary media directly inside PostgreSQL.
-
-────────────────────────────────────────
-
-PRISMA ARCHITECTURE
-
-Define Prisma strategy including:
-
-- Schema ownership
-- Prisma schema organization
-- Service-specific clients where appropriate
-- Migration ownership
-- Transaction boundaries
-- Connection pooling
-- Read replica strategy
-- Query performance standards
-
-Prevent uncontrolled cross-domain database access.
-
-────────────────────────────────────────
-
-REDIS ARCHITECTURE
-
-Design Redis usage for:
-
-- Sessions
-- Presence
-- Typing indicators
-- Rate limiting
-- WebSocket coordination
-- API caching
-- Conversation caching
-- Temporary synchronization state
-- Distributed locks
-- Queue infrastructure
-
-For each use case define:
-
-- Key pattern
-- TTL
-- Invalidation
-- Consistency
-- Failure behavior
-
-Redis must never become the authoritative source for critical durable message data.
-
-────────────────────────────────────────
-
-REAL-TIME ARCHITECTURE
-
-Design the complete WebSocket architecture.
-
-Support:
-
-- Connection authentication
-- Connection lifecycle
-- Heartbeats
-- Reconnection
-- Presence
-- Typing indicators
-- Message delivery
-- Read receipts
-- Delivery receipts
-- Group events
-- Notification events
-
-Define:
-
-- WebSocket gateway responsibilities
-- Horizontal scaling
-- Redis adapter
-- Connection routing
-- Backpressure
-- Rate limiting
-- Connection recovery
-- Failure handling
-
-Explain how multiple WebSocket gateway instances coordinate without creating a single point of failure.
-
-────────────────────────────────────────
-
-MESSAGE ARCHITECTURE
-
-Design durable messaging.
-
-Support:
-
-- Client-generated message IDs
-- Server-generated IDs
-- Message ordering
-- Idempotency
-- Message creation
-- Message delivery
-- Message acknowledgment
-- Read receipts
-- Message edits
-- Message deletion
-- Reactions
-- Replies
-- Forwarding
-- Mentions
-- Attachments
-
-Define:
-
-- Message lifecycle
-- Message states
-- Ordering guarantees
-- Delivery guarantees
-- Retry behavior
-- Duplicate prevention
-- Offline behavior
-
-────────────────────────────────────────
-
-OFFLINE SYNCHRONIZATION
-
-Design the synchronization architecture.
-
-Support:
-
-- Offline message creation
-- Pending messages
-- Local queue
-- Sync cursor
-- Incremental synchronization
-- Missed events
-- Reconnection
-- Conflict handling
-- Acknowledgments
-- Device synchronization
-- Background synchronization
-
-Define exactly how a device catches up after being offline.
-
-Do not rely solely on WebSocket events for synchronization.
-
-────────────────────────────────────────
-
-MULTI-DEVICE ARCHITECTURE
-
-Design support for multiple simultaneously registered devices.
-
-Support:
-
-- Device registration
-- Device identification
-- Device naming
-- Device capabilities
-- Device trust
-- Session management
-- Device revocation
-- Remote logout
-- Message synchronization
-- Notification routing
-
-Define how messages and events reach all authorized devices.
-
-────────────────────────────────────────
-
-PRESENCE ARCHITECTURE
-
-Design scalable presence for:
-
-- Online
-- Offline
-- Last seen
-- Typing
-- Recording
-- Temporary activity states
-
-Define:
-
-- Storage
-- TTL
-- Heartbeat
-- Presence propagation
-- Failure behavior
-- Privacy controls
-
-Presence must remain ephemeral and scalable.
-
-────────────────────────────────────────
-
-MEDIA ARCHITECTURE
-
-Design support for:
-
-- Images
-- Videos
-- Audio
-- Voice messages
-- Documents
-- Files
-
-Define:
-
-- Upload authorization
-- Direct S3 uploads
-- Signed URLs
-- Metadata
-- File validation
-- Malware scanning boundary
-- Image processing
-- Video processing
-- Thumbnail generation
-- CDN delivery
-- Lifecycle management
-- Cleanup
-
-Application servers should not unnecessarily proxy large media files.
-
-────────────────────────────────────────
-
-NOTIFICATION ARCHITECTURE
-
-Design:
-
-- Push notifications
-- In-app notifications
-- Email-ready architecture
-
-Support:
-
-- Notification preferences
-- Device tokens
-- Notification routing
-- Deduplication
-- Retry
-- Rate limiting
-- Provider failure
-- Notification batching where appropriate
-
-────────────────────────────────────────
-
-SEARCH ARCHITECTURE
-
-Design search for:
-
-- Users
-- Contacts
-- Conversations
-- Groups
-- Messages
-- Media metadata
-
-Define whether Elasticsearch/OpenSearch is required initially or should be introduced as a separate scaling layer.
-
-Support:
-
-- Full-text search
-- Autocomplete
-- Filtering
-- Ranking
-- Pagination
-- Privacy-aware indexing
-- Reindexing
-- Index versioning
-
-Search results must never expose data the requesting user is not authorized to access.
-
-────────────────────────────────────────
-
-SECURITY ARCHITECTURE
-
-Design:
-
-- Authentication
-- Authorization
-- Session security
-- Device security
-- Rate limiting
-- Abuse prevention
-- Account takeover protection
-- Secrets management
-- Encryption
-- Audit logging
-- Secure communication
-- OWASP protections
-
-Define security boundaries between:
-
-- Client
-- API
-- WebSocket
-- Database
-- Redis
-- Object storage
-- Event infrastructure
-- Administration
-
-────────────────────────────────────────
-
-END-TO-END ENCRYPTION BOUNDARIES
-
-Define an architecture that is compatible with future end-to-end encryption.
-
-Cover:
-
-- Identity keys
-- Device keys
-- Key registration
-- Key rotation
-- Key revocation
-- Multi-device encryption
-- Group encryption
-- Encrypted message payloads
-- Offline encrypted messages
-- Backup considerations
-
-Do not design proprietary cryptography.
-
-Do not invent cryptographic protocols.
-
-Clearly separate:
-
-- Authentication
-- Authorization
-- Encryption
-- Key management
-- Message transport
-- Message storage
-
-────────────────────────────────────────
-
-EVENT-DRIVEN ARCHITECTURE
-
-Define Kafka/Redpanda architecture.
-
-Include:
-
-- Topic naming
-- Partitioning
-- Partition keys
-- Consumer groups
-- Event ownership
-- Schema versioning
-- Retention
-- Replay
-- Idempotency
-- Ordering
-- Dead-letter handling
-- Observability
-
-Define events such as:
-
-Identity:
-
-- UserRegistered
-- UserVerified
-- SessionCreated
-- SessionRevoked
-- DeviceRegistered
-- DeviceRemoved
-
-Conversations:
-
-- ConversationCreated
-- ConversationMemberAdded
-- ConversationMemberRemoved
-- GroupCreated
-- GroupUpdated
-
-Messages:
-
-- MessageCreated
-- MessageDelivered
-- MessageRead
-- MessageEdited
-- MessageDeleted
-- ReactionAdded
-- ReactionRemoved
-
-Media:
-
-- MediaUploaded
-- MediaProcessingStarted
-- MediaProcessingCompleted
-- MediaProcessingFailed
-
-Notifications:
-
-- NotificationCreated
-- NotificationDelivered
-- NotificationFailed
-
-Security:
-
-- UserBlocked
-- UserReported
-- SuspiciousLoginDetected
-
-Do not duplicate complete database records inside events.
-
-────────────────────────────────────────
-
-QUEUE ARCHITECTURE
-
-Define BullMQ queues for:
-
-- Push notification delivery
-- Email delivery
-- Media processing
-- Thumbnail generation
-- Video processing
-- Search indexing
-- Notification cleanup
-- Message retention
-- Analytics aggregation
-- Scheduled maintenance
-
-For each queue define:
-
-- Producer
-- Consumer
-- Retry policy
-- Backoff
-- Idempotency
-- Dead-letter behavior
-- Monitoring
-
-────────────────────────────────────────
-
-API ARCHITECTURE
-
-Define public and internal API boundaries.
-
-Cover:
-
-Authentication
-
-- Registration
-- Login
-- Logout
-- Refresh
-- Password reset
-- Verification
-- Device management
-
-Users
-
-- Profile
-- Privacy
-- Contacts
-- Blocking
-
-Conversations
-
-- Create
-- List
-- Members
-- Settings
-
-Messages
-
-- Send
-- Edit
-- Delete
-- React
-- Reply
-- Forward
-- History
-- Search
-
-Media
-
-- Upload authorization
-- Metadata
-- Download authorization
-
-Notifications
-
-- Preferences
-- Notification center
-
-Administration
-
-- Users
-- Reports
-- Moderation
-- Audit logs
-
-Define:
-
-- Versioning
-- Naming
-- Authentication
-- Authorization
-- Validation
-- Pagination
-- Cursor pagination
-- Filtering
-- Sorting
-- Error format
-- Idempotency
-- Rate limiting
-
-Do not generate application code.
-
-────────────────────────────────────────
-
-AUTHENTICATION ARCHITECTURE
-
-Support:
-
-- Email/password
-- Email verification
-- Password reset
-- OAuth-ready architecture
-- MFA-ready architecture
-- Passkey-ready architecture
-- Session management
-- Multi-device sessions
-- Session revocation
-- Token rotation
-- Suspicious login detection
-
-Define:
-
-- Token/session strategy
-- Refresh strategy
-- Secure storage
-- Expiration
-- Revocation
-- Device binding where appropriate
-
-────────────────────────────────────────
-
-AUTHORIZATION ARCHITECTURE
-
-Define:
-
-- RBAC
-- Permissions
-- Resource ownership
-- Conversation permissions
-- Group permissions
-- Administrative permissions
-- Moderation permissions
-
-Identify where authorization must occur:
-
-- API Gateway
-- Domain services
-- Database queries
-- WebSocket gateway
-
-Frontend authorization must never be the only enforcement layer.
-
-────────────────────────────────────────
-
-PRIVACY ARCHITECTURE
-
-Design privacy controls for:
-
-- Last seen
-- Online status
-- Profile photo
-- About/status information
-- Read receipts
-- Group invitations
-- Contact discovery
-- Blocking
-- Reporting
-- Device visibility
-
-Define privacy enforcement at backend and real-time layers.
-
-────────────────────────────────────────
-
-SCALABILITY STRATEGY
-
-Design scaling strategies for:
-
-- API servers
-- WebSocket gateways
-- PostgreSQL
-- Redis
-- Kafka
-- BullMQ
-- Search
-- Object storage
-- CDN
-- Notification providers
-
-Identify:
-
-- Likely bottlenecks
-- Scaling triggers
-- Horizontal scaling strategies
-- Caching strategies
-- Partitioning strategies
-- Regional strategies
-
-────────────────────────────────────────
-
-FAILURE STRATEGY
-
-Define graceful behavior when:
-
-- PostgreSQL is unavailable
-- Redis is unavailable
-- Kafka is unavailable
-- Search is unavailable
-- S3 is unavailable
-- FCM is unavailable
-- APNS is unavailable
-- WebSocket infrastructure is degraded
-
-For each failure define:
-
-- Detection
-- Fallback
-- Retry
-- Degraded functionality
-- Recovery
-
-────────────────────────────────────────
-
-DATA CONSISTENCY
-
-Define where the system requires:
-
-- Strong consistency
-- Eventual consistency
-- Idempotency
-- Optimistic concurrency
-- Distributed locks
-- Transactional outbox
-
-Explicitly define consistency requirements for:
-
-- Message persistence
-- Message delivery
-- Read receipts
-- Conversation membership
-- Device registration
-- Presence
-- Notifications
-- Search indexing
-- Analytics
-
-────────────────────────────────────────
-
-OBSERVABILITY
-
-Design observability using:
-
-- OpenTelemetry
-- Prometheus
-- Grafana
-- Loki
-
-Define:
-
-- Structured logs
-- Metrics
-- Traces
-- Correlation IDs
-- Trace propagation
-- Dashboards
-- Alerts
-
-Include observability requirements for:
-
-- API
-- WebSockets
-- Message delivery
-- Synchronization
-- Database
-- Redis
-- Kafka
-- BullMQ
-- Media processing
-- Notifications
-
-────────────────────────────────────────
-
-DEPLOYMENT ARCHITECTURE
-
-Define deployment architecture for:
-
-- Local
-- Development
-- Testing
-- Staging
-- Production
-
-Include:
-
-- Kubernetes
-- Helm
-- Container registry
-- CI/CD
-- Rolling deployments
-- Canary or blue-green strategy
-- Rollback
-- Health checks
-- Autoscaling
-- Secrets management
-
-────────────────────────────────────────
-
-DISASTER RECOVERY
-
-Define:
-
-- RTO
-- RPO
-- Database backups
-- Point-in-time recovery
-- Object storage recovery
-- Redis recovery
-- Kafka recovery
-- Search recovery
-- Infrastructure recovery
-- Multi-region strategy
-
-Define recovery procedures for critical platform failures.
-
-────────────────────────────────────────
-
-TESTING ARCHITECTURE
-
-Define:
-
-Unit Testing
-
-- Domain logic
-- Services
-- Utilities
-
-Integration Testing
-
-- PostgreSQL
-- Redis
-- Kafka
-- S3
-- Notification providers
-
-Contract Testing
-
-- REST APIs
-- WebSocket contracts
-- Event schemas
-
-End-to-End Testing
-
-- Registration
-- Login
-- Messaging
-- Group messaging
-- Offline synchronization
-- Multi-device synchronization
-- Media sharing
-- Notifications
-
-Performance Testing
-
-- Message throughput
-- WebSocket connections
-- Message delivery latency
-- Synchronization
-- Search
-
-Security Testing
-
-- Authentication
-- Authorization
-- Rate limiting
-- Input validation
-- Dependency security
-
-────────────────────────────────────────
-
-ARCHITECTURAL DECISION RECORDS
-
-Define ADRs for major decisions including:
-
-- Architecture style
-- Service boundaries
-- PostgreSQL ownership
-- Prisma strategy
-- Redis strategy
-- WebSocket architecture
-- Kafka/Redpanda
-- BullMQ
-- Object storage
-- CDN
-- Search
-- Multi-device synchronization
-- Offline synchronization
-- End-to-end encryption boundaries
-- Kubernetes
-- Terraform
-- Observability
-
-Each ADR must contain:
-
-- Context
-- Decision
-- Alternatives
-- Consequences
-
-────────────────────────────────────────
-
-PROJECT INDEX
-
-Create the initial Project Index containing:
-
-- Architecture status
-- Applications
-- Domains
-- Services
-- Service ownership
-- Database ownership
-- API boundaries
-- WebSocket events
-- Domain events
-- Queues
-- Redis usage
-- Storage architecture
-- Security architecture
-- Observability architecture
-- Deployment architecture
-- Testing strategy
-- ADRs
-- Future implementation phases
-
-────────────────────────────────────────
-
-ARCHITECTURE DELIVERABLES
-
-Produce:
-
-1. Executive Architecture Overview
-2. System Context
-3. C4 Architecture
-4. Service Decomposition
-5. Service Ownership Matrix
-6. Communication Matrix
-7. Monorepo Architecture
-8. Detailed Folder Hierarchy
-9. Core Domain Model
-10. Complete ERD
-11. PostgreSQL Architecture
-12. Prisma Strategy
-13. Redis Architecture
-14. Real-Time WebSocket Architecture
-15. Messaging Architecture
-16. Offline Synchronization Architecture
-17. Multi-Device Architecture
-18. Presence Architecture
-19. Media Architecture
-20. Notification Architecture
-21. Search Architecture
-22. Authentication Architecture
-23. Authorization Architecture
-24. Privacy Architecture
-25. End-to-End Encryption Boundaries
-26. Event-Driven Architecture
-27. Event Catalog
-28. BullMQ Queue Architecture
-29. API Architecture
-30. Scalability Strategy
-31. Failure Strategy
-32. Data Consistency Strategy
-33. Observability Architecture
-34. Deployment Architecture
-35. Disaster Recovery Strategy
-36. Testing Architecture
-37. Architectural Decision Records
-38. Initial Project Index
-
-────────────────────────────────────────
-
-QUALITY REQUIREMENTS
-
-Every architectural decision must consider:
-
-- Scalability
-- Availability
-- Security
-- Performance
-- Data consistency
-- Latency
-- Operational complexity
-- Cost
-- Developer productivity
-- Maintainability
-- Future extensibility
-
-Avoid:
-
-- Unnecessary microservices
-- Shared database ownership
-- Distributed transactions unless absolutely necessary
-- Tight coupling
-- Redis as a system of record
-- WebSockets as the only message durability mechanism
-- Frontend-only authorization
-- Premature complexity
-- Invented cryptography
-- Contradictory technology decisions
-
-The resulting architecture must be detailed enough for independent backend, frontend, mobile, infrastructure, DevOps, and QA teams to implement the platform without needing to redesign its core architecture.
+1. Correctness
+2. Security
+3. Privacy
+4. Data integrity
+5. Reliability
+6. Maintainability
+7. Scalability
+8. Observability
+9. Performance
+10. Operational efficiency

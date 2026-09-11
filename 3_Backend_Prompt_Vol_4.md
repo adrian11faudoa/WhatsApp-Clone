@@ -1,1726 +1,1101 @@
-# BACKEND IMPLEMENTATION PROMPT — VOLUME 4
+# WHATSAPP — BACKEND VOLUME 4
 
-## Production-Grade Real-Time Communication Platform
+## ROLE
 
-### WebSockets, Socket.IO, Presence, Typing Indicators, Multi-Device Synchronization, Kafka/Redpanda Consumers, BullMQ Workers, Offline Recovery, and Reliable Event Delivery
+Act as a Principal Backend Engineer, Staff Backend Engineer, Distributed Systems Engineer, Security Engineer, Privacy Engineer, Compliance Engineer, Database Architect, SRE, QA Engineer, Performance Engineer, Abuse Prevention Engineer, and Technical Writer working as one senior engineering team.
 
-You are implementing **Volume 4 of the backend** for a production-grade, globally scalable, WhatsApp-like real-time communication platform.
+You are implementing the production security, privacy, moderation, administration, compliance, analytics, retention, reliability, and backend hardening layer of a global communication platform comparable in capability and reliability to WhatsApp, Telegram, Signal, Messenger, Discord, and Microsoft Teams.
 
-This is an original communication platform inspired by modern real-time messaging products. It is not an implementation of proprietary WhatsApp source code, private infrastructure, undocumented protocols, or proprietary algorithms.
+Do not teach. Do not provide tutorials. Do not produce pseudo-code. Perform the implementation directly in the repository.
 
-This prompt is **fully standalone**. It must be executable without requiring another prompt, previous conversation, architecture document, or previously generated prompt to be present.
-
-The actual repository is the source of truth for existing implementation.
-
-This volume is an implementation unit of **one coherent backend system**. It must integrate with the repository's actual identity, authentication, users, devices, sessions, contacts, conversations, memberships, messaging, database, Redis, event, error, security, observability, and testing systems.
-
-Do not create competing implementations.
-
-Do not duplicate existing functionality.
+Build production-grade software suitable for a globally distributed communication platform operating at very large scale.
 
 ---
 
-# 1. PRIMARY OBJECTIVE
+# PROJECT
 
-Implement the production-grade distributed real-time backend layer.
+Implement the backend systems responsible for:
 
-This volume must provide real functionality for:
+* Privacy controls
+* User blocking
+* Reporting
+* Abuse prevention
+* Moderation
+* Administrative operations
+* Administrative authorization
+* Security administration
+* Account lifecycle controls
+* Data retention
+* Data deletion
+* Data export foundations
+* Privacy-preserving analytics
+* Platform analytics
+* Operational analytics
+* Audit systems
+* Compliance-oriented controls
+* Abuse detection foundations
+* Fraud and spam prevention foundations
+* Account restrictions
+* Rate-limit escalation
+* Feature flags
+* Backend operational controls
+* Data lifecycle management
+* Disaster-recovery-aware backend behavior
+* Production hardening
+* Performance hardening
+* Reliability hardening
 
-* authenticated WebSocket connections;
-* Socket.IO integration where appropriate;
-* connection lifecycle;
-* device/session association;
-* real-time message delivery;
-* conversation event delivery;
-* presence;
-* typing indicators;
-* multi-device synchronization;
-* reconnect recovery;
-* synchronization cursors;
-* event consumption;
-* Kafka/Redpanda consumers;
-* BullMQ background processing where required;
-* delivery acknowledgement integration;
-* offline-device handling;
-* event retries;
-* idempotent consumers;
-* dead-letter handling;
-* graceful degradation;
-* real-time observability;
-* abuse protection.
+The platform must support:
 
-The system must continue functioning correctly when users are offline, connections drop, events are duplicated, workers restart, or downstream infrastructure temporarily fails.
+* Hundreds of millions of registered users
+* Tens of millions of daily active users or greater
+* Large global traffic volumes
+* Very large concurrent sessions
+* High message throughput
+* Large media volumes
+* Multiple devices per user
+* Multi-region operation
+* Strict privacy requirements
+* High security requirements
+* Abuse resistance
+* Administrative controls
+* Auditable operational behavior
 
----
-
-# 2. PRODUCT CONTEXT
-
-The platform supports:
-
-* accounts;
-* multiple devices per user;
-* direct conversations;
-* groups;
-* messages;
-* delivery receipts;
-* read receipts;
-* typing indicators;
-* presence;
-* reactions;
-* replies;
-* forwarding;
-* edits;
-* deletions;
-* media;
-* notifications;
-* search;
-* privacy controls;
-* blocking/reporting;
-* voice/video calling.
-
-The messaging engine persists authoritative state.
-
-This volume is responsible for moving relevant state changes reliably to connected devices and maintaining ephemeral real-time state.
+Do not implement frontend or mobile application code in this volume.
 
 ---
 
-# 3. REQUIRED TECHNOLOGY STACK
+# TECHNOLOGY DIRECTION
 
-Use the repository's existing compatible implementation of:
+Use the following backend technology direction unless the existing repository contains a technically justified implementation that must be preserved:
 
-* Node.js;
-* NestJS;
-* TypeScript;
-* PostgreSQL;
-* Prisma;
-* Redis;
-* Kafka or Redpanda;
-* BullMQ;
-* WebSockets;
-* Socket.IO where appropriate;
-* OpenTelemetry;
-* Prometheus;
-* structured logging.
+* Node.js
+* TypeScript
+* NestJS
+* PostgreSQL
+* Prisma
+* Redis
+* BullMQ
+* Kafka or Redpanda
+* Elasticsearch or OpenSearch
+* S3-compatible object storage
+* Docker
+* Kubernetes
+* OpenTelemetry
+* Prometheus
+* Grafana
+* Loki
+* Tempo
+* Jest
+* Supertest
 
-Do not replace working infrastructure.
+PostgreSQL remains authoritative for durable transactional data.
 
-Do not introduce a second event broker.
+Redis is used for ephemeral distributed state and coordination.
 
-Do not introduce a second queue system.
+Kafka or Redpanda is used for durable event distribution where appropriate.
+
+Analytics must not interfere with transactional workloads.
+
+Search remains a derived data system.
+
+Object storage remains authoritative for binary media.
 
 ---
 
-# 4. FIRST ACTION — INSPECT THE ACTUAL REPOSITORY
+# SOURCE OF TRUTH
 
-Before changing anything:
+The repository is the source of truth.
 
-1. Inspect the backend.
-2. Inspect identity/authentication.
-3. Inspect devices/sessions.
-4. Inspect conversations/membership.
-5. Inspect messaging.
-6. Inspect Prisma models/migrations.
-7. Inspect Redis integration.
-8. Inspect Kafka/Redpanda integration.
-9. Inspect transactional outbox.
-10. Inspect BullMQ.
-11. Inspect existing WebSocket/Socket.IO code.
-12. Inspect event schemas.
-13. Inspect API error contracts.
-14. Inspect observability.
+Before modifying anything:
+
+1. Inspect the complete backend.
+2. Inspect account and authentication systems.
+3. Inspect sessions and devices.
+4. Inspect conversations and messaging.
+5. Inspect groups.
+6. Inspect media.
+7. Inspect notifications.
+8. Inspect search.
+9. Inspect Redis.
+10. Inspect event and queue infrastructure.
+11. Inspect database schema and migrations.
+12. Inspect API contracts.
+13. Inspect authorization.
+14. Inspect existing security controls.
 15. Inspect tests.
+16. Inspect observability.
+17. Inspect infrastructure configuration.
+18. Inspect documentation.
 
-If any of these already exist:
+Preserve correct existing behavior.
 
-* extend them;
-* preserve compatible behavior;
-* consolidate duplicates;
-* repair incomplete functionality.
+Do not blindly rewrite existing modules.
 
-Never create parallel infrastructure merely because the current implementation is imperfect.
-
----
-
-# 5. ARCHITECTURAL RESPONSIBILITIES
-
-Maintain clear boundaries.
-
-## PostgreSQL
-
-Authoritative source for durable:
-
-* users;
-* devices;
-* sessions;
-* conversations;
-* memberships;
-* messages;
-* durable read/delivery state;
-* durable domain state.
-
-## Redis
-
-Use for:
-
-* presence;
-* typing state;
-* connection/device routing metadata;
-* ephemeral coordination;
-* short-lived synchronization state;
-* rate limiting;
-* distributed locks where justified.
-
-Redis must not become the sole durable source for messages.
-
-## Kafka/Redpanda
-
-Use for durable asynchronous domain/event distribution.
-
-## BullMQ
-
-Use for background jobs requiring:
-
-* delayed execution;
-* retries;
-* controlled concurrency;
-* worker processing;
-* scheduled processing.
-
-## WebSocket/Socket.IO
-
-Use for real-time transport.
-
-Transport must not become the authoritative message store.
+Do not redesign unrelated domains.
 
 ---
 
-# 6. WEBSOCKET AUTHENTICATION
+# 1. BACKEND IMPLEMENTATION BOUNDARY
 
-Implement secure authenticated WebSocket connections.
+Implement the production hardening and platform-control layer.
 
-A connection must be associated with:
+This volume owns:
 
-* authenticated user;
-* authenticated device;
-* authenticated session.
+* Privacy
+* Blocking
+* Reporting
+* Moderation
+* Abuse prevention
+* Spam prevention
+* Administrative APIs
+* Administrative authorization
+* Security auditing
+* Data retention
+* Data deletion
+* Data export foundations
+* Account restrictions
+* Abuse signals
+* Privacy-preserving analytics
+* Operational analytics
+* Feature flags
+* Platform configuration
+* Compliance-oriented workflows
+* Performance hardening
+* Reliability hardening
+* Operational safeguards
 
-Validate credentials during connection establishment.
+Do not redesign the messaging system.
 
-Do not trust:
+Do not redesign media storage.
 
-* client-provided user ID;
-* client-provided device ID;
-* arbitrary conversation membership;
-* client-provided role.
+Do not redesign authentication unless security defects require changes.
 
-Reuse the repository's authentication/session validation system.
-
----
-
-# 7. CONNECTION LIFECYCLE
-
-Implement:
-
-* connection;
-* authentication;
-* authorization;
-* registration;
-* heartbeat;
-* disconnect;
-* reconnect;
-* session invalidation;
-* device revocation;
-* graceful server shutdown.
-
-When a session/device is revoked, active real-time connections associated with it must eventually be disconnected or rendered unauthorized.
-
-Do not allow revoked sessions to remain indefinitely active.
+Do not implement frontend or mobile applications.
 
 ---
 
-# 8. CONNECTION IDENTIFICATION
+# 2. PRIVACY DOMAIN
 
-Maintain a reliable mapping between:
+Implement a comprehensive privacy domain.
 
-* user;
-* device;
-* session;
-* socket connection.
+Support configurable controls for areas such as:
 
-A single user may have:
+* Profile visibility
+* Last-seen visibility
+* Online presence visibility
+* Read receipts
+* Typing visibility
+* Profile photo visibility
+* Group invitation permissions
+* Contact discoverability
+* Message preview preferences
+* Notification privacy
+* Search discoverability
 
-* multiple devices;
-* multiple connections where the platform permits it.
+Privacy settings must be:
 
-Do not assume:
+* Persisted
+* Validated
+* Authorized
+* Versionable where appropriate
+* Consistently enforced across APIs
+* Consistently enforced across WebSockets
+* Consistently enforced across notifications
+* Consistently enforced across search
 
-```text
-one user = one socket
-```
-
-The routing layer must support multiple active devices.
-
----
-
-# 9. SOCKET ROOM MODEL
-
-Use a consistent room/channel strategy.
-
-Potential logical scopes include:
-
-* user scope;
-* device scope;
-* conversation scope.
-
-Do not allow clients to join arbitrary rooms by submitting arbitrary room IDs.
-
-Room membership must be authorized server-side.
-
-A user must not receive events for conversations they cannot access.
+Do not enforce privacy only on clients.
 
 ---
 
-# 10. MESSAGE REAL-TIME DELIVERY
+# 3. PRIVACY POLICY EVALUATION
 
-When a canonical `message.created` event is available:
+Create reusable server-side privacy evaluation mechanisms.
 
-1. identify the conversation;
-2. resolve eligible recipients;
-3. identify eligible devices;
-4. determine online connections;
-5. deliver through the WebSocket transport;
-6. record appropriate delivery state;
-7. allow offline recipients to recover through synchronization/push systems.
+Privacy checks must support:
 
-Do not make message persistence depend on immediate WebSocket delivery.
+* Requesting user
+* Target user
+* Relationship
+* Block status
+* Conversation membership
+* Target privacy setting
+* Resource sensitivity
+* Administrative privileges where legitimately applicable
 
-If all recipients are offline, the message must remain safely persisted.
+Avoid duplicating privacy logic independently in every controller.
 
----
-
-# 11. EVENT-DRIVEN TRANSPORT
-
-The message service must not directly depend on individual sockets.
-
-Instead:
-
-```text
-Database mutation
-→ transactional outbox
-→ Kafka/Redpanda
-→ realtime consumer
-→ connection/device routing
-→ WebSocket delivery
-```
-
-Use the actual repository's event infrastructure.
-
-Do not introduce a second path that creates inconsistent message events.
+Do not allow one API to expose information that another API correctly hides.
 
 ---
 
-# 12. EVENT CONSUMERS
+# 4. BLOCKING
 
-Implement consumers for relevant events such as:
-
-* message.created;
-* message.edited;
-* message.deleted;
-* message.reaction.added;
-* message.reaction.removed;
-* conversation.created;
-* conversation.updated;
-* member.added;
-* member.removed;
-* member.role.changed;
-* read-state changes;
-* delivery-state changes.
-
-Only consume events that actually exist.
-
-Do not fabricate event types without integrating them into the producer side.
-
----
-
-# 13. CONSUMER IDEMPOTENCY
-
-Kafka/Redpanda delivery is at-least-once.
-
-Consumers must tolerate duplicate events.
-
-Use:
-
-* event ID;
-* aggregate ID;
-* version;
-* durable/ephemeral deduplication where appropriate.
-
-Do not assume exactly-once delivery.
-
-Repeated processing must not:
-
-* send uncontrolled duplicate notifications;
-* regress read state;
-* corrupt presence;
-* duplicate durable records.
-
----
-
-# 14. EVENT ORDERING
-
-Respect ordering where the domain requires it.
-
-For conversation message events, preserve canonical message sequence.
-
-Kafka/Redpanda partitioning should be compatible with the desired ordering key, such as:
-
-* conversation ID.
-
-Do not rely on global event ordering.
-
-Do not assume events from unrelated conversations need to be globally ordered.
-
----
-
-# 15. EVENT REPLAY
-
-Design consumers to tolerate:
-
-* replay;
-* delayed events;
-* duplicate events;
-* consumer restart.
-
-A consumer must not corrupt state when an older valid event is replayed after newer state.
-
-Use versions/sequences where appropriate.
-
----
-
-# 16. DEAD-LETTER HANDLING
-
-Implement real failure handling for events that repeatedly fail processing.
+Implement user blocking.
 
 Support:
 
-* bounded retries;
-* retry backoff;
-* dead-letter queue/topic;
-* failure metadata;
-* observability;
-* operational recovery.
+* Block
+* Unblock
+* Block status lookup
+* Blocked-user listing
+* Message interaction restrictions
+* Conversation interaction restrictions
+* Search restrictions
+* Presence restrictions
+* Contact restrictions
+* Notification restrictions
 
-Do not silently discard failed events.
+Blocking must take effect consistently across the platform.
 
-Do not endlessly retry poison messages.
+A blocked relationship must be respected by:
 
----
+* REST APIs
+* WebSockets
+* Search
+* Notifications
+* Presence
+* Contact discovery
+* Messaging
+* Group interactions where applicable
 
-# 17. EVENT CORRELATION
-
-Preserve:
-
-* event ID;
-* correlation ID;
-* causation ID where available;
-* trace context.
-
-Trace a message through:
-
-```text
-API
-→ database
-→ outbox
-→ Kafka/Redpanda
-→ consumer
-→ routing
-→ WebSocket
-```
-
-This must be observable in production.
+Do not allow blocked users to bypass restrictions by changing clients or transport protocols.
 
 ---
 
-# 18. PRESENCE
+# 5. REPORTING
 
-Implement ephemeral user presence.
+Implement abuse-reporting infrastructure.
 
-Support states appropriate to the product, such as:
+Support reports for:
 
-* online;
-* offline;
-* away/idle if implemented.
+* Users
+* Messages
+* Groups
+* Media
+* Profiles
+* Spam
+* Harassment
+* Impersonation
+* Illegal or prohibited content categories supported by product policy
 
-Presence must account for multiple devices.
-
-A user should not become offline merely because one device disconnects while another remains active.
-
----
-
-# 19. PRESENCE SOURCE OF TRUTH
-
-Presence is ephemeral.
-
-Redis may be the authoritative operational store for current presence.
-
-It must include:
-
-* user/device identity;
-* last heartbeat;
-* connection information;
-* expiration/TTL.
-
-Use TTLs so crashed servers/connections do not leave users permanently online.
-
----
-
-# 20. PRESENCE HEARTBEATS
-
-Implement bounded heartbeat behavior.
-
-A connected device should periodically refresh its presence state.
-
-When heartbeats stop:
-
-* expire the device connection state;
-* recompute user presence;
-* emit the appropriate state transition.
-
-Do not require a persistent database write for every heartbeat.
-
-Avoid excessive Redis traffic.
-
----
-
-# 21. MULTI-DEVICE PRESENCE
-
-User presence should be derived from the set of active devices/connections.
-
-For example:
-
-```text
-Device A online
-Device B offline
-→ user online
-```
-
-When the last active device disappears:
-
-```text
-Device A offline
-Device B offline
-→ user offline
-```
-
-Do not overwrite user-level presence independently from device state in a way that creates contradictions.
-
----
-
-# 22. PRESENCE PRIVACY
-
-Presence visibility must eventually respect privacy settings.
-
-If the repository already implements privacy controls:
-
-* reuse them.
-
-If privacy settings are not yet available, design presence authorization so visibility decisions can later be enforced without rewriting the presence system.
-
-Do not expose presence universally by default if the product's privacy model does not permit it.
-
----
-
-# 23. TYPING INDICATORS
-
-Implement ephemeral typing state.
+A report should include only the minimum information required for investigation.
 
 Support:
 
-* start typing;
-* stop typing;
-* automatic expiration;
-* conversation authorization.
+* Report creation
+* Report categorization
+* Report status
+* Reporter identity
+* Target identity
+* Related resource
+* Creation timestamp
+* Investigation metadata
+* Resolution metadata
 
-Typing indicators must never be stored as durable message data.
-
-Use Redis with short TTLs where appropriate.
-
----
-
-# 24. TYPING AUTHORIZATION
-
-A user may only publish typing state to conversations they are authorized to access.
-
-A client must not be able to:
-
-* impersonate another user;
-* publish typing into arbitrary conversations;
-* observe typing state from unauthorized conversations.
-
-Do not trust client-provided sender identity.
+Do not expose internal moderation information to ordinary users.
 
 ---
 
-# 25. TYPING EXPIRATION
+# 6. MODERATION CASES
 
-Typing state must expire automatically.
+Implement a moderation-case domain.
 
-This protects against:
+Support:
 
-* crashed clients;
-* lost disconnect events;
-* network failures;
-* application suspension.
+* Case creation
+* Case assignment
+* Case status
+* Priority
+* Evidence references
+* Moderator notes
+* Actions
+* Resolution
+* Escalation
 
-Do not require the client to always send a stop event.
+Do not copy large media payloads into moderation records.
 
----
+Store references to authoritative resources.
 
-# 26. REAL-TIME EVENT SCHEMA
-
-Define stable WebSocket event envelopes.
-
-Events should contain appropriate fields such as:
-
-* event ID;
-* event type;
-* version;
-* timestamp;
-* conversation ID where relevant;
-* sender/user/device context where appropriate;
-* sequence/version;
-* payload.
-
-Do not expose internal database fields unnecessarily.
-
-Do not send secrets.
+Protect moderation data with strict authorization.
 
 ---
 
-# 27. WEBSOCKET EVENT CATEGORIES
+# 7. MODERATION ACTIONS
 
-Support appropriate events such as:
+Support administrative actions such as:
 
-### Messaging
+* Warning
+* Temporary restriction
+* Messaging restriction
+* Account suspension
+* Account disablement
+* Account termination
+* Content removal
+* Group restriction
+* Device/session revocation
 
-* message.created;
-* message.updated;
-* message.deleted;
-* message.reaction.updated;
-* message.delivery.updated;
-* message.read.updated.
+Every action must:
 
-### Conversations
+* Validate authorization
+* Record the acting administrator
+* Record target
+* Record reason
+* Record timestamp
+* Produce an audit event
+* Be idempotent where appropriate
 
-* conversation.created;
-* conversation.updated;
-* member.added;
-* member.removed;
-* member.role.changed.
-
-### Presence
-
-* presence.updated.
-
-### Typing
-
-* typing.started;
-* typing.stopped.
-
-### Synchronization
-
-* sync.available;
-* sync.required;
-* synchronization state events where appropriate.
-
-Only expose events to authorized clients.
+Do not permit irreversible actions through ambiguous endpoints.
 
 ---
 
-# 28. CLIENT ACKNOWLEDGEMENTS
+# 8. ADMINISTRATIVE AUTHORIZATION
 
-Implement explicit acknowledgement behavior where appropriate.
+Implement strict administrative access control.
 
-Distinguish:
+Separate permissions for:
 
-* WebSocket transport delivered;
-* client acknowledged receipt;
-* durable message delivery state.
+* Support
+* Moderation
+* Security
+* Operations
+* System administration
+* Platform administration
 
-Do not interpret a TCP/socket write as equivalent to a user/device delivery receipt.
+Use least privilege.
 
----
+Do not rely on a single `isAdmin` boolean for sensitive production operations.
 
-# 29. DELIVERY STATE INTEGRATION
+Administrative actions must require explicit permissions.
 
-Integrate WebSocket delivery with the durable messaging system.
-
-When the platform defines a message as delivered after a recipient device/client acknowledges it:
-
-1. validate the authenticated device;
-2. validate the conversation;
-3. validate message sequence/identity;
-4. update durable delivery state;
-5. publish the appropriate event.
-
-The client must never be able to acknowledge delivery for another device/user.
+High-risk operations should support stronger authorization requirements where appropriate.
 
 ---
 
-# 30. READ STATE INTEGRATION
+# 9. ADMINISTRATIVE AUDITING
 
-When a client marks messages as read:
+Every sensitive administrative operation must produce an immutable audit record.
 
-* validate conversation access;
-* validate the read cursor;
-* enforce monotonicity;
-* persist authoritative state;
-* publish the read-state event.
+Audit:
 
-Do not allow arbitrary future sequence numbers.
+* Actor
+* Action
+* Target
+* Reason
+* Timestamp
+* Request ID
+* Trace ID
+* Relevant resource identifiers
+* Result
+* Security context where appropriate
 
----
+Never store:
 
-# 31. MULTI-DEVICE SYNCHRONIZATION
+* Passwords
+* Tokens
+* Private keys
+* Full private message contents unnecessarily
 
-Implement the foundation for syncing account state across devices.
-
-A newly connected device must be able to determine what durable state it has missed.
-
-Synchronization must support:
-
-* messages;
-* edits;
-* deletions;
-* reactions;
-* read state;
-* conversation changes;
-* membership changes.
-
-Do not rely solely on transient WebSocket events.
+Audit records must be protected against ordinary administrative modification.
 
 ---
 
-# 32. SYNCHRONIZATION CURSOR
+# 10. ACCOUNT RESTRICTIONS
 
-Implement a durable synchronization cursor strategy appropriate to the repository.
+Implement account restriction state.
 
-The cursor must allow a client to communicate:
+Support:
 
-```text
-I have processed events/state through position X.
-```
+* Active
+* Restricted
+* Suspended
+* Disabled
+* Deleted
+* Security-locked
 
-The server must be able to determine what comes after X.
+Restrictions must be enforceable by backend authorization.
 
-Do not use only wall-clock time if it can cause ambiguity.
+An account restriction must be checked during:
 
----
+* Authentication
+* Session refresh
+* WebSocket connection
+* Message creation
+* Conversation operations
+* Media operations
+* Group operations
+* Search
+* Administrative actions
 
-# 33. GAP DETECTION
-
-Detect situations where:
-
-* the client missed events;
-* the connection was interrupted;
-* events are no longer available in the transient layer;
-* the client's cursor is stale.
-
-In such cases, instruct the client to perform durable synchronization rather than assuming the transient event stream is complete.
-
----
-
-# 34. RECONNECT RECOVERY
-
-On reconnect:
-
-1. authenticate the device;
-2. validate session;
-3. establish connection;
-4. receive synchronization state;
-5. determine whether a gap exists;
-6. replay/recover durable changes where possible;
-7. restore subscriptions;
-8. resume real-time delivery.
-
-Do not simply reconnect the socket and assume no events were lost.
+Do not rely on a client receiving a restriction notice.
 
 ---
 
-# 35. OFFLINE DEVICES
+# 11. SESSION AND DEVICE SECURITY RESPONSE
 
-Do not attempt to maintain an unbounded WebSocket queue for offline devices.
+Integrate security controls with sessions and devices.
 
-Offline devices should recover durable state through:
+Support:
 
-* synchronization;
-* message history;
-* push notifications where appropriate.
+* Revoke suspicious sessions
+* Revoke devices
+* Force credential refresh
+* Force logout
+* Security lock
+* Risk-triggered session invalidation
 
-Transient Redis queues must not become the only copy of an event.
+Administrative and automated security actions must be auditable.
 
----
-
-# 36. USER-SPECIFIC SYNCHRONIZATION
-
-Multi-device synchronization must distinguish:
-
-* user-level state;
-* device-specific acknowledgement state.
-
-A message may need to be synchronized to multiple devices belonging to the same user.
-
-Do not incorrectly suppress delivery to one device because another device already received the event unless the canonical synchronization model explicitly allows that.
+Do not silently invalidate security state without recording the appropriate event.
 
 ---
 
-# 37. EVENT RETENTION
+# 12. SPAM PREVENTION
 
-Determine an appropriate retention window for transient event/synchronization data.
+Implement scalable spam-prevention foundations.
 
-If events are no longer available:
+Use signals such as:
 
-* fall back to authoritative database synchronization.
+* Request velocity
+* Message velocity
+* Account age
+* Device activity
+* Authentication anomalies
+* Repeated recipient patterns
+* Failed operations
+* Abuse reports
+* Previous restrictions
 
-Do not guarantee indefinite replay from Kafka/Redis unless the infrastructure actually provides it.
+Do not rely on a single heuristic.
 
----
-
-# 38. REDIS KEY DESIGN
-
-Every real-time Redis key must use a consistent namespace.
-
-Examples of logical categories:
-
-```text
-presence:user:{userId}
-presence:device:{deviceId}
-typing:conversation:{conversationId}:user:{userId}
-connection:user:{userId}
-connection:device:{deviceId}
-sync:{deviceId}
-```
-
-Adapt the exact convention to the repository.
-
-Every key must define:
-
-* purpose;
-* TTL;
-* owner;
-* serialization;
-* cleanup;
-* failure behavior.
-
-Do not create arbitrary undocumented keys.
+Design the system so detection rules can evolve without rewriting the messaging system.
 
 ---
 
-# 39. DISTRIBUTED CONNECTION ROUTING
+# 13. ABUSE RATE CONTROLS
 
-The platform may run multiple backend instances.
+Implement adaptive rate-control foundations.
 
-A WebSocket connection may exist on any instance.
+Support:
 
-Design routing so a Kafka event received by one instance can reach a client connected to another instance.
+* Endpoint limits
+* Account limits
+* Device limits
+* Conversation limits
+* IP/network limits
+* Action-specific limits
+* Escalating restrictions
 
-Use a shared coordination mechanism appropriate to the repository, such as:
+Rate controls must be distributed.
 
-* Socket.IO Redis adapter;
-* Redis pub/sub;
-* another explicitly justified mechanism.
+Avoid permanently blocking legitimate users based on one transient signal.
 
-Do not assume all connections exist inside one process.
-
----
-
-# 40. HORIZONTAL SCALING
-
-The real-time layer must support multiple replicas.
-
-Do not store authoritative connection state only in local process memory.
-
-Local memory may be used as a performance optimization, but the architecture must remain correct when:
-
-* multiple pods exist;
-* a pod restarts;
-* traffic is load balanced;
-* clients reconnect to another pod.
+Ensure abuse controls cannot be trivially bypassed through multiple devices or application instances.
 
 ---
 
-# 41. REDIS PUB/SUB
+# 14. ABUSE SIGNAL PIPELINE
 
-If Redis pub/sub is used:
+Create an asynchronous abuse-signal architecture.
 
-* keep messages ephemeral;
-* do not treat pub/sub as durable;
-* handle subscriber reconnect;
-* handle duplicate delivery;
-* handle missed publications.
+Signals may include:
 
-Durable state must come from PostgreSQL/event infrastructure.
+* Excessive account creation
+* Repeated failed authentication
+* High message velocity
+* Repeated reports
+* Rapid contact discovery
+* Suspicious device churn
+* Unusual session behavior
+* Repeated blocked interactions
 
----
+Signals should be:
 
-# 42. BULLMQ
+* Structured
+* Versioned
+* Privacy-conscious
+* Correlatable
+* Retainable according to policy
 
-Use BullMQ for tasks that genuinely require asynchronous job processing.
-
-Potential jobs include:
-
-* stale presence cleanup where appropriate;
-* synchronization maintenance;
-* event retry processing where appropriate;
-* cleanup;
-* deferred processing.
-
-Each job must define:
-
-* queue;
-* job name;
-* payload;
-* priority;
-* timeout;
-* retry count;
-* backoff;
-* concurrency;
-* idempotency;
-* dead-letter/failure handling.
-
-Do not create BullMQ jobs for operations that must be synchronous and transactional.
+Do not place raw message contents into generic abuse telemetry unless explicitly required and appropriately protected.
 
 ---
 
-# 43. WORKER IMPLEMENTATION
+# 15. SECURITY EVENT PROCESSING
 
-Every worker must:
+Create a security-event pipeline supporting:
 
-* validate input;
-* process idempotently;
-* emit useful logs/metrics;
-* handle retries;
-* handle permanent failures;
-* respect shutdown;
-* avoid duplicate side effects.
+* Authentication events
+* Session events
+* Device events
+* Account restrictions
+* Abuse signals
+* Administrative actions
+* Privacy changes
+* Report activity
 
-Do not let workers silently swallow exceptions.
+Use durable asynchronous processing where appropriate.
 
----
+Consumers must be idempotent.
 
-# 44. WORKER CONCURRENCY
-
-Configure worker concurrency deliberately.
-
-Do not assume unlimited concurrency.
-
-Consider:
-
-* database connection limits;
-* Redis capacity;
-* Kafka throughput;
-* WebSocket routing;
-* CPU/memory;
-* downstream provider limits.
+Failures must not silently discard security events.
 
 ---
 
-# 45. JOB TIMEOUTS
+# 16. DATA RETENTION
 
-Every long-running job must have bounded execution.
+Implement explicit data-retention policies.
 
-A worker stuck indefinitely must not consume capacity forever.
+Define retention behavior for:
 
-Use:
+* Messages
+* Media metadata
+* Media objects
+* Sessions
+* Security events
+* Audit events
+* Reports
+* Moderation cases
+* Search indexes
+* Analytics data
+* Temporary processing artifacts
 
-* job-level timeout;
-* provider timeout;
-* database timeout where applicable;
-* cancellation/shutdown handling.
+Retention must be:
 
----
+* Configurable
+* Auditable
+* Automated where appropriate
+* Safe
+* Idempotent
 
-# 46. RETRIES
-
-Retries must use:
-
-* bounded attempts;
-* exponential/backoff strategy where appropriate;
-* jitter where appropriate;
-* distinction between transient and permanent failures.
-
-Do not retry:
-
-* malformed payloads;
-* authorization failures;
-* permanent validation failures;
-
-indefinitely.
+Do not delete data merely because it is old without a defined retention policy.
 
 ---
 
-# 47. DEAD-LETTER QUEUES
+# 17. DATA DELETION
 
-Failed jobs requiring manual investigation must be recoverable.
+Implement secure deletion workflows.
 
-Capture:
+Support deletion of:
 
-* job ID;
-* job type;
-* failure reason;
-* retry count;
-* timestamps;
-* correlation ID;
-* safe metadata.
+* User accounts
+* Sessions
+* Devices
+* Profile data
+* User-created resources
+* User-owned media
+* Search-derived data
 
-Do not store sensitive tokens or private message content unnecessarily.
+Where immediate physical deletion is unsafe or operationally expensive, use asynchronous deletion workflows.
 
----
+Deletion must propagate to derived systems.
 
-# 48. REAL-TIME RATE LIMITING
-
-Protect WebSocket operations against abuse.
-
-Apply appropriate limits to:
-
-* connection attempts;
-* authentication attempts;
-* typing events;
-* read acknowledgements;
-* delivery acknowledgements;
-* subscription changes;
-* synchronization requests;
-* arbitrary event submissions.
-
-Do not allow a malicious client to flood a conversation or server.
+Do not leave deleted user information indefinitely inside search indexes, caches, queues, or analytics stores.
 
 ---
 
-# 49. WEBSOCKET INPUT VALIDATION
+# 18. ACCOUNT DELETION WORKFLOW
 
-Validate every inbound event.
+Implement an account-deletion state machine.
 
-Reject:
+Support:
 
-* malformed event names;
-* invalid IDs;
-* unauthorized conversation IDs;
-* oversized payloads;
-* invalid sequences;
-* invalid cursors;
-* unexpected fields.
+* Deletion request
+* Verification
+* Grace period where appropriate
+* Account disablement
+* Session revocation
+* Device revocation
+* Data cleanup
+* Derived-data cleanup
+* Object-storage cleanup
+* Search cleanup
+* Completion state
 
-Do not trust WebSocket payloads merely because they bypass HTTP.
+Deletion jobs must be retryable.
 
----
-
-# 50. WEBSOCKET AUTHORIZATION
-
-Authorization must occur for every resource-sensitive operation.
-
-Examples:
-
-* joining a conversation;
-* requesting synchronization;
-* marking read;
-* acknowledging delivery;
-* publishing typing;
-* requesting presence;
-* receiving private events.
-
-Do not assume that authentication at socket connection time grants access to every future resource.
-
-Membership can change after connection.
+A failed cleanup step must not incorrectly report complete deletion.
 
 ---
 
-# 51. MEMBERSHIP REVOCATION
+# 19. DATA EXPORT FOUNDATION
 
-If a user is:
+Implement a privacy-oriented data-export foundation.
 
-* removed from a group;
-* leaves a group;
-* banned;
-* loses authorization;
+Support:
 
-the real-time layer must stop delivering protected conversation events to that user.
+* Export request
+* Authorization
+* Job creation
+* Progress state
+* Secure artifact generation
+* Expiration
+* Secure download access
+* Cleanup
 
-Do not depend solely on a socket reconnect.
+Exports must not be generated synchronously inside API requests.
 
-Authorization state must be refreshed or invalidated appropriately.
+Do not expose export artifacts indefinitely.
 
----
-
-# 52. BLOCKING INTEGRATION
-
-Real-time delivery must respect blocking/privacy rules.
-
-If user A blocks user B:
-
-* future event delivery must follow the product's blocking semantics;
-* presence visibility must respect privacy;
-* typing visibility must respect privacy;
-* direct conversation events must not bypass the block.
-
-Do not implement a second blocking subsystem.
-
-Use authoritative privacy/security decisions.
+Protect exports with short-lived authorization.
 
 ---
 
-# 53. SECURITY
+# 20. PRIVACY DATA MINIMIZATION
 
-Defend the real-time system against:
+Review all implemented domains for unnecessary data collection.
 
-* connection flooding;
-* authentication brute force;
-* token replay;
-* unauthorized subscriptions;
-* room enumeration;
-* event spoofing;
-* user impersonation;
-* message acknowledgement spoofing;
-* oversized payloads;
-* event amplification;
-* Redis abuse;
-* synchronization abuse.
+Minimize:
 
-Do not trust client identity fields.
+* Device metadata
+* IP retention
+* Location-related metadata
+* Analytics identifiers
+* Security telemetry
+* Search-indexed fields
+* Notification metadata
 
----
+Do not collect information merely because it could be useful later.
 
-# 54. CONNECTION LIMITS
-
-Define configurable limits for:
-
-* connections per user;
-* connections per device;
-* subscriptions;
-* event frequency;
-* payload size.
-
-Handle excess connections deterministically.
-
-Do not allow one compromised account to consume unlimited socket resources.
+Document legitimate operational reasons for retained sensitive metadata.
 
 ---
 
-# 55. HEARTBEAT AND DEAD CONNECTIONS
+# 21. ANALYTICS ARCHITECTURE
 
-Implement appropriate heartbeat/ping behavior.
+Implement analytics foundations that do not overload transactional databases.
 
-Clean up:
+Support event-based analytics.
 
-* dead sockets;
-* stale connection metadata;
-* stale presence;
-* expired typing state.
+Analytics events should contain:
 
-Do not rely on application-level disconnect callbacks alone.
+* Event ID
+* Event type
+* Version
+* Timestamp
+* Anonymous or controlled identity reference where appropriate
+* Platform context
+* Application version where appropriate
+* Aggregatable properties
 
-Network failures may prevent graceful disconnect events.
+Avoid sending private message contents to analytics.
 
----
-
-# 56. BACKPRESSURE
-
-The real-time system must handle slow consumers.
-
-Do not allow one slow client to block a server worker or event consumer indefinitely.
-
-Use appropriate:
-
-* bounded buffers;
-* disconnect thresholds;
-* batching;
-* event coalescing for ephemeral events.
-
-Never drop durable message state.
-
-Transient events such as typing may safely expire/coalesce according to product semantics.
+Avoid storing unnecessary personally identifying information.
 
 ---
 
-# 57. MESSAGE BURSTS
+# 22. PRODUCT METRICS
 
-The system must remain stable when a conversation experiences bursts of messages.
+Implement metrics for areas such as:
 
-Avoid:
+* Active users
+* Active devices
+* Message throughput
+* Conversation creation
+* Message delivery latency
+* Read latency
+* Media processing
+* Notification delivery
+* Search latency
+* Search indexing lag
+* Connection counts
+* Error rates
 
-* one database query per socket unnecessarily;
-* unbounded in-memory queues;
-* synchronous push to every device inside the database transaction.
-
-Use asynchronous event processing where appropriate.
-
----
-
-# 58. EVENT FANOUT
-
-For group conversations:
-
-* identify eligible recipients efficiently;
-* avoid loading unnecessary user data;
-* handle large groups without quadratic behavior;
-* separate durable persistence from transport fanout.
-
-Do not perform massive synchronous database work inside the message creation request merely to deliver WebSocket events.
+Prefer aggregated metrics over raw event storage when raw events are unnecessary.
 
 ---
 
-# 59. PUSH NOTIFICATION HANDOFF
+# 23. OPERATIONAL ANALYTICS
 
-Offline recipients may eventually require push notifications.
+Create observability for:
 
-This volume should publish sufficient message/conversation events for a future notification service.
+* API performance
+* Database performance
+* Redis performance
+* Queue depth
+* Worker latency
+* Event processing
+* WebSocket connections
+* Message throughput
+* Media workers
+* Search cluster behavior
+* Notification providers
 
-Do not make message persistence depend on FCM/APNs availability.
+Metrics must support operational troubleshooting.
 
-Do not implement fake push delivery.
-
----
-
-# 60. OBSERVABILITY
-
-Instrument the entire real-time path.
-
-Track:
-
-* active connections;
-* connection attempts;
-* authentication failures;
-* disconnects;
-* reconnects;
-* event throughput;
-* event delivery latency;
-* delivery failures;
-* consumer lag;
-* retry counts;
-* dead-letter counts;
-* Redis latency;
-* synchronization latency;
-* presence updates;
-* typing events;
-* worker execution.
-
-Use low-cardinality metrics.
-
-Do not use:
-
-* user ID;
-* device ID;
-* conversation ID;
-
-as unrestricted metric labels.
+Do not put sensitive user content into operational metrics.
 
 ---
 
-# 61. DISTRIBUTED TRACING
+# 24. FEATURE FLAGS
 
-Propagate tracing across:
+Implement a backend feature-flag foundation.
 
-```text
-HTTP/WebSocket
-→ domain service
-→ PostgreSQL
-→ outbox
-→ Kafka/Redpanda
-→ consumer
-→ Redis
-→ WebSocket
-```
+Support:
 
-Preserve trace context through asynchronous boundaries where supported.
+* Global flags
+* Environment-specific flags
+* Controlled rollout
+* User targeting where justified
+* Percentage rollout
+* Emergency disablement
 
-Do not break tracing when events cross processes.
+Feature flags must be evaluated server-side for security-sensitive behavior.
 
----
+Do not use feature flags as authorization.
 
-# 62. LOGGING
-
-Log structured operational information such as:
-
-* event type;
-* event ID;
-* connection state;
-* worker state;
-* latency;
-* retry count;
-* error category;
-* correlation ID.
-
-Never log:
-
-* passwords;
-* access tokens;
-* refresh tokens;
-* private keys;
-* push credentials;
-* unnecessary message contents;
-* sensitive personal data.
+Ensure disabled functionality cannot accidentally remain reachable through alternate API paths.
 
 ---
 
-# 63. HEALTH CHECKS
+# 25. PLATFORM CONFIGURATION
 
-Extend health/readiness infrastructure for:
+Implement safe runtime configuration for operational settings such as:
 
-* Redis;
-* Kafka/Redpanda;
-* BullMQ workers;
-* WebSocket subsystem where appropriate.
+* Rate limits
+* Upload limits
+* Notification policies
+* Search limits
+* Processing concurrency
+* Retention parameters
+* Abuse thresholds
 
-Do not make liveness dependent on every downstream service.
+Configuration changes must be:
 
-Readiness should reflect whether the instance can safely accept traffic.
+* Authenticated
+* Authorized
+* Audited
+* Validated
 
----
-
-# 64. GRACEFUL SHUTDOWN
-
-On shutdown:
-
-1. stop accepting new WebSocket connections;
-2. stop accepting new jobs;
-3. stop Kafka consumers;
-4. allow in-flight processing to finish within a bounded deadline;
-5. disconnect sockets cleanly;
-6. release Redis resources;
-7. close database connections;
-8. flush telemetry;
-9. exit.
-
-Do not lose acknowledged durable state.
+Do not allow arbitrary runtime configuration values to crash production services.
 
 ---
 
-# 65. FAILURE MATRIX
+# 26. COMPLIANCE-ORIENTED FOUNDATIONS
 
-Implement explicit behavior for:
+Implement technical foundations that support:
 
-| Failure                 | Required behavior                      |
-| ----------------------- | -------------------------------------- |
-| WebSocket disconnect    | Client reconnect/sync                  |
-| Redis unavailable       | Fail/recover ephemeral features safely |
-| Kafka unavailable       | Preserve durable DB state/outbox       |
-| Consumer crash          | Restart/reprocess safely               |
-| Duplicate event         | Idempotent processing                  |
-| Slow client             | Apply bounded backpressure             |
-| Worker crash            | Retry job                              |
-| Poison event            | Retry then DLQ                         |
-| Session revoked         | Terminate/deny connection              |
-| Membership revoked      | Stop protected delivery                |
-| Presence heartbeat lost | TTL-based expiry                       |
-| Typing stop event lost  | TTL-based expiry                       |
+* Data access requests
+* Data deletion requests
+* Auditability
+* Retention enforcement
+* Consent/preference state where required
+* Administrative traceability
 
-Do not allow transient infrastructure failure to corrupt durable messaging state.
+Do not claim legal compliance with any jurisdiction merely because technical controls exist.
+
+Design the backend so jurisdiction-specific policies can be layered onto the platform.
 
 ---
 
-# 66. SYNCHRONIZATION API
+# 27. SECURITY THREAT REVIEW
 
-Provide an appropriate synchronization endpoint/service.
+Perform a backend threat review covering:
 
-It should allow an authenticated device to request changes after a known cursor.
+* Authentication bypass
+* Authorization bypass
+* Privilege escalation
+* Session theft
+* Device compromise
+* Token replay
+* API enumeration
+* Object enumeration
+* SSRF
+* Injection
+* DoS
+* Queue abuse
+* WebSocket abuse
+* Search abuse
+* Media abuse
+* Administrative abuse
+* Insider threats
+* Audit tampering
+* Privacy leakage
 
-The response must support:
+Fix issues within scope.
 
-* events/changes;
-* cursor advancement;
-* pagination/batching;
-* gap detection;
-* resynchronization.
-
-Do not return unbounded histories in one response.
-
----
-
-# 67. SYNC AUTHORIZATION
-
-Synchronization must be scoped to the authenticated account/device.
-
-A device must never request arbitrary users' synchronization streams.
-
-The server must determine the correct state from authenticated identity.
-
----
-
-# 68. SYNC BATCHING
-
-Large synchronization operations must be bounded.
-
-Use:
-
-* batch size;
-* cursor;
-* continuation token where needed.
-
-Do not allocate massive memory for a device with months of missed activity.
+Document residual risks honestly.
 
 ---
 
-# 69. SYNC ORDERING
+# 28. DATABASE SECURITY AND PERFORMANCE
 
-Synchronization must return changes in a deterministic order appropriate to the canonical event model.
+Review all database changes for:
 
-If multiple domains produce events, define a consistent synchronization strategy.
+* Index quality
+* Constraint integrity
+* Transaction boundaries
+* Lock contention
+* Hot rows
+* High-cardinality indexes
+* Retention cleanup performance
+* Partitioning opportunities
+* Query plans
 
-Do not mix unrelated timestamps without a clear ordering contract.
+Do not perform large deletion operations in a single unbounded transaction.
 
----
+Use controlled batch processing for large datasets.
 
-# 70. EVENT SCHEMA EVOLUTION
-
-Consumers must tolerate supported event versions.
-
-Implement:
-
-* explicit versions;
-* compatibility handling;
-* validation;
-* safe rejection of unsupported versions;
-* observability for schema mismatches.
-
-Do not silently interpret unknown event schemas.
+Do not run expensive analytics queries against production transactional tables when an asynchronous derived system is more appropriate.
 
 ---
 
-# 71. SECURITY EVENT HANDLING
+# 29. CACHE AND REDIS HARDENING
 
-Real-time security events may include:
+Review Redis usage for:
 
-* suspicious connection attempts;
-* invalid authentication;
-* repeated authorization failures;
-* session revocation;
-* device revocation;
-* abnormal event rates.
+* TTL correctness
+* Memory growth
+* Key namespaces
+* Eviction behavior
+* Sensitive data
+* Connection limits
+* Failure behavior
+* Stampede protection
 
-Integrate with the existing security/audit mechanism.
+Do not store durable business state exclusively in Redis.
 
-Do not expose internal security signals to ordinary users.
+Do not allow unbounded user-controlled Redis keys.
 
----
-
-# 72. TESTING — UNIT
-
-Test:
-
-* WebSocket authentication;
-* authorization;
-* connection lifecycle;
-* presence;
-* typing;
-* synchronization;
-* event routing;
-* event idempotency;
-* retry logic;
-* worker logic;
-* backpressure rules.
+Avoid caching private information without authorization-aware invalidation.
 
 ---
 
-# 73. TESTING — INTEGRATION
+# 30. EVENT AND QUEUE HARDENING
 
-Test against realistic infrastructure where possible:
+Review all asynchronous infrastructure for:
 
-* PostgreSQL;
-* Redis;
-* Kafka/Redpanda;
-* BullMQ;
-* Socket.IO/WebSocket.
+* Duplicate events
+* Lost events
+* Retry storms
+* Poison messages
+* Dead-letter handling
+* Ordering assumptions
+* Consumer lag
+* Backpressure
+* Idempotency
 
-Verify:
+Every consumer must safely tolerate duplicate delivery.
 
-* event publication;
-* event consumption;
-* duplicate events;
-* retry;
-* DLQ;
-* presence TTL;
-* multi-device routing;
-* reconnect recovery.
+Do not create infinite retry loops.
 
----
-
-# 74. TESTING — MULTI-INSTANCE
-
-Where the repository supports integration environments, run multiple backend instances.
-
-Verify:
-
-* user connects to instance A;
-* event consumed by instance B;
-* event reaches the user;
-* Redis/shared routing bridges the instances.
-
-This is critical.
-
-Do not declare horizontal scaling correct based only on a single-process test.
+Do not acknowledge jobs before durable processing requirements are satisfied.
 
 ---
 
-# 75. TESTING — RECONNECT
+# 31. DISASTER RECOVERY READINESS
 
-Test:
+Ensure backend behavior supports:
 
-1. device connects;
-2. receives events;
-3. connection drops;
-4. messages/events occur while offline;
-5. device reconnects;
-6. synchronization detects missed state;
-7. device recovers all required durable changes;
-8. real-time delivery resumes.
+* Database backups
+* Point-in-time recovery
+* Redis recovery
+* Event-stream recovery
+* Search reindexing
+* Object-storage recovery
+* Queue recovery
+* Multi-region failover
 
----
+Define which data is:
 
-# 76. TESTING — SECURITY
+* Authoritative
+* Derived
+* Reconstructable
+* Replicated
+* Disposable
 
-Test:
-
-* invalid WebSocket credentials;
-* revoked sessions;
-* unauthorized room subscription;
-* unauthorized synchronization;
-* unauthorized read acknowledgement;
-* unauthorized delivery acknowledgement;
-* blocked users;
-* removed group members;
-* event spoofing;
-* payload flooding;
-* connection flooding.
+Do not treat derived systems as irreplaceable sources of truth.
 
 ---
 
-# 77. TESTING — FAILURE
+# 32. FAILURE INJECTION AND RESILIENCE
 
-Test:
+Test or prepare controlled failure scenarios for:
 
-* Redis outage;
-* Kafka outage;
-* worker restart;
-* consumer restart;
-* duplicate events;
-* delayed events;
-* DLQ behavior;
-* slow clients;
-* dropped connections;
-* database outage.
+* PostgreSQL outage
+* Redis outage
+* Kafka/Redpanda outage
+* Search outage
+* Object-storage outage
+* Notification-provider outage
+* Worker crash
+* Network timeout
+* Dependency latency
+* Partial region failure
 
-The system must fail safely.
+Verify that:
 
----
-
-# 78. PERFORMANCE
-
-Measure:
-
-* WebSocket connection capacity;
-* event throughput;
-* fanout latency;
-* Redis operations;
-* Kafka consumer lag;
-* synchronization throughput;
-* worker throughput.
-
-Identify bottlenecks.
-
-Do not optimize based solely on theoretical assumptions.
+* Durable data is protected.
+* Retries are bounded.
+* Backpressure works.
+* Health checks remain meaningful.
+* Recovery is possible.
+* Operators can identify the failure.
 
 ---
 
-# 79. NO PLACEHOLDERS
+# 33. PERFORMANCE HARDENING
 
-Do not leave:
+Review backend performance at scale.
 
-* TODO;
-* FIXME;
-* fake event consumers;
-* fake WebSocket handlers;
-* fake presence;
-* in-memory-only production state;
-* fake synchronization;
-* fake workers;
-* silently swallowed failures.
+Measure and optimize:
 
-Every implemented path must work.
+* API latency
+* Database latency
+* Redis latency
+* Queue throughput
+* Event throughput
+* WebSocket handling
+* Search latency
+* Media job throughput
+* Notification throughput
 
----
+Do not optimize based only on assumptions.
 
-# 80. BACKWARD COMPATIBILITY
+Use metrics and profiling where available.
 
-Preserve existing:
-
-* authentication;
-* messaging APIs;
-* event schemas;
-* Redis conventions;
-* database behavior;
-* WebSocket contracts.
-
-If incompatible behavior must change:
-
-1. inspect actual clients/contracts;
-2. design migration;
-3. preserve compatibility where possible;
-4. document unavoidable changes.
-
-Do not break existing functionality simply to simplify implementation.
+Avoid premature micro-optimizations that reduce maintainability.
 
 ---
 
-# 81. CROSS-SYSTEM CONTRACTS
+# 34. SECURITY TESTING
 
-Preserve canonical:
+Add tests for:
 
-* User ID;
-* Device ID;
-* Session ID;
-* Conversation ID;
-* Message ID;
-* message sequence;
-* event ID;
-* event type/version;
-* cursor;
-* timestamp;
-* correlation ID;
-* trace context;
-* error codes.
+* Privilege escalation
+* Unauthorized admin access
+* Block bypass
+* Privacy bypass
+* Deleted-account access
+* Session revocation
+* Data export authorization
+* Report access
+* Moderation access
+* Object access
+* Search leakage
+* Rate-limit bypass
+* Administrative audit integrity
 
-These contracts must remain consistent across:
-
-* REST;
-* WebSocket;
-* Kafka/Redpanda;
-* Redis;
-* BullMQ;
-* PostgreSQL;
-* web;
-* mobile.
-
-Do not introduce parallel representations.
+Test both positive and negative authorization paths.
 
 ---
 
-# 82. FINAL VALIDATION
+# 35. FINAL VALIDATION
 
-Before considering this volume complete, actually run applicable:
+Before declaring completion:
 
-* TypeScript type checking;
-* linting;
-* formatting;
-* unit tests;
-* integration tests;
-* API/E2E tests;
-* WebSocket tests;
-* Redis tests;
-* Kafka/Redpanda tests;
-* BullMQ tests;
-* synchronization tests;
-* reconnect tests;
-* multi-instance tests where available;
-* security tests;
-* application startup;
-* health/readiness checks.
+1. Run formatting.
+2. Run linting.
+3. Run TypeScript type checking.
+4. Validate Prisma schema.
+5. Validate migrations.
+6. Run unit tests.
+7. Run integration tests.
+8. Run end-to-end tests.
+9. Validate privacy enforcement.
+10. Validate blocking.
+11. Validate reporting.
+12. Validate moderation authorization.
+13. Validate administrative authorization.
+14. Validate account restrictions.
+15. Validate deletion workflows.
+16. Validate export workflows.
+17. Validate retention jobs.
+18. Validate queue failure handling.
+19. Validate security auditing.
+20. Validate feature flags.
+21. Validate observability.
+22. Review database performance.
+23. Review Redis behavior.
+24. Review asynchronous processing.
+25. Review repository changes for unrelated modifications.
 
-Fix failures.
-
-Do not claim successful validation without actually running it.
-
----
-
-# 83. IMPLEMENTATION ORDER
-
-Use this sequence unless repository constraints require a safer alternative:
-
-1. inspect repository;
-2. inspect existing messaging/event contracts;
-3. establish WebSocket authentication;
-4. establish connection/device mapping;
-5. implement distributed socket routing;
-6. implement Kafka/Redpanda consumers;
-7. implement real-time message delivery;
-8. implement conversation event delivery;
-9. implement delivery acknowledgements;
-10. implement read-state real-time updates;
-11. implement presence;
-12. implement typing;
-13. implement synchronization cursor;
-14. implement synchronization API/service;
-15. implement reconnect recovery;
-16. implement event deduplication;
-17. implement retries/DLQ;
-18. implement BullMQ workers where justified;
-19. implement rate limiting/backpressure;
-20. implement membership/privacy revocation handling;
-21. implement observability;
-22. implement tests;
-23. validate multi-instance behavior;
-24. validate failure scenarios;
-25. run complete backend validation;
-26. fix all discovered issues.
+Do not declare success if required checks fail.
 
 ---
 
-# 84. FINAL ENGINEERING REQUIREMENT
+# 36. FINAL IMPLEMENTATION REPORT
 
-The completed implementation must leave the repository with a real distributed real-time backend.
+When implementation is complete, provide:
 
-It must be:
+1. **Implementation Summary**
+2. **Privacy Architecture**
+3. **Blocking and Reporting**
+4. **Moderation System**
+5. **Administrative Authorization**
+6. **Security Auditing**
+7. **Account Restriction System**
+8. **Abuse and Spam Prevention**
+9. **Retention and Deletion**
+10. **Data Export**
+11. **Analytics**
+12. **Feature Flags**
+13. **Operational Configuration**
+14. **Disaster Recovery Improvements**
+15. **Security Hardening**
+16. **Performance Improvements**
+17. **Tests Added**
+18. **Validation Commands**
+19. **Validation Results**
+20. **Known Limitations**
+21. **Configuration Changes**
+22. **Files and Directories Modified**
 
-* horizontally scalable;
-* authenticated;
-* authorization-aware;
-* multi-device capable;
-* reconnect-safe;
-* event-driven;
-* idempotent;
-* observable;
-* resilient to infrastructure failures;
-* resistant to abuse;
-* compatible with offline clients;
-* compatible with future push notifications;
-* compatible with future media processing;
-* compatible with future search;
-* compatible with future calling.
+Report only actual implementation.
 
-The critical architectural guarantee is:
+Do not claim legal compliance without legal validation.
 
-```text
-Durable state
-    ↓
-Transactional event
-    ↓
-Kafka/Redpanda
-    ↓
-Real-time consumers
-    ↓
-Distributed connection routing
-    ↓
-WebSocket/Socket.IO
-    ↓
-Client
-```
+Do not claim production-scale testing if only local tests were executed.
 
-And when the client is offline:
+---
 
-```text
-Durable state
-    ↓
-Synchronization
-    ↓
-Client recovery
-```
+# BACKEND VOLUME 4 COMPLETION STANDARD
 
-The WebSocket layer must never become the authoritative source of message state.
+This volume is complete only when the backend has production-grade foundations for:
 
-Redis must never become the only durable copy of messages.
+* Privacy enforcement
+* Blocking
+* Reporting
+* Moderation
+* Administrative operations
+* Abuse prevention
+* Spam prevention
+* Account restrictions
+* Data retention
+* Data deletion
+* Data export
+* Security auditing
+* Analytics
+* Feature flags
+* Operational controls
+* Reliability hardening
+* Performance hardening
+* Disaster recovery readiness
 
-Kafka/Redpanda must not be treated as an exactly-once transport.
+The implementation must be:
 
-Every consumer and worker must be safe under retries and duplicate delivery.
+* Secure
+* Privacy-conscious
+* Auditable
+* Scalable
+* Resilient
+* Observable
+* Testable
+* Maintainable
+* Production-ready
 
-Do not merely describe what should be implemented.
+Do not leave placeholders.
 
-**Inspect the actual repository and implement this backend volume completely.**
+Do not leave TODO/FIXME implementation gaps.
+
+Do not use pseudo-code.
+
+Do not omit required implementations.
+
+Do not say “implement similarly.”
+
+Do not say “remaining code omitted.”
+
+Do not replace implementation with explanations.
+
+Inspect the repository, implement the scope completely, integrate it, validate it, and report the exact result.

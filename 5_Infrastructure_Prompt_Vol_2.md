@@ -1,1703 +1,1635 @@
-# INFRASTRUCTURE IMPLEMENTATION PROMPT — VOLUME 2
+# WHATSAPP — INFRASTRUCTURE VOLUME 2
 
-## Production Operations, Observability, Scaling, Security, Disaster Recovery, and Final Hardening
+## ROLE
 
-You are the senior infrastructure, cloud, DevOps, SRE, security, and platform engineering team responsible for taking a production-grade real-time communication platform to final operational readiness.
+Act as a Principal Cloud Architect, Staff DevOps Engineer, Staff SRE, Staff Platform Engineer, Database Reliability Engineer, Security Engineer, Network Architect, Kubernetes Engineer, Observability Engineer, Disaster Recovery Engineer, and Production Operations Engineer working as one senior engineering team.
 
-This is an implementation task against the existing repository.
+You are implementing the advanced production infrastructure of a global, enterprise-grade real-time communication platform comparable in capability and operational scale to WhatsApp, Telegram, Signal, Messenger, Discord, and Microsoft Teams.
 
-Do not provide a tutorial, pseudo-code, conceptual-only recommendations, placeholder infrastructure, fake production configurations, TODO lists, or incomplete operational scaffolding.
+You are not writing a tutorial, proof of concept, demonstration, or simplified deployment.
 
-Inspect the actual repository and existing infrastructure first.
-
-Implement the required production operations directly in the repository.
-
-The actual repository is the source of truth.
+You are implementing production-grade infrastructure suitable for a funded global technology company operating at very large scale.
 
 ---
 
-# 1. SYSTEM CONTEXT
+# PROJECT
 
-The platform is a production-grade real-time communication system consisting of:
+Build the infrastructure required to operate a global real-time communication platform with:
 
-* web application
-* React Native mobile application
-* NestJS/Node.js backend
+* Hundreds of millions of registered users
+* Tens of millions of daily active users or greater
+* Very large concurrent WebSocket populations
+* Extremely high message throughput
+* Large media volumes
+* Global traffic
+* Multi-region requirements
+* High availability
+* Horizontal scalability
+* Fault tolerance
+* Disaster recovery
+* Secure media delivery
+* Production observability
+* Automated deployment
+* Zero-downtime operational practices
+
+Core product capabilities include:
+
+* Individual messaging
+* Group messaging
+* Profiles
+* Contacts
+* Presence
+* Typing indicators
+* Delivery/read states
+* Replies
+* Reactions
+* Editing
+* Deletion
+* Forwarding
+* Pinned messages
+* Saved messages
+* Media
+* Documents
+* Voice messages
+* Stickers
+* GIFs
+* Link previews
+* Search
+* Push notifications
+* Multi-device synchronization
+* Offline synchronization
+* Blocking
+* Reporting
+* Privacy controls
+* Disappearing messages
+* Moderation
+* Administration
+* Analytics
+* Media storage and delivery
+
+The infrastructure must support web clients, mobile clients, backend APIs, WebSocket services, asynchronous workers, media processing, search, notifications, databases, event streaming, observability, and administrative systems.
+
+---
+
+# TECHNOLOGY DIRECTION
+
+Use the repository's existing implementation as the source of truth for exact versions and already-established conventions.
+
+The infrastructure direction includes:
+
+* AWS
+* Terraform
+* Kubernetes
+* Amazon EKS
+* Docker
+* Helm
+* GitHub Actions
+* Amazon ECR
 * PostgreSQL
 * Prisma
 * Redis
-* Kafka/Redpanda
 * BullMQ
-* WebSockets/Socket.IO
-* S3
-* CloudFront
-* Elasticsearch/OpenSearch where implemented
-* media processing
-* push notifications
-* WebRTC calling where implemented
-* Docker
-* Kubernetes or the repository's selected orchestration platform
-* CI/CD
-* OpenTelemetry-compatible observability
+* Kafka or Redpanda
+* OpenSearch or Elasticsearch
+* Amazon S3 or compatible object storage
+* CloudFront or equivalent CDN
+* FFmpeg media workers
+* OpenTelemetry
+* Prometheus
+* Grafana
+* Loki
+* Tempo
+* AWS WAF
+* Route 53 or equivalent DNS
+* TLS
+* IAM
+* KMS
+* Secrets Manager or equivalent secure secret management
 
-The infrastructure must operate all components as one coherent distributed system.
+The infrastructure must support:
 
----
+* Local development
+* Development
+* Testing
+* Staging
+* Production
+* Disaster recovery
 
-# 2. REPOSITORY-FIRST REQUIREMENT
+Production architecture must be capable of evolving toward multi-region active-active or active-passive operation according to the repository's architecture and data consistency requirements.
 
-Before making changes, inspect:
-
-* all infrastructure directories
-* Terraform/OpenTofu/Pulumi files
-* Kubernetes manifests
-* Helm charts
-* Dockerfiles
-* CI/CD workflows
-* environment configuration
-* backend deployment configuration
-* worker configuration
-* database configuration
-* Redis configuration
-* Kafka/Redpanda configuration
-* S3/CloudFront configuration
-* search configuration
-* monitoring configuration
-* logging configuration
-* tracing configuration
-* security configuration
-* backup configuration
-* existing operational documentation
-
-Determine what Infrastructure Volume 1 already implemented in the actual repository.
-
-Do not assume a file exists because this prompt describes it.
-
-Do not recreate existing resources.
-
-Do not create competing infrastructure.
+Do not replace existing technology choices without a concrete repository-driven reason.
 
 ---
 
-# 3. OBJECTIVE
+# SOURCE OF TRUTH
 
-Complete the production operations layer.
+Before modifying anything:
 
-Implement and harden:
+1. Inspect the entire repository.
+2. Identify the existing application structure.
+3. Identify all existing Terraform modules.
+4. Identify all Kubernetes manifests.
+5. Identify all Helm charts.
+6. Identify Dockerfiles and container configurations.
+7. Identify GitHub Actions workflows.
+8. Identify existing AWS resources and environment definitions.
+9. Identify database infrastructure configuration.
+10. Identify Redis infrastructure configuration.
+11. Identify Kafka/Redpanda infrastructure configuration.
+12. Identify OpenSearch/Elasticsearch infrastructure configuration.
+13. Identify S3/media/CDN infrastructure.
+14. Identify observability infrastructure.
+15. Identify secrets and IAM configuration.
+16. Identify current deployment strategies.
+17. Identify existing naming, tagging, labels, namespaces, variables, outputs, modules, and conventions.
+18. Identify incomplete infrastructure and implementation gaps.
+19. Preserve compatible infrastructure that is already correct.
+20. Modify existing files only when required by this scope.
 
-1. observability
-2. metrics
-3. logs
-4. distributed tracing
-5. dashboards
-6. alerting
-7. SLOs
-8. autoscaling
-9. capacity management
-10. deployment safety
-11. rollback
-12. resilience
-13. disaster recovery
-14. backup validation
-15. security hardening
-16. network hardening
-17. IAM hardening
-18. secret rotation
-19. container security
-20. dependency security
-21. cost controls
-22. operational runbooks
-23. incident response
-24. production readiness validation
+The repository is the source of truth for integration.
 
----
+Do not assume that infrastructure is empty.
 
-# 4. PRODUCTION OPERATING PRINCIPLE
+Do not recreate working infrastructure unnecessarily.
 
-The platform must be designed around:
+Do not generate duplicate Terraform modules, Kubernetes resources, Helm charts, workflows, or configuration files when an existing implementation can be extended safely.
 
-* reliability
-* observability
-* recoverability
-* least privilege
-* controlled change
-* graceful degradation
-* horizontal scalability
-* predictable failure behavior
-* measurable service objectives
-
-Do not optimize only for successful deployments.
-
-A production system must remain diagnosable and recoverable when dependencies fail.
+All infrastructure introduced by this prompt must integrate with the existing repository.
 
 ---
 
-# 5. OBSERVABILITY ARCHITECTURE
+# 1. ADVANCED INFRASTRUCTURE OBJECTIVE
 
-Complete the observability stack using the actual technologies in the repository.
+Implement the advanced production infrastructure required to operate the platform reliably at global scale.
 
-Where appropriate:
+The implementation must address:
+
+* Multi-region architecture
+* Global traffic management
+* Regional failure handling
+* Database high availability
+* Database replication and failover
+* Redis resilience
+* Event broker resilience
+* Kubernetes high availability
+* Advanced autoscaling
+* Zero-downtime deployments
+* Progressive delivery
+* Media delivery at global scale
+* CDN behavior
+* Observability hardening
+* Backup and restoration
+* Disaster recovery
+* Security hardening
+* Operational readiness
+* Capacity planning
+* Failure recovery
+* Infrastructure testing
+
+Do not implement theoretical architecture without deployable infrastructure.
+
+---
+
+# 2. MULTI-REGION AWS ARCHITECTURE
+
+Implement the infrastructure required for multiple production regions.
+
+Define:
+
+* Primary regions
+* Secondary regions
+* Region-specific Terraform configuration
+* Shared global resources
+* Regional resources
+* Region-independent resources
+* Resource naming
+* Resource tagging
+* Environment isolation
+* Account boundaries where applicable
+
+Design infrastructure so that regional failure does not require manual recreation of the entire platform.
+
+Implement appropriate support for:
+
+* Regional EKS clusters
+* Regional networking
+* Regional load balancing
+* Regional application services
+* Regional workers
+* Regional Redis
+* Regional event infrastructure
+* Regional observability ingestion
+* Regional media processing
+* Regional database capabilities
+* Regional failover
+
+Clearly separate:
+
+* Global control-plane resources
+* Regional data-plane resources
+* Shared services
+* Region-local services
+
+Do not incorrectly centralize latency-sensitive or failure-sensitive infrastructure.
+
+---
+
+# 3. GLOBAL TRAFFIC MANAGEMENT
+
+Implement production-grade global traffic routing.
+
+Support:
+
+* Global DNS
+* Health-based routing
+* Region selection
+* Failover routing
+* Weighted routing
+* Controlled traffic shifting
+* Regional evacuation
+* Disaster recovery routing
+
+Use AWS-native global traffic capabilities where appropriate.
+
+Implement health checks that verify actual application availability rather than only infrastructure reachability.
+
+Health checks must distinguish between:
+
+* DNS availability
+* Load balancer availability
+* API availability
+* WebSocket availability
+* Dependency health
+* Regional application readiness
+
+Do not route traffic into a region whose infrastructure exists but whose application dependencies are unhealthy.
+
+Document traffic failover behavior.
+
+---
+
+# 4. MULTI-REGION NETWORKING
+
+Implement secure networking for regional environments.
+
+Each region must provide appropriate:
+
+* VPCs
+* Public subnets
+* Private subnets
+* Availability zones
+* Route tables
+* Security groups
+* Network ACLs where justified
+* NAT strategy
+* VPC endpoints
+* Private service connectivity
+* DNS resolution
+* Egress controls
+
+Minimize unnecessary public exposure.
+
+Prefer private communication for:
+
+* Databases
+* Redis
+* Kafka/Redpanda
+* OpenSearch
+* Internal services
+* Kubernetes control paths
+* Worker infrastructure
+
+Implement cross-region connectivity where required.
+
+Avoid creating unnecessary cross-region dependencies for latency-sensitive message delivery.
+
+---
+
+# 5. DATABASE HIGH AVAILABILITY
+
+Harden PostgreSQL infrastructure for production.
+
+Implement appropriate:
+
+* Multi-AZ deployment
+* Automated backups
+* Point-in-time recovery
+* Encryption at rest
+* Encryption in transit
+* Parameter configuration
+* Connection management
+* Monitoring
+* Failover
+* Replica strategy
+* Read scaling where appropriate
+* Maintenance configuration
+* Storage scaling
+* Performance monitoring
+
+The implementation must account for:
+
+* Large connection counts
+* Connection pooling
+* Long-running queries
+* Lock contention
+* Transaction pressure
+* Migration safety
+* Replica lag
+* Failover behavior
+* Recovery time
+
+Do not expose PostgreSQL directly to the public internet.
+
+Implement appropriate network and IAM boundaries.
+
+---
+
+# 6. DATABASE REPLICATION AND DISASTER RECOVERY
+
+Implement the infrastructure required for cross-region database recovery.
+
+Define:
+
+* Primary database region
+* Disaster recovery database region
+* Replication strategy
+* Backup replication
+* Recovery procedures
+* Failover process
+* Failback process
+* RPO
+* RTO
+
+The infrastructure must distinguish between:
+
+* Automatic failover
+* Operator-assisted failover
+* Disaster recovery restoration
+
+Do not claim zero data loss unless the actual infrastructure guarantees it.
+
+Document the consistency and data-loss implications of regional database failure.
+
+Implement restoration procedures that can be executed and tested.
+
+---
+
+# 7. DATABASE MIGRATION SAFETY
+
+Harden database deployment workflows.
+
+Implement infrastructure and CI/CD controls that prevent unsafe migrations.
+
+Support:
+
+* Migration validation
+* Migration ordering
+* Backup verification
+* Expand-and-contract patterns
+* Backward-compatible application deployment
+* Rollback-aware deployment
+* Production migration safeguards
+
+Prevent destructive schema changes from being silently applied during normal deployments.
+
+Where migrations require operator approval, make that requirement explicit in the deployment workflow.
+
+---
+
+# 8. REDIS HIGH AVAILABILITY
+
+Harden Redis infrastructure for production-scale workloads.
+
+Support:
+
+* Multi-AZ deployment
+* Replication
+* Automatic failover
+* Encryption
+* Authentication
+* Private networking
+* Monitoring
+* Memory policies
+* Connection limits
+* Failover detection
+* Backup where applicable
+
+Separate Redis responsibilities when required.
+
+Account for workloads including:
+
+* Sessions
+* Presence
+* WebSocket coordination
+* Rate limiting
+* Distributed locks
+* Caching
+* Idempotency
+* Temporary state
+* BullMQ
+
+Do not assume every Redis dataset can be safely lost.
+
+Classify Redis data into:
+
+* Reconstructable
+* Ephemeral
+* Operationally important
+* Persistent-equivalent state
+
+Configure infrastructure accordingly.
+
+---
+
+# 9. KAFKA OR REDPANDA PRODUCTION SCALING
+
+Harden the event streaming platform.
+
+Implement infrastructure for:
+
+* High availability
+* Broker distribution
+* Persistent storage
+* Replication
+* Availability-zone awareness
+* Capacity scaling
+* Partition planning
+* Monitoring
+* Retention
+* Network security
+* Encryption
+* Authentication
+* Failure recovery
+
+Account for high-throughput domains including:
+
+* Message events
+* Delivery events
+* Presence events
+* Notification events
+* Media processing events
+* Search indexing events
+* Analytics events
+* Security events
+* Audit events
+
+Prevent a single overloaded partition or broker from becoming a systemic bottleneck.
+
+Define operational monitoring for:
+
+* Consumer lag
+* Partition imbalance
+* Broker health
+* Disk pressure
+* Throughput
+* Replication health
+* Under-replicated partitions
+
+---
+
+# 10. BULLMQ WORKER INFRASTRUCTURE
+
+Harden background job infrastructure.
+
+Implement scalable worker deployment for:
+
+* Notifications
+* Media processing
+* Search indexing
+* Link previews
+* Cleanup
+* Retention
+* Analytics
+* Security processing
+* Data export
+* Account deletion
+* Other asynchronous workloads already present in the repository
+
+Each worker class must support:
+
+* Horizontal scaling
+* Graceful shutdown
+* Retry behavior
+* Dead-letter handling where appropriate
+* Concurrency control
+* Resource limits
+* Autoscaling
+* Observability
+
+Prevent a single workload category from exhausting the entire worker cluster.
+
+Use queue-specific resource isolation where required.
+
+---
+
+# 11. KUBERNETES HIGH AVAILABILITY
+
+Harden EKS workloads for production.
+
+Implement:
+
+* Multiple availability zones
+* Pod anti-affinity
+* Topology spread constraints
+* Pod disruption budgets
+* Resource requests
+* Resource limits
+* Readiness probes
+* Liveness probes
+* Startup probes
+* Graceful termination
+* Termination grace periods
+* Security contexts
+* Non-root execution
+* Network policies
+
+Critical services must not depend on a single pod or node.
+
+Ensure WebSocket services are distributed across zones.
+
+Ensure worker workloads can scale independently from API workloads.
+
+---
+
+# 12. ADVANCED AUTOSCALING
+
+Implement production-grade autoscaling.
+
+Use appropriate Kubernetes and AWS capabilities for:
+
+* CPU scaling
+* Memory scaling
+* Request-rate scaling
+* Queue-depth scaling
+* Kafka consumer-lag scaling
+* WebSocket connection scaling
+* Worker concurrency scaling
+* Node scaling
+
+Where appropriate, implement:
+
+* Horizontal Pod Autoscaler
+* KEDA
+* Cluster Autoscaler or Karpenter
+* Scheduled scaling
+* Predictive scaling where justified
+
+Do not rely solely on CPU utilization for real-time workloads.
+
+Autoscaling must account for:
+
+* Connection counts
+* Message throughput
+* Queue depth
+* Event lag
+* Request latency
+* Media workload
+* Regional capacity
+
+Prevent autoscaling feedback loops and uncontrolled cost growth.
+
+---
+
+# 13. WEBSOCKET PRODUCTION INFRASTRUCTURE
+
+Harden infrastructure for very large concurrent WebSocket populations.
+
+Account for:
+
+* Long-lived connections
+* Connection draining
+* Load balancer behavior
+* Idle timeouts
+* Connection distribution
+* Pod termination
+* Rolling deployments
+* Regional routing
+* Reconnection storms
+* Health checks
+* Capacity limits
+
+Implement graceful connection draining.
+
+When a pod or node is terminated:
+
+1. Stop accepting new connections.
+2. Mark the instance unavailable for new traffic.
+3. Allow active sessions to drain where possible.
+4. Notify clients appropriately when required.
+5. Preserve synchronization semantics.
+6. Terminate within bounded time.
+7. Allow clients to reconnect safely.
+
+Design for reconnect storms after:
+
+* Regional failures
+* Deployments
+* Network outages
+* Mobile network changes
+* Load balancer failures
+
+---
+
+# 14. ZERO-DOWNTIME DEPLOYMENTS
+
+Implement production deployment strategies that minimize service disruption.
+
+Support:
+
+* Rolling deployments
+* Readiness-based rollout
+* Graceful shutdown
+* Connection draining
+* Backward-compatible API deployment
+* Backward-compatible event schemas
+* Database migration safety
+
+For critical services, support progressive delivery such as:
+
+* Canary deployment
+* Weighted traffic
+* Automated health verification
+* Rollback
+
+Deployment systems must not send production traffic to unhealthy instances.
+
+---
+
+# 15. BLUE/GREEN AND CANARY CAPABILITIES
+
+Where the repository architecture supports it, implement production-safe progressive delivery.
+
+Support:
+
+* Versioned deployments
+* Immutable container images
+* Canary traffic
+* Health evaluation
+* Error-rate comparison
+* Latency comparison
+* Rollback
+* Deployment annotations
+* Release tracking
+
+Define automated rollback conditions using measurable signals such as:
+
+* HTTP error rate
+* WebSocket connection failure rate
+* Message processing failure rate
+* Queue backlog
+* Consumer lag
+* Database error rate
+* Dependency failures
+* Crash loops
+
+Do not rely exclusively on deployment completion status.
+
+---
+
+# 16. CONTAINER AND IMAGE SUPPLY CHAIN HARDENING
+
+Harden the container supply chain.
+
+Implement:
+
+* Immutable image tags or digests
+* ECR repositories
+* Image scanning
+* Dependency scanning
+* Minimal runtime images
+* Non-root containers
+* Read-only filesystems where practical
+* Dropped Linux capabilities
+* Resource limits
+* Provenance where supported
+* SBOM generation where practical
+
+CI must fail on appropriately severe security findings according to repository policy.
+
+Do not allow mutable `latest`-style production deployment behavior.
+
+---
+
+# 17. MEDIA DELIVERY AT GLOBAL SCALE
+
+Harden the media infrastructure.
+
+Support:
+
+* S3 origin architecture
+* CloudFront delivery
+* Origin access controls
+* Signed URLs or signed cookies where appropriate
+* Media authorization
+* Cache policies
+* Cache invalidation strategy
+* Range requests
+* Large object delivery
+* Thumbnail delivery
+* Video delivery
+* Audio delivery
+* Document delivery
+
+Separate public cacheability from private user content.
+
+Prevent unauthorized media enumeration.
+
+Ensure expired authorization cannot continue granting access indefinitely.
+
+---
+
+# 18. MEDIA PROCESSING SCALABILITY
+
+Harden FFmpeg and media worker infrastructure.
+
+Support independent scaling for:
+
+* Image processing
+* Video transcoding
+* Audio processing
+* Thumbnail generation
+* Metadata extraction
+* Preview generation
+
+Implement:
+
+* Queue isolation
+* Resource requests
+* Resource limits
+* Temporary storage sizing
+* CPU-intensive worker node pools
+* GPU support only where justified
+* Job timeout
+* Retry behavior
+* Dead-letter handling
+* Cleanup
+
+Prevent a single oversized media job from exhausting worker capacity.
+
+---
+
+# 19. CDN AND CACHE STRATEGY
+
+Implement appropriate CDN policies for:
+
+* Static web assets
+* Public application assets
+* User media
+* Thumbnails
+* Transcoded media
+* Downloadable documents where authorized
+
+Define:
+
+* Cache keys
+* TTLs
+* Cache-control
+* Compression
+* Origin failover
+* Signed access
+* Invalidation
+* Regional behavior
+
+Do not cache private data in a way that can cross authorization boundaries.
+
+---
+
+# 20. OBSERVABILITY HARDENING
+
+Implement production-grade observability infrastructure.
+
+Ensure:
+
+* Metrics
+* Logs
+* Distributed traces
+* Correlation IDs
+* Request IDs
+* WebSocket connection metrics
+* Message processing metrics
+* Queue metrics
+* Kafka/Redpanda metrics
+* Database metrics
+* Redis metrics
+* Kubernetes metrics
+* CDN metrics
+* Load balancer metrics
+* Infrastructure metrics
+
+Use:
 
 * OpenTelemetry
 * Prometheus
 * Grafana
 * Loki
 * Tempo
-* cloud-native monitoring services
 
-Do not deploy duplicate observability systems unnecessarily.
-
-Define clear ownership between:
-
-* application telemetry
-* infrastructure telemetry
-* database telemetry
-* queue telemetry
-* event-stream telemetry
-* load-balancer telemetry
-* cloud-provider telemetry
+where already established by the repository.
 
 ---
 
-# 6. METRICS
-
-Implement useful metrics for:
-
-## API
-
-* request count
-* error count
-* error rate
-* latency
-* status-code distribution
-* route-level latency
-
-## WebSockets
-
-* active connections
-* connection attempts
-* connection failures
-* disconnects
-* reconnects
-* event throughput
-* event failures
-* connection duration
-
-## Messaging
-
-* messages created
-* message processing latency
-* delivery latency
-* read latency
-* synchronization latency
-* failed operations
-
-## Kafka/Redpanda
-
-* consumer lag
-* throughput
-* partition health
-* producer failures
-* consumer failures
-
-## BullMQ
-
-* queue depth
-* active jobs
-* failed jobs
-* retry count
-* job latency
-* processing duration
-
-## Media
-
-* upload failures
-* upload latency
-* processing latency
-* processing failures
-* queue depth
-* CDN errors
-
-## PostgreSQL
-
-* connections
-* query latency
-* errors
-* locks
-* replication health where applicable
-* storage
-* CPU
-* memory
-
-## Redis
-
-* memory
-* hit/miss ratio where meaningful
-* commands
-* latency
-* connections
-* evictions
-* availability
-
----
-
-# 7. METRIC CARDINALITY
-
-Avoid high-cardinality metrics.
-
-Never create unbounded labels from:
-
-* user IDs
-* message IDs
-* conversation IDs
-* request IDs
-* arbitrary URLs
-* media IDs
-
-Use controlled dimensions such as:
-
-* service
-* environment
-* route template
-* operation
-* status class
-* dependency
-
----
-
-# 8. DISTRIBUTED TRACING
-
-Implement end-to-end tracing where supported.
-
-Trace important flows such as:
-
-```text
-Mobile/Web
-→ API
-→ PostgreSQL
-→ Outbox
-→ Kafka/Redpanda
-→ Consumer
-→ Redis
-→ WebSocket
-→ Notification
-```
-
-and:
-
-```text
-Client
-→ Media Authorization
-→ S3
-→ Processing Queue
-→ Media Worker
-→ S3
-→ CDN
-```
-
-and:
-
-```text
-Client
-→ Call Signaling
-→ WebSocket
-→ WebRTC infrastructure
-```
-
-Propagate:
-
-* trace ID
-* span ID
-* correlation ID
-
-where technically appropriate.
-
-Do not put sensitive user content into traces.
-
----
-
-# 9. LOGGING
-
-Standardize structured logging.
-
-Each service should produce logs containing useful metadata such as:
-
-* timestamp
-* severity
-* service
-* environment
-* instance
-* operation
-* request ID
-* correlation ID
-* trace ID
-* duration
-* outcome
-
-Errors should contain actionable information.
-
-Never log:
-
-* passwords
-* access tokens
-* refresh tokens
-* API keys
-* private keys
-* secrets
-* signed URLs
-* raw notification tokens
-* unnecessary private message content
-
----
-
-# 10. LOG RETENTION
-
-Define retention appropriate to:
-
-* operational troubleshooting
-* security investigations
-* cost
-* privacy
-
-Separate:
-
-* application logs
-* audit/security logs
-* infrastructure logs
-
-Do not retain private data indefinitely.
-
----
-
-# 11. AUDIT LOGGING
-
-Ensure security-sensitive operations are auditable.
-
-Where supported by the application architecture, record events such as:
-
-* authentication changes
-* account security changes
-* administrative group changes
-* blocking/reporting
-* privileged actions
-* secret/configuration changes
-* deployment changes
-
-Audit logs should contain sufficient metadata to investigate an event without unnecessarily storing private content.
-
----
-
-# 12. DASHBOARDS
-
-Create production dashboards for:
-
-## Platform overview
-
-* availability
-* request rate
-* error rate
-* latency
-* active users/connections
-* infrastructure health
-
-## Backend
-
-* API traffic
-* errors
-* latency
-* WebSocket connections
-* event throughput
-
-## Messaging
-
-* message throughput
-* delivery latency
-* event processing
-* queue backlog
-* synchronization
-
-## Media
-
-* uploads
-* processing
-* failures
-* storage
-* CDN
-
-## Infrastructure
-
-* nodes
-* pods
-* CPU
-* memory
-* disk
-* network
-
-## Database
-
-* connections
-* CPU
-* storage
-* latency
-* locks
-* replication
-
----
-
-# 13. ALERTING
-
-Create actionable alerts.
-
-Alerts should cover:
-
-* service unavailable
-* elevated error rate
-* elevated latency
-* failed deployments
-* crash loops
-* database failure
-* Redis failure
-* Kafka consumer lag
-* queue backlog
-* worker failure
-* storage failure
-* certificate expiration
-* resource exhaustion
-* backup failure
-* replication failure
-
-Every alert should identify:
-
-* severity
-* affected component
-* condition
-* likely impact
-* useful diagnostic information
-
-Avoid noisy alerts.
-
----
-
-# 14. SLOs AND SLIs
-
-Define practical initial SLOs.
-
-Examples:
-
-### API availability
-
-Measure successful API requests.
-
-### API latency
-
-Measure important API operations.
-
-### Messaging
-
-Measure message acceptance and processing latency.
-
-### WebSocket
-
-Measure connection availability and event delivery behavior.
-
-### Media
-
-Measure successful upload and processing completion.
-
-### Notifications
-
-Measure notification processing where measurable.
-
-### Calling
-
-Measure call setup success where measurable.
-
-Do not invent unrealistic guarantees.
-
-Document the measurement methodology.
-
----
-
-# 15. ERROR BUDGETS
-
-Where the observability platform supports them, establish error-budget concepts.
-
-Operational changes should become more conservative when reliability objectives are being consumed rapidly.
-
-Do not create an elaborate SRE process without actual measurable metrics.
-
----
-
-# 16. AUTOSCALING
-
-Review all scalable workloads.
-
-Configure autoscaling for:
-
-* API
-* WebSocket workloads
-* workers
-* media processors
-* web application
-
-Use appropriate signals.
-
-Examples:
-
-* CPU
-* memory
-* request rate
-* active connections
-* queue depth
-* processing latency
-
-Avoid scaling stateful services without architectural justification.
-
----
-
-# 17. WEBSOCKET SCALING
-
-Validate multi-instance real-time behavior.
-
-Ensure:
-
-* connection routing works
-* Redis adapter/shared state works where required
-* events reach the correct devices
-* authorization remains correct
-* connection draining works
-* reconnect synchronization works
-
-Test scale-out and scale-in.
-
-A WebSocket connection must not depend on a permanently fixed application instance.
-
----
-
-# 18. QUEUE AUTOSCALING
-
-Workers must scale based on actual workload.
-
-Monitor:
-
-* waiting jobs
-* active jobs
-* job duration
-* failure rate
-* retry rate
-
-Avoid excessive concurrency that overloads:
-
-* PostgreSQL
-* Redis
-* S3
-* FFmpeg
-* external providers
-
-Scaling must respect downstream capacity.
-
----
-
-# 19. BACKPRESSURE
-
-Implement operational protection against overload.
-
-Examples:
-
-* API rate limits
-* queue limits
-* connection limits
-* worker concurrency
-* database pool limits
-* upload limits
-* Kafka consumer controls
-
-When overloaded, noncritical operations should degrade before critical messaging/authentication paths.
-
----
-
-# 20. GRACEFUL DEGRADATION
-
-Define behavior when dependencies become unavailable.
-
-Examples:
-
-### Search unavailable
-
-Messaging should continue.
-
-### Notification provider unavailable
-
-Message persistence should continue.
-
-### CDN unavailable
-
-Secure origin/media fallback should behave according to the actual architecture.
-
-### Redis unavailable
-
-Only functionality truly dependent on Redis should fail; durable operations should not silently lose data.
-
-### Kafka temporarily unavailable
-
-Use the actual outbox/retry strategy.
-
-### Search unavailable
-
-Do not make the transactional database dependent on search availability.
-
----
-
-# 21. FAILURE DOMAINS
-
-Review infrastructure for failure-domain isolation.
-
-Avoid placing all critical workloads on:
-
-* one node
-* one availability zone
-* one instance
-* one worker
-* one broker
-
-where the selected infrastructure supports redundancy.
-
----
-
-# 22. POD DISRUPTION
-
-Where Kubernetes is used, configure:
-
-* PodDisruptionBudgets
-* anti-affinity/topology spread
-* rolling update limits
-* termination grace periods
-
-Ensure voluntary infrastructure maintenance does not unnecessarily take down the service.
-
----
-
-# 23. DEPLOYMENT SAFETY
-
-Production deployment must include:
-
-1. validation
-2. artifact creation
-3. security scanning
-4. staging deployment
-5. smoke tests
-6. controlled production rollout
-7. health verification
-8. monitoring
-9. rollback capability
-
-Do not deploy broken images directly to production.
-
----
-
-# 24. ROLLING DEPLOYMENTS
-
-Ensure rolling deployments preserve compatibility.
-
-For backend changes:
-
-* old and new instances may coexist
-* database migrations must be compatible
-* event schemas must remain compatible
-* WebSocket clients must reconnect safely
-* synchronization must handle mixed versions where necessary
-
-Do not require every client to upgrade simultaneously.
-
----
-
-# 25. CANARY / PROGRESSIVE DELIVERY
-
-If the repository's deployment platform supports progressive delivery and it is justified by the system's scale, implement an appropriate strategy.
-
-Possible stages:
-
-```text
-small percentage
-→ health validation
-→ increased percentage
-→ full rollout
-```
-
-Do not add complicated canary tooling without a practical reason.
-
----
-
-# 26. ROLLBACK
-
-Implement reliable rollback.
-
-Rollback must account for:
-
-* application image
-* configuration
-* infrastructure
-* database migrations
-* event schema changes
-
-Never assume a database rollback is as simple as reverting application code.
-
-Prefer forward-compatible migrations.
-
----
-
-# 27. DATABASE MIGRATION SAFETY
-
-Audit production migrations.
-
-Use expand/contract patterns when required.
-
-Example:
-
-```text
-add new field
-→ deploy compatible application
-→ backfill
-→ switch reads/writes
-→ remove old field later
-```
-
-Do not perform destructive schema changes during a deployment where older instances still depend on the removed schema.
-
----
-
-# 28. SECRET ROTATION
-
-Implement or document secret rotation.
-
-Secrets should be rotatable without requiring unnecessary downtime.
-
-Consider:
-
-* database credentials
-* Redis credentials
-* Kafka credentials
-* cloud credentials
-* provider keys
-* signing secrets
-* TURN credentials
-
-Use short-lived credentials where supported.
-
----
-
-# 29. CERTIFICATE MANAGEMENT
-
-Ensure TLS certificates:
-
-* renew automatically
-* are monitored
-* are not manually copied into containers
-* are stored securely
-* are not committed to Git
-
-Alert before expiration.
-
----
-
-# 30. IAM REVIEW
-
-Perform a least-privilege audit.
-
-For each workload determine:
-
-* what it can read
-* what it can write
-* what secrets it can access
-* what cloud resources it can modify
-
-Remove unnecessary permissions.
-
-Do not use wildcard administrative permissions unless technically unavoidable and explicitly justified.
-
----
-
-# 31. NETWORK SECURITY REVIEW
-
-Audit:
-
-* security groups
-* firewall rules
-* public IPs
-* load balancers
-* private endpoints
-* database access
-* Redis access
-* Kafka access
-* search access
-
-Every publicly reachable resource must have a documented purpose.
-
----
-
-# 32. CONTAINER SECURITY
-
-Harden images.
-
-Check for:
-
-* root execution
-* unnecessary packages
-* known vulnerabilities
-* exposed secrets
-* writable filesystem requirements
-* unnecessary Linux capabilities
-
-Use:
-
-* non-root users
-* minimal images
-* read-only filesystem where practical
-* dropped capabilities
-* security contexts
-
-Do not break applications merely to satisfy generic hardening rules; validate actual runtime requirements.
-
----
-
-# 33. KUBERNETES SECURITY
-
-Where Kubernetes is used, review:
-
-* RBAC
-* service accounts
-* namespaces
-* pod security
-* network policies
-* secret access
-* container privileges
-* host networking
-* host filesystem mounts
-
-Applications should not have cluster-admin access.
-
----
-
-# 34. NETWORK POLICIES
-
-Where supported, restrict service-to-service communication.
-
-Examples:
-
-* API → PostgreSQL
-* API → Redis
-* API → Kafka
-* workers → Redis
-* workers → S3
-* search consumers → search
-* observability agents → telemetry endpoints
-
-Do not allow unrestricted pod-to-pod communication when network policies can safely restrict it.
-
----
-
-# 35. WAF / EDGE PROTECTION REVIEW
-
-Review public endpoints for:
-
-* rate limits
-* common attack patterns
-* malicious traffic
-* oversized requests
-* abusive clients
-
-WAF configuration must complement, not replace:
-
-* authentication
-* authorization
-* application validation
-* rate limiting
-
----
-
-# 36. DDoS / ABUSE RESILIENCE
-
-Review edge protections for:
-
-* authentication abuse
-* API floods
-* WebSocket connection floods
-* upload abuse
-* search abuse
-
-Protect expensive operations more aggressively.
-
-Do not allow unauthenticated clients to consume unlimited compute.
-
----
-
-# 37. BACKUP VALIDATION
-
-Backups must be tested.
-
-Validate:
-
-* backup creation
-* backup retention
-* backup accessibility
-* restoration
-* application connectivity after restore
-
-A backup that has never been restored should not be treated as fully validated.
-
----
-
-# 38. DATABASE DISASTER RECOVERY
-
-Document and validate:
-
-* database failure
-* replica promotion where supported
-* point-in-time recovery
-* restore to a new environment
-* application reconnection
-* migration compatibility
-
-Clearly identify the authoritative database.
-
----
-
-# 39. REDIS DISASTER RECOVERY
-
-Determine which Redis workloads require persistence.
-
-Differentiate:
-
-### Reconstructable
-
-* cache
-* presence
-* typing
-* ephemeral state
-
-### Operationally important
-
-* BullMQ state
-* coordination state
-
-Do not apply one persistence policy blindly to every Redis use case.
-
----
-
-# 40. KAFKA / REDPANDA DISASTER RECOVERY
+# 21. SERVICE LEVEL OBJECTIVES
+
+Define infrastructure support for measurable SLOs.
+
+At minimum monitor:
+
+* API availability
+* API latency
+* WebSocket connection success
+* WebSocket stability
+* Message acceptance latency
+* Message delivery latency
+* Event processing latency
+* Queue latency
+* Consumer lag
+* Media upload success
+* Media processing latency
+* Media download success
+* Push notification processing
+* Search availability
 
 Define:
 
-* replication
-* retention
-* consumer recovery
-* replay
-* offset recovery
-* topic recreation
-* backup strategy where appropriate
+* SLIs
+* SLOs
+* Error budgets
+* Alert thresholds
 
-The system must be able to recover consumers without silently losing required durable events.
+Avoid alerts based only on infrastructure utilization.
 
 ---
 
-# 41. SEARCH RECOVERY
+# 22. ALERTING
 
-Search is derived data.
+Implement actionable production alerts.
 
-Ensure indexes can be recreated from authoritative sources/events.
+Alert on:
 
-Document:
+* Regional outages
+* Kubernetes control-plane issues
+* Pod crash loops
+* Node pressure
+* Autoscaling failures
+* API error spikes
+* WebSocket failure spikes
+* Message processing failures
+* Database failover
+* Replica lag
+* Redis failover
+* Kafka/Redpanda replication failures
+* Consumer lag
+* Queue backlog
+* Media processing failures
+* CDN origin failures
+* Certificate expiration
+* Security events
+* Backup failures
+* Recovery failures
 
-* index creation
-* versioning
-* alias switching
-* reindexing
-* failure recovery
+Every critical alert must identify:
 
-Do not make search restoration dependent on manually rebuilding data.
+* What failed
+* Impact
+* Relevant service
+* Region
+* Severity
+* Suggested investigation path
 
----
-
-# 42. MEDIA RECOVERY
-
-Media storage must be recoverable according to its durability requirements.
-
-Validate:
-
-* S3 durability assumptions
-* object retention
-* deleted-object behavior
-* lifecycle rules
-* processing recovery
-* orphan cleanup
-
-Do not delete objects simply because a worker temporarily failed.
-
----
-
-# 43. INCIDENT RESPONSE
-
-Create practical operational procedures for:
-
-* API outage
-* database outage
-* Redis outage
-* Kafka outage
-* queue backlog
-* media processing outage
-* notification outage
-* search outage
-* security incident
-* credential compromise
-* failed deployment
-* certificate failure
-
-Each runbook should contain:
-
-* symptoms
-* impact
-* immediate mitigation
-* diagnostics
-* recovery
-* validation
-* escalation
-* post-incident steps
+Avoid noisy alerts that cannot lead to action.
 
 ---
 
-# 44. ON-CALL READINESS
+# 23. BACKUP INFRASTRUCTURE
 
-Document:
+Implement comprehensive backups for all stateful systems where required.
 
-* critical dashboards
-* alerts
-* service dependencies
-* common failure modes
-* deployment procedures
-* rollback procedures
-* backup recovery
-* escalation contacts/process where applicable
+Include:
 
-Do not invent personal contact information.
+* PostgreSQL
+* Object storage metadata where required
+* Kubernetes critical configuration
+* Terraform state
+* Infrastructure configuration
+* Search indexes where required
+* Event-stream configuration
+* Application configuration
+* Security configuration
 
----
+Backups must support:
 
-# 45. HEALTH AND DEPENDENCY CHECKS
+* Encryption
+* Retention
+* Cross-region storage
+* Integrity verification
+* Restore testing
 
-Review readiness checks carefully.
-
-Do not make a service permanently unready because an optional dependency is unavailable.
-
-Classify dependencies:
-
-### Critical
-
-Required for correct core operation.
-
-### Degraded
-
-Allows partial operation.
-
-### Optional
-
-Should not prevent normal service.
-
-Use this classification when designing readiness behavior.
+Do not consider an untested backup to be a reliable backup.
 
 ---
 
-# 46. SERVICE DEPENDENCY MAP
+# 24. DISASTER RECOVERY
 
-Document the real dependency graph.
+Implement a complete disaster recovery infrastructure strategy.
 
-Example:
+Cover:
 
-```text
-Web / Mobile
-      ↓
-Load Balancer
-      ↓
-API / WebSocket
- ┌────┼─────┬────────┐
- ↓    ↓     ↓        ↓
-DB   Redis Kafka    S3
-            ↓
-         Workers
-       ┌────┼────┐
-       ↓    ↓    ↓
-    Media Search Notifications
-```
+* Region failure
+* Availability-zone failure
+* Database failure
+* Redis failure
+* Broker failure
+* Kubernetes cluster failure
+* S3 dependency failure
+* CDN origin failure
+* Secret-management failure
+* CI/CD failure
+* DNS failure
 
-Adjust this diagram to match the actual repository.
+Define:
 
-Do not document imaginary dependencies.
+* RPO
+* RTO
+* Recovery sequence
+* Failover sequence
+* Failback sequence
+* Validation sequence
 
----
-
-# 47. CAPACITY PLANNING
-
-Estimate initial production capacity for:
-
-* API instances
-* WebSocket connections
-* database connections
-* Redis memory
-* Kafka partitions
-* worker concurrency
-* media processing
-* object storage
-* search
-
-Document assumptions.
-
-Identify which values must be load-tested before major production scale.
+Document which components recover automatically and which require operator intervention.
 
 ---
 
-# 48. LOAD TESTING
+# 25. RESTORE TESTING
 
-Where infrastructure and tooling support it, create realistic load tests for:
-
-* authentication
-* conversation retrieval
-* message sending
-* message synchronization
-* WebSocket connections
-* message fanout
-* media upload
-* search
-* notification processing
-
-Measure:
-
-* throughput
-* latency
-* error rate
-* resource utilization
-* queue growth
-* database behavior
-
-Do not generate meaningless synthetic benchmarks.
-
----
-
-# 49. REAL-TIME LOAD TESTING
+Implement automated or scheduled infrastructure validation for recovery procedures where practical.
 
 Test:
 
-* many simultaneous WebSocket connections
-* reconnect storms
-* group fanout
-* message bursts
-* multiple devices
-* event duplication
-* consumer lag
+* Database restore
+* Backup integrity
+* Replica recovery
+* Infrastructure recreation
+* Kubernetes recovery
+* Critical secret restoration
+* Media accessibility
+* Application startup after restoration
 
-Verify the platform remains correct under load, not merely available.
+Recovery tests must verify actual application functionality rather than only infrastructure creation.
 
 ---
 
-# 50. RECONNECT STORM PROTECTION
+# 26. SECURITY HARDENING
 
-The infrastructure must handle scenarios where many clients reconnect simultaneously.
+Harden production infrastructure.
+
+Implement:
+
+* Least-privilege IAM
+* KMS encryption
+* Secrets Manager
+* Security groups
+* Network policies
+* Private subnets
+* Private endpoints
+* TLS
+* Certificate management
+* WAF
+* DDoS protection where appropriate
+* Audit logging
+* CloudTrail
+* EKS audit visibility
+* Security event monitoring
+
+Avoid long-lived static credentials.
+
+Prefer:
+
+* IAM roles
+* Workload identity
+* Short-lived credentials
+
+where supported.
+
+---
+
+# 27. WAF AND EDGE SECURITY
+
+Harden the public edge.
 
 Protect:
 
-* load balancer
-* authentication
-* WebSocket service
+* Web application
+* API endpoints
+* Authentication endpoints
+* Media endpoints
+* WebSocket entry points
+
+Implement appropriate controls for:
+
+* IP reputation
+* Rate limiting
+* Request size
+* Malicious payloads
+* Automated abuse
+* Credential attacks
+* HTTP floods
+* Common application-layer attacks
+
+Do not configure generic blocking rules that break legitimate messaging traffic.
+
+Monitor false positives.
+
+---
+
+# 28. NETWORK SECURITY
+
+Implement internal segmentation.
+
+Separate appropriately:
+
+* Public edge
+* API workloads
+* WebSocket workloads
+* Worker workloads
+* Databases
 * Redis
-* database
-* Kafka
+* Brokers
+* Search
+* Observability
+* Administration
+
+Use Kubernetes NetworkPolicies where supported.
+
+Default toward deny-by-default internal communication where practical, then explicitly allow required traffic.
+
+---
+
+# 29. SECRETS AND KEY MANAGEMENT
+
+Harden secret handling.
+
+Implement:
+
+* AWS KMS
+* Secrets Manager
+* Kubernetes secret integration
+* Secret rotation
+* Encryption
+* Access auditing
+* Environment isolation
+
+Do not commit:
+
+* API keys
+* Passwords
+* Tokens
+* Private keys
+* Database credentials
+* Cloud credentials
+
+to the repository.
+
+Do not print secrets into logs.
+
+---
+
+# 30. INFRASTRUCTURE STATE SECURITY
+
+Harden Terraform state management.
+
+Ensure:
+
+* Remote state
+* Encryption
+* State locking
+* Restricted access
+* Versioning
+* Recovery
+* Environment isolation
+
+Terraform state must never be publicly accessible.
+
+CI/CD must use secure credentials for Terraform operations.
+
+---
+
+# 31. CI/CD ADVANCED PIPELINES
+
+Extend GitHub Actions for production infrastructure.
+
+Implement pipelines for:
+
+* Terraform validation
+* Terraform plan
+* Terraform apply
+* Container build
+* Image scan
+* Image push
+* Helm validation
+* Kubernetes validation
+* Deployment
+* Smoke tests
+* Progressive rollout
+* Rollback
+
+Separate:
+
+* Pull request validation
+* Non-production deployment
+* Production deployment
+
+Production deployment must include appropriate approval and protection controls.
+
+---
+
+# 32. ENVIRONMENT PROMOTION
+
+Implement predictable promotion across:
+
+* Development
+* Test
+* Staging
+* Production
+
+Artifacts should be promoted rather than rebuilt differently for every environment.
+
+Ensure:
+
+* Immutable artifacts
+* Version tracking
+* Configuration separation
+* Secret separation
+* Environment-specific infrastructure
+* Deployment traceability
+
+---
+
+# 33. CAPACITY MANAGEMENT
+
+Implement infrastructure capacity planning support.
+
+Monitor and document capacity for:
+
+* Kubernetes nodes
+* API pods
+* WebSocket pods
+* Worker pods
+* Database connections
+* Database storage
+* Redis memory
+* Broker partitions
+* Broker storage
+* Search nodes
+* S3 storage
+* CDN throughput
+* Network throughput
+
+Define scaling thresholds and operational limits.
+
+Do not allow services to reach hard capacity limits before scaling begins.
+
+---
+
+# 34. COST CONTROL
+
+Implement production cost controls without sacrificing reliability.
 
 Use:
 
-* exponential backoff
-* jitter
-* connection limits
-* rate limiting
-* autoscaling
-* graceful degradation
+* Appropriate instance types
+* Autoscaling
+* Storage lifecycle policies
+* S3 lifecycle rules
+* Log retention
+* Metrics retention
+* Right-sized environments
+* Spot capacity for appropriate non-critical workloads
+* Reserved capacity where justified
 
-where appropriate.
+Never use cost optimization that compromises:
 
----
-
-# 51. COST OPTIMIZATION
-
-Review infrastructure cost.
-
-Look for:
-
-* oversized instances
-* unnecessary NAT usage
-* excessive logging
-* excessive metrics
-* oversized Kafka retention
-* unused search capacity
-* excessive S3 storage
-* unnecessary CDN invalidations
-* idle development resources
-
-Do not sacrifice production reliability for small cost reductions.
+* Security
+* Availability
+* Data durability
+* Disaster recovery
+* Production SLOs
 
 ---
 
-# 52. RESOURCE TAGGING
+# 35. INFRASTRUCTURE DRIFT DETECTION
 
-Where supported, consistently tag cloud resources.
+Implement controls against configuration drift.
 
-Useful tags include:
+Detect:
 
-* project
-* environment
-* service
-* owner/team
-* managed-by
-* cost-center where applicable
+* Terraform drift
+* Kubernetes drift
+* Unauthorized AWS changes
+* Configuration changes
+* IAM changes
+* Security-group changes
 
-Do not invent organizational identifiers.
+Where practical, integrate drift detection into scheduled CI/CD or operational workflows.
 
 ---
 
-# 53. ENVIRONMENT ISOLATION
+# 36. PRODUCTION OPERATIONS
 
-Ensure staging cannot accidentally access production resources.
+Implement operational readiness for:
 
-Review:
+* Deployments
+* Rollbacks
+* Regional evacuation
+* Database failover
+* Redis failover
+* Broker recovery
+* Kubernetes node replacement
+* Certificate rotation
+* Secret rotation
+* Backup restoration
+* Media pipeline recovery
 
+Create operational documentation and runbooks where required.
+
+Runbooks must contain actual actionable procedures.
+
+Do not create placeholder runbooks.
+
+---
+
+# 37. FAILURE AND RESILIENCE ENGINEERING
+
+Design infrastructure to tolerate:
+
+* Pod failures
+* Node failures
+* Availability-zone failures
+* Region failures
+* Network partitions
+* Dependency failures
+* Database failovers
+* Redis failovers
+* Broker failures
+* Queue backlogs
+* CDN origin failures
+* Deployment failures
+* Reconnect storms
+* Traffic spikes
+
+Implement bounded retries, backoff, circuit-breaking support, and load-shedding mechanisms where appropriate to the infrastructure layer.
+
+Avoid retry storms.
+
+---
+
+# 38. SECURITY AND COMPLIANCE EVIDENCE
+
+Ensure infrastructure produces auditable evidence for:
+
+* Authentication
+* Authorization
+* Infrastructure changes
+* IAM changes
+* Secret access
+* Administrative actions
+* Deployment events
+* Security events
+* Backup status
+* Recovery testing
+
+Use centralized audit logging.
+
+Ensure logs have appropriate retention and access restrictions.
+
+---
+
+# 39. INFRASTRUCTURE TESTING
+
+Implement meaningful infrastructure tests.
+
+Include where applicable:
+
+* Terraform validation
+* Terraform formatting
+* Terraform plan validation
+* Terraform module tests
+* Helm linting
+* Kubernetes manifest validation
+* Policy validation
+* Security scanning
+* Container scanning
+* Infrastructure integration tests
+* Deployment smoke tests
+* Backup validation
+* Recovery validation
+
+Do not consider syntax validation sufficient.
+
+---
+
+# 40. PRODUCTION READINESS REVIEW
+
+Perform a full production infrastructure review.
+
+Verify:
+
+* Multi-region strategy
+* High availability
+* Network isolation
+* Database resilience
+* Redis resilience
+* Broker resilience
+* Kubernetes resilience
+* Autoscaling
+* WebSocket scaling
+* Media delivery
+* CDN
+* Observability
+* Alerting
+* Backup
+* Disaster recovery
+* Security
 * IAM
-* network routing
-* credentials
-* secrets
-* databases
-* buckets
-* Kafka
-* Redis
-* search
+* Secrets
+* CI/CD
+* Rollback
+* Capacity
+* Cost controls
+* Operational runbooks
 
-A staging compromise must not automatically become a production compromise.
+Identify and correct implementation gaps that fall within this prompt's scope.
 
 ---
 
-# 54. PRODUCTION DATA PROTECTION
+# 41. REPOSITORY INTEGRATION
 
-Never use production data in development or tests unless explicitly authorized and appropriately sanitized.
+Integrate the implementation into the existing repository.
 
-Operational tooling must avoid accidental exposure of private user data.
+Requirements:
 
----
+* Preserve existing working infrastructure.
+* Do not regenerate unchanged files.
+* Do not create duplicate infrastructure.
+* Maintain naming consistency.
+* Maintain environment consistency.
+* Maintain Terraform module boundaries.
+* Maintain Helm conventions.
+* Maintain Kubernetes conventions.
+* Maintain CI/CD conventions.
+* Maintain existing application contracts.
+* Maintain compatibility with the backend, frontend, mobile, database, messaging, media, and observability systems already represented in the repository.
+* Update documentation when infrastructure behavior changes.
+* Ensure all infrastructure references resolve correctly.
 
-# 55. PRIVACY REVIEW
-
-Infrastructure must respect application privacy.
-
-Audit:
-
-* logs
-* traces
-* backups
-* search indexes
-* object storage
-* metrics
-* notification systems
-* analytics
-
-Avoid retaining personal/private content where unnecessary.
-
-Ensure deletion/retention behavior is compatible with the application's privacy model.
+If an existing implementation conflicts with a production requirement, correct it rather than creating a parallel competing implementation.
 
 ---
 
-# 56. SECURITY MONITORING
+# 42. VALIDATION REQUIREMENTS
 
-Where appropriate, monitor:
+Before declaring this prompt complete:
 
-* unusual authentication activity
-* privilege changes
-* unexpected network traffic
-* unusual API usage
-* abnormal upload activity
-* excessive WebSocket connections
-* suspicious worker behavior
-* secret access
-* administrative actions
+1. Validate Terraform formatting.
+2. Validate Terraform configuration.
+3. Validate Terraform modules.
+4. Validate Terraform plans where credentials and environment access permit.
+5. Validate Kubernetes manifests.
+6. Validate Helm charts.
+7. Validate Docker configurations.
+8. Validate CI/CD workflows.
+9. Validate IAM configuration.
+10. Validate networking.
+11. Validate security boundaries.
+12. Validate autoscaling configuration.
+13. Validate health probes.
+14. Validate deployment strategies.
+15. Validate backup configuration.
+16. Validate disaster recovery configuration.
+17. Validate observability.
+18. Validate alerting.
+19. Validate secrets handling.
+20. Validate production configuration consistency.
+21. Validate repository integration.
+22. Run all relevant infrastructure and application tests available in the repository.
+23. Fix all issues discovered within the scope of this prompt.
 
-Do not collect unnecessary personal information merely for monitoring.
-
----
-
-# 57. SUPPLY-CHAIN SECURITY
-
-Review:
-
-* npm dependencies
-* Docker base images
-* GitHub Actions or CI actions
-* infrastructure providers/modules
-* container images
-
-Use version pinning or controlled version ranges where appropriate.
-
-Enable dependency and container scanning.
-
-Avoid untrusted build dependencies.
+Do not declare success merely because configuration files exist.
 
 ---
 
-# 58. CI/CD HARDENING
+# 43. HARD IMPLEMENTATION RULES
 
-CI/CD must:
+You MUST:
 
-* use least-privilege credentials
-* prefer OIDC/short-lived credentials
-* protect production environments
-* prevent secret leakage
-* scan artifacts
-* validate infrastructure
-* support rollback
-* record deployment metadata
+* Inspect the repository before changing anything.
+* Implement actual infrastructure.
+* Use production-grade configuration.
+* Preserve compatibility.
+* Prefer secure defaults.
+* Prefer immutable infrastructure.
+* Prefer automation over manual configuration.
+* Prefer horizontal scaling.
+* Design for failure.
+* Design for observability.
+* Design for recovery.
+* Keep infrastructure reproducible.
+* Keep environments isolated.
+* Keep production access restricted.
+* Validate every meaningful infrastructure change.
 
-Production deployments should require appropriate controls for the project's maturity.
+You MUST NOT:
+
+* Use pseudo-code.
+* Use placeholders.
+* Use fake resource identifiers.
+* Use fake secrets.
+* Add TODO comments instead of implementation.
+* Leave incomplete Terraform modules.
+* Leave incomplete Helm charts.
+* Leave broken Kubernetes manifests.
+* Invent unavailable AWS features.
+* Expose private services publicly without justification.
+* Commit credentials.
+* Disable security controls merely to simplify deployment.
+* Replace production infrastructure with toy examples.
+* Rebuild working infrastructure unnecessarily.
+* Use mutable production artifacts.
+* Ignore failure recovery.
+* Ignore observability.
+* Ignore backup and restoration.
+* Claim high availability without implementing it.
+
+Never use phrases such as:
+
+* “implement similarly”
+* “left as an exercise”
+* “for brevity”
+* “remaining code omitted”
+* “placeholder”
+* “TODO”
+* “etc.” as a substitute for required implementation
 
 ---
 
-# 59. DEPLOYMENT AUDITABILITY
+# 44. DOCUMENTATION REQUIREMENTS
 
-Every production deployment should identify:
+Update or create infrastructure documentation covering:
 
-* application version
-* container image
-* commit
-* deployment time
-* environment
-* migration version
-* deployment result
-
-This information must be observable without exposing secrets.
-
----
-
-# 60. CONFIGURATION DRIFT
-
-Prevent or detect infrastructure drift.
-
-Where infrastructure-as-code is used:
-
-* define authoritative configuration
-* validate changes through code review/CI
-* detect unexpected changes where practical
-
-Do not make production infrastructure dependent on undocumented manual changes.
-
----
-
-# 61. OPERATIONAL DOCUMENTATION
-
-Update documentation for:
-
-* deployment
-* rollback
-* scaling
-* incident response
-* backups
-* restoration
-* secret rotation
-* certificate management
-* monitoring
-* alerts
-* infrastructure recreation
-* database migrations
-* queue recovery
-* Kafka recovery
-* search reindexing
-* media recovery
+* Multi-region architecture
+* Traffic routing
+* Deployment strategy
+* Scaling
+* Database failover
+* Redis failover
+* Broker recovery
+* Backup
+* Disaster recovery
+* Security
+* Secrets
+* Monitoring
+* Alerting
+* Incident response
+* Operational runbooks
+* Environment management
 
 Documentation must describe the actual implementation.
 
+Do not document infrastructure that does not exist.
+
 ---
 
-# 62. FINAL SECURITY AUDIT
+# 45. FINAL IMPLEMENTATION REPORT
 
-Perform a final infrastructure security audit covering:
+At completion, provide a concise but technically complete report containing:
 
-* public resources
-* IAM
-* secrets
-* encryption
-* TLS
-* networking
-* containers
-* Kubernetes
-* CI/CD
-* S3
-* database
+## IMPLEMENTED
+
+List the major infrastructure capabilities implemented.
+
+## MULTI-REGION
+
+Describe:
+
+* Regions
+* Traffic routing
+* Failover
+* Regional isolation
+
+## DATA SERVICES
+
+Describe:
+
+* PostgreSQL
+* Replication
 * Redis
-* Kafka
-* search
-* observability
-* backups
+* Kafka/Redpanda
+* OpenSearch/Elasticsearch
+* S3
 
-Fix issues directly where possible.
+## KUBERNETES
 
-Do not merely report obvious security defects.
+Describe:
 
----
+* EKS
+* Node strategy
+* Autoscaling
+* Pod distribution
+* Deployment strategy
 
-# 63. FINAL RESILIENCE AUDIT
+## MEDIA
 
-Verify behavior during:
+Describe:
 
-* API instance failure
-* worker failure
-* database failover
-* Redis failure
-* Kafka broker failure
-* search failure
-* S3 temporary failure
-* notification provider failure
-* WebSocket instance termination
-* node failure
-* availability-zone failure where supported
-* deployment failure
-* migration failure
-* network interruption
+* S3
+* CloudFront
+* Authorization
+* Processing
+* CDN strategy
 
-For every critical dependency determine:
+## OBSERVABILITY
 
-* what fails
-* what continues
-* how recovery occurs
+Describe:
 
----
+* Metrics
+* Logs
+* Traces
+* Dashboards
+* Alerts
 
-# 64. PRODUCTION READINESS GATES
+## SECURITY
 
-Do not consider the infrastructure production-ready until these categories have been validated:
+Describe:
 
-## Security
+* IAM
+* KMS
+* Secrets
+* Network security
+* WAF
+* Container security
 
-* least privilege
-* secret protection
-* network isolation
-* encryption
-* TLS
-* container security
-* CI/CD security
+## DISASTER RECOVERY
 
-## Reliability
+Describe:
 
-* redundancy
-* health checks
-* graceful shutdown
-* autoscaling
-* failure recovery
+* Backups
+* RPO
+* RTO
+* Failover
+* Restore procedures
 
-## Observability
+## CI/CD
 
-* logs
-* metrics
-* traces
-* dashboards
-* alerts
-* SLOs
+Describe:
 
-## Data
+* Build
+* Scan
+* Deployment
+* Promotion
+* Rollback
 
-* backups
-* restore
-* migration safety
-* replication where applicable
+## TESTING
 
-## Deployment
+List the validation and infrastructure tests executed.
 
-* CI/CD
-* staged deployment
-* rollback
-* configuration management
+## FILES CHANGED
 
-## Operations
+List every created, modified, or deleted file with a short explanation.
 
-* runbooks
-* incident response
-* capacity planning
-* disaster recovery
+## REMAINING ISSUES
+
+Only list genuine unresolved issues that are outside the current implementation scope or require unavailable external infrastructure access.
+
+Do not claim an issue is resolved if it was not actually resolved.
 
 ---
 
-# 65. FINAL VALIDATION
+# INFRASTRUCTURE VOLUME 2 COMPLETION STANDARD
 
-Run every relevant validation available in the repository.
+This prompt is complete only when the repository contains a coherent advanced production infrastructure implementation capable of supporting global operation with:
 
-At minimum:
+* Multi-region deployment
+* Regional failover
+* Highly available data services
+* Scalable Kubernetes workloads
+* Large-scale WebSocket infrastructure
+* Advanced autoscaling
+* Production-safe deployments
+* Global media delivery
+* Strong observability
+* Secure infrastructure
+* Tested backups
+* Disaster recovery readiness
+* Production CI/CD
+* Failure-aware operational procedures
 
-1. infrastructure syntax validation
-2. infrastructure formatting validation
-3. Terraform/OpenTofu validation where applicable
-4. Kubernetes validation where applicable
-5. Helm validation where applicable
-6. Docker builds
-7. CI configuration validation
-8. security scanning
-9. secret scanning
-10. dependency scanning
-11. application build
-12. application tests
-13. infrastructure tests
-14. deployment smoke tests
-15. health checks
-16. observability validation
-17. backup validation
-18. restore validation where environment permits
-19. load testing where available
-20. failure/recovery validation
+Every implemented configuration must be syntactically valid, internally consistent, secure, reproducible, and integrated with the repository.
 
-Fix failures instead of simply documenting them.
+Every infrastructure component must have a clear ownership boundary.
 
----
+Every production-critical dependency must have a documented failure strategy.
 
-# 66. NO FALSE COMPLETION
+Every deployment must be observable and reversible.
 
-Do not claim:
+Every stateful production system must have an appropriate recovery strategy.
 
-* production deployment succeeded unless it actually succeeded
-* backups were restored unless restoration was actually tested
-* infrastructure is highly available unless the deployed configuration provides it
-* autoscaling works unless configured and validated
-* monitoring works unless telemetry is actually produced
-* disaster recovery works unless the recovery process has been tested or its untested status is explicitly stated
-
-Report actual repository and environment state.
-
----
-
-# 67. NO PLACEHOLDERS
-
-Do not leave:
-
-* TODO infrastructure
-* fake dashboards
-* fake alerts
-* dummy production resources
-* empty runbooks
-* placeholder Terraform
-* imaginary metrics
-* fake recovery procedures
-* commented-out security controls presented as implemented
-
-Every committed artifact must have a real purpose.
-
----
-
-# 68. CROSS-SYSTEM CONSISTENCY
-
-Verify infrastructure compatibility with the actual application.
-
-Do not accidentally change:
-
-* API URLs
-* WebSocket URLs
-* database connection formats
-* Redis configuration
-* Kafka topics
-* BullMQ queue names
-* S3 paths
-* CloudFront paths
-* search endpoints
-* notification configuration
-* WebRTC configuration
-* environment variable names
-
-unless the actual repository requires it.
-
-If a change is required, update every affected consumer.
-
----
-
-# 69. IMPLEMENTATION ORDER
-
-Use this implementation sequence unless repository dependencies require another safe order:
-
-### Phase 1
-
-Audit current infrastructure.
-
-### Phase 2
-
-Complete observability.
-
-### Phase 3
-
-Complete dashboards and alerts.
-
-### Phase 4
-
-Implement SLO/SLI monitoring.
-
-### Phase 5
-
-Harden autoscaling and capacity.
-
-### Phase 6
-
-Harden deployments and rollback.
-
-### Phase 7
-
-Validate backups and disaster recovery.
-
-### Phase 8
-
-Perform IAM/security hardening.
-
-### Phase 9
-
-Perform network/container/Kubernetes hardening.
-
-### Phase 10
-
-Implement operational runbooks.
-
-### Phase 11
-
-Perform load and failure testing.
-
-### Phase 12
-
-Perform final production-readiness audit.
-
----
-
-# 70. FINAL DELIVERABLE
-
-The repository must contain a complete operational foundation capable of supporting the real-time communication platform in production.
-
-At completion report:
-
-* files created
-* files modified
-* infrastructure hardened
-* observability implemented
-* dashboards implemented
-* alerts implemented
-* SLOs/SLIs implemented
-* scaling configuration
-* deployment improvements
-* rollback capability
-* security improvements
-* backup/restore validation
-* disaster-recovery procedures
-* incident-response runbooks
-* load/failure tests
-* CI/CD changes
-* dependencies added
-* validation commands
-* validation results
-* actual limitations
-* any items that could not be validated because of unavailable external infrastructure
-
-Do not provide a conceptual answer instead of implementation.
-
-Inspect the repository first.
-
-Then implement the complete production-operations and final-hardening scope described above.
+Do not stop at architectural descriptions. Implement the infrastructure.

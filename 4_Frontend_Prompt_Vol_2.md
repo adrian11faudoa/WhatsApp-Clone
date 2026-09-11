@@ -1,3495 +1,1241 @@
-# Frontend Prompt — Volume 2 — Advanced Messaging, Media, Search, Notifications, Settings, Calling, and Production Hardening
+# WHATSAPP — FRONTEND VOLUME 2
 
 ## ROLE
 
-You are the senior frontend engineering team responsible for completing the production-grade web application for an enterprise real-time communication platform.
+Act as a Principal Frontend Architect, Staff Frontend Engineer, Staff TypeScript Engineer, Staff Real-Time Systems Engineer, Staff UI/UX Engineer, Staff Accessibility Engineer, Staff Performance Engineer, Staff Security Engineer, and Senior QA Engineer working as one production engineering team.
 
-Work directly against the existing repository.
+Your responsibility is to implement the **advanced messaging experience and real-time communication UX** for the WhatsApp web application.
 
-This is one implementation phase of one coherent system. The repository is the source of truth for all existing frontend implementation, backend contracts, API contracts, WebSocket contracts, authentication behavior, domain models, UI conventions, and infrastructure assumptions.
+Do not act as a teacher. Do not provide tutorials instead of implementation. Inspect the repository, understand its current implementation, and directly implement the required production functionality.
 
-Do not create a separate application.
+The resulting implementation must support a global communication platform operating at very large scale with high message throughput, large conversation histories, large groups, millions of concurrent connections, intermittent connectivity, and continuous real-time updates.
 
-Do not create a competing frontend architecture.
+---
+
+# PROJECT
+
+Build the advanced web messaging experience for a production-grade global real-time communication platform comparable in capability and usability to WhatsApp, Telegram, Signal, Messenger, Discord, and Teams.
+
+The scope of this volume is the **complete interactive messaging experience built on top of the repository's existing frontend foundation**.
+
+Implement production-quality support for:
+
+* sending and receiving messages
+* optimistic message states
+* message delivery states
+* read states
+* replies
+* message editing
+* message deletion
+* reactions
+* forwarding
+* pinning
+* saved messages
+* message selection
+* contextual actions
+* conversation search
+* message search
+* unread handling
+* typing indicators
+* presence
+* group messaging UX
+* group member interactions
+* real-time reconciliation
+* offline/reconnect behavior
+* message pagination
+* scroll restoration
+* message virtualization
+* notification behavior
+* accessibility
+* performance
+* security
+* automated testing
+
+Do not create fake backend behavior.
+
+Consume the actual API and WebSocket contracts available in the repository.
+
+---
+
+# TECHNOLOGY DIRECTION
+
+Use the existing repository technology and conventions.
+
+The intended web stack is:
+
+* Next.js
+* React
+* TypeScript
+* Tailwind CSS
+* TanStack Query
+* Zustand
+* React Hook Form
+* Zod
+* Socket.IO client or the repository's established WebSocket client
+* REST/OpenAPI APIs
+* modern browser APIs
+* accessible semantic HTML
+
+Use existing shared UI components and utilities whenever appropriate.
+
+Do not introduce redundant dependencies.
+
+---
+
+# SOURCE OF TRUTH
+
+The repository is the authoritative source for:
+
+* frontend architecture
+* routes
+* components
+* API contracts
+* WebSocket events
+* domain models
+* authentication
+* conversation models
+* message models
+* group models
+* design system
+* state management
+* testing
+* environment configuration
 
 Inspect the repository before modifying anything.
 
-Reuse compatible existing implementation and make the smallest safe changes required to complete this phase.
+Do not assume that an endpoint or event exists.
+
+Do not regenerate unchanged files.
+
+Do not replace existing working implementations unnecessarily.
+
+Do not redesign backend contracts merely to simplify frontend implementation.
 
 ---
 
-# 1. PLATFORM CONTEXT
+# 1. IMPLEMENTATION OBJECTIVES
 
-The application is an original enterprise-grade real-time communication platform inspired by modern messaging products.
+Prioritize:
 
-The web application already has its foundational architecture and core messaging experience.
+1. correctness
+2. real-time consistency
+3. user experience
+4. accessibility
+5. security
+6. performance
+7. maintainability
+8. resilience
+9. testability
+10. scalability
 
-This phase completes the advanced client capabilities, including:
+The messaging interface must remain usable during:
 
-* production media workflows;
-* image/video/audio/document experiences;
-* media upload progress;
-* media processing states;
-* advanced message interactions;
-* search;
-* notification preferences;
-* browser notifications where supported;
-* profile/settings;
-* privacy controls;
-* conversation controls;
-* group administration;
-* blocking/reporting;
-* disappearing-message UI where supported;
-* voice/video calling UI foundations;
-* WebRTC client integration where backend contracts support it;
-* call signaling;
-* call states;
-* production resilience;
-* performance;
-* accessibility;
-* security;
-* testing;
-* deployment readiness.
-
-Do not invent functionality that the backend does not support.
+* high message volume
+* rapid message arrival
+* network loss
+* WebSocket reconnect
+* duplicate events
+* delayed events
+* out-of-order events
+* large conversation histories
+* large groups
+* slow devices
+* slow APIs
 
 ---
 
-# 2. REPOSITORY-FIRST REQUIREMENT
+# 2. MESSAGE DOMAIN CLIENT ARCHITECTURE
 
-Before changing anything:
+Implement a strongly typed client-side message model.
 
-1. Inspect the existing frontend.
-2. Inspect the implementation from the previous frontend phase.
-3. Inspect backend APIs.
-4. Inspect OpenAPI contracts.
-5. Inspect WebSocket/Socket.IO events.
-6. Inspect synchronization contracts.
-7. Inspect media contracts.
-8. Inspect notification contracts.
-9. Inspect search contracts.
-10. Inspect call/signaling contracts.
-11. Inspect authentication and authorization behavior.
-12. Inspect existing UI/design system.
-13. Inspect tests.
-14. Inspect environment variables and configuration.
+Represent the lifecycle of a message distinctly.
 
-The actual repository determines existing behavior.
+Support states such as:
 
-If something described here is already implemented correctly:
+* composing
+* pending
+* sending
+* sent
+* delivered
+* read
+* failed
+* edited
+* deleted
 
-* reuse it;
-* improve it only when required;
-* do not rewrite it unnecessarily.
+Where the backend supports additional states, integrate them without collapsing semantically different states into one generic status.
 
-If the backend does not expose a capability:
+Every rendered message must have a stable identity.
 
-* do not fake it;
-* do not create a frontend-only version;
-* integrate only what is actually supported.
+Do not use array indexes as message identity.
 
 ---
 
-# 3. ADVANCED MEDIA EXPERIENCE
+# 3. MESSAGE SENDING
 
-Complete the media experience using the backend media contracts.
+Implement the complete send-message UX.
 
 Support:
 
-* image attachments;
-* video attachments;
-* audio attachments;
-* voice messages;
-* documents;
-* thumbnails;
-* previews;
-* processing states;
-* upload progress;
-* retry;
-* failed uploads;
-* media access authorization;
-* secure download/open behavior.
+* text message composition
+* send button
+* keyboard send
+* validation
+* pending state
+* optimistic rendering where appropriate
+* server acknowledgement
+* replacement of temporary client identifiers
+* failure state
+* retry
+* cancellation where supported
+
+The user must immediately see a locally pending message when optimistic behavior is safe.
+
+When the server confirms the message:
+
+* reconcile the temporary message
+* preserve ordering
+* prevent duplicate rendering
+* update delivery state
+
+If sending fails:
+
+* preserve the user's message
+* clearly indicate failure
+* provide retry
+* do not silently discard content
+
+Never create duplicate messages because a WebSocket acknowledgement and HTTP response arrive through different paths.
 
 ---
 
-# 4. MEDIA ATTACHMENT FLOW
+# 4. MESSAGE IDEMPOTENCY AND RECONCILIATION
 
-Implement the complete client workflow:
+Implement client reconciliation around the backend's idempotency contract.
 
-1. user selects media;
-2. client performs basic validation;
-3. client displays attachment preview;
-4. client requests backend upload initialization;
-5. client uploads using the backend-provided mechanism;
-6. client tracks progress;
-7. client handles cancellation where supported;
-8. client confirms upload completion;
-9. backend processing begins;
-10. client receives or polls processing status according to actual contract;
-11. client creates/sends the message;
-12. UI reconciles with canonical server state.
+Track the appropriate identifiers for:
 
-Do not send raw files through the normal message JSON API if the backend architecture uses direct object-storage uploads.
+* client-generated message identity
+* server message identity
+* conversation identity
+* event identity
 
----
+When an acknowledgement is received:
 
-# 5. MEDIA VALIDATION
+* locate the pending message deterministically
+* merge server-authoritative fields
+* preserve local-only UI state where appropriate
+* remove the temporary representation
+* avoid duplicate insertion
 
-Perform useful client-side validation for immediate UX:
+When the same message arrives through another event:
 
-* file size;
-* supported type;
-* obvious invalid extension;
-* image dimensions where easily available;
-* duration where available.
+* deduplicate it
+* update existing state rather than append another message
 
-Client validation is only an optimization.
-
-The backend remains authoritative.
-
-If the backend rejects the file, display the server's normalized error appropriately.
+The client must be safe against repeated delivery of the same event.
 
 ---
 
-# 6. UPLOAD PROGRESS
+# 5. MESSAGE ORDERING
 
-Provide reliable progress UI.
+Respect server-authoritative ordering.
 
-Represent:
+Do not rely exclusively on:
 
-* preparing;
-* uploading;
-* uploaded;
-* processing;
-* ready;
-* failed;
-* canceled.
+* browser timestamps
+* JavaScript array insertion order
+* local clock values
 
-Avoid displaying 100% upload progress as equivalent to media readiness.
-
-Upload completion and media processing are separate states.
-
----
-
-# 7. MEDIA RETRY
-
-Allow retry when appropriate.
-
-Retry behavior must:
-
-* reuse safe idempotency semantics;
-* avoid duplicate media objects;
-* avoid duplicate messages;
-* not restart expensive processing unnecessarily;
-* respect backend expiration;
-* provide a clear failure state.
-
-Do not implement infinite retries.
-
----
-
-# 8. IMAGE VIEWER
-
-Implement a production-quality image viewer.
-
-Support:
-
-* preview;
-* larger view;
-* keyboard navigation where multiple images exist;
-* close;
-* zoom where appropriate;
-* loading state;
-* failure state.
-
-Do not bypass authorization by constructing arbitrary S3 URLs.
-
-Use backend-provided secure media access.
-
----
-
-# 9. VIDEO PLAYER
-
-Implement video playback according to backend-provided media variants.
-
-Support:
-
-* play/pause;
-* seek;
-* volume;
-* fullscreen;
-* loading;
-* error;
-* poster/thumbnail.
-
-Do not assume every uploaded video has been transcoded into every browser-compatible format.
-
-Use the actual available media variants.
-
----
-
-# 10. AUDIO AND VOICE MESSAGES
-
-Implement audio playback UI.
-
-Support:
-
-* play/pause;
-* progress;
-* duration;
-* loading;
-* failure;
-* playback position.
-
-For voice messages, provide a compact messaging-oriented presentation.
-
-Do not expose unnecessary raw media URLs.
-
----
-
-# 11. DOCUMENT MESSAGES
-
-Implement document message presentation.
-
-Display:
-
-* filename;
-* file size;
-* file type;
-* processing state;
-* download/open action;
-* unavailable/deleted state.
-
-Do not trust filename extensions for security decisions.
-
----
-
-# 12. MEDIA SECURITY
-
-Never:
-
-* expose permanent private storage URLs;
-* trust client authorization;
-* embed credentials;
-* expose signed URLs unnecessarily;
-* execute uploaded content;
-* render unsafe document types blindly.
-
-Use the backend's authorization and secure media-access contracts.
-
----
-
-# 13. MESSAGE SELECTION
-
-Implement message selection where supported.
-
-Support:
-
-* selecting one or multiple messages;
-* selected-state UI;
-* contextual actions;
-* cancel selection.
-
-Do not duplicate backend authorization rules.
-
-The server remains authoritative for whether a selected action is allowed.
-
----
-
-# 14. ADVANCED MESSAGE ACTIONS
-
-Complete production UI for:
-
-* reply;
-* react;
-* edit;
-* delete for self;
-* delete for everyone;
-* forward;
-* copy;
-* retry;
-* select.
-
-Actions must reflect current server state.
-
-Do not show actions that the backend will necessarily reject unless the UI is intentionally optimistic and handles rejection correctly.
-
----
-
-# 15. FORWARDING
-
-Implement forwarding using actual backend contracts.
-
-Support:
-
-1. selecting message(s);
-2. selecting destination conversation(s);
-3. previewing what will be forwarded;
-4. confirming;
-5. submitting;
-6. handling success/failure.
-
-Do not clone messages locally.
-
-Forward through the backend so permissions and canonical IDs remain authoritative.
-
----
-
-# 16. MESSAGE SEARCH
-
-Complete the search experience.
-
-Support:
-
-* global search where supported;
-* conversation-scoped search;
-* text search;
-* filters;
-* sender filters;
-* date filters;
-* message-type filters;
-* result pagination;
-* navigation to matching message;
-* highlighted matching context where safely supported.
-
-Search results must come from the backend.
-
----
-
-# 17. SEARCH RESULT NAVIGATION
-
-When a user selects a search result:
-
-* open the correct conversation;
-* load the relevant message range;
-* navigate to the message;
-* visually highlight it temporarily;
-* preserve normal conversation behavior.
-
-If the message no longer exists or access is revoked:
-
-* display the appropriate unavailable state;
-* do not expose stale private content.
-
----
-
-# 18. SEARCH PERFORMANCE
-
-Use:
-
-* debouncing;
-* cancellation;
-* cursor pagination;
-* query caching where appropriate.
-
-Do not issue a backend request for every keystroke.
-
-Prevent excessive query sizes.
-
-Handle slow or unavailable search services gracefully.
-
----
-
-# 19. SEARCH PRIVACY
-
-Never expose search results that the current user is not authorized to see.
-
-The backend remains authoritative.
-
-Do not cache private search results indefinitely.
-
-Clear or invalidate sensitive results appropriately after:
-
-* logout;
-* authorization changes;
-* membership changes;
-* account changes.
-
----
-
-# 20. NOTIFICATION PREFERENCES
-
-Build the notification settings experience.
-
-Support backend-defined controls such as:
-
-* push notifications;
-* message previews;
-* conversation notifications;
-* group notifications;
-* notification sounds;
-* muted conversations;
-* notification categories.
-
-Only expose settings actually supported by the backend.
-
----
-
-# 21. BROWSER NOTIFICATIONS
-
-Where browser support and product requirements allow:
-
-* request permission intentionally;
-* explain why permission is useful;
-* register/update the device notification token through the backend;
-* handle denied permission;
-* handle permission changes;
-* avoid repeated permission prompts.
-
-Never assume browser notification permission is equivalent to backend registration.
-
----
-
-# 22. NOTIFICATION DEEP LINKS
-
-Notification payloads must navigate through safe application routes.
-
-When a user opens a notification:
-
-* authenticate if necessary;
-* verify authorization;
-* navigate to the appropriate conversation/message;
-* synchronize state;
-* handle deleted or unavailable content.
-
-Do not trust arbitrary URLs contained in notification payloads.
-
----
-
-# 23. PROFILE
-
-Implement the user profile experience.
-
-Support backend-defined functionality such as:
-
-* avatar;
-* display name;
-* username;
-* status/about;
-* account information.
-
-Media/avatar uploads must use the secure media pipeline.
-
-Do not upload sensitive files directly to public storage.
-
----
-
-# 24. SETTINGS
-
-Implement a coherent settings area.
-
-Organize settings into logical sections such as:
-
-* account;
-* profile;
-* privacy;
-* notifications;
-* appearance;
-* chats;
-* storage/data;
-* devices/sessions;
-* security.
-
-Only implement settings that correspond to actual backend contracts or legitimate client-only preferences.
-
----
-
-# 25. PRIVACY SETTINGS
-
-Implement privacy controls exposed by the backend.
-
-Potential controls include:
-
-* last-seen visibility;
-* online status;
-* read receipts;
-* profile visibility;
-* group-add permissions;
-* media/privacy preferences.
-
-The frontend must accurately represent server state.
-
-Do not pretend a client-only setting provides server-side privacy.
-
----
-
-# 26. BLOCKING
-
-Implement user blocking/unblocking if supported.
-
-When a user is blocked:
-
-* update UI immediately where safe;
-* synchronize with backend;
-* update conversation behavior;
-* respect presence/privacy changes;
-* prevent unsupported interactions.
-
-Handle real-time block state changes.
-
-Do not rely solely on client filtering.
-
----
-
-# 27. REPORTING
-
-If reporting is supported by the backend, implement the reporting workflow.
-
-Support:
-
-* selecting a reason;
-* optional supported context;
-* confirmation;
-* submission;
-* success/failure.
-
-Do not transmit more private message content than required by the backend contract.
-
----
-
-# 28. GROUP ADMINISTRATION
-
-Implement group-management UI according to backend capabilities.
-
-Support where available:
-
-* group name;
-* group avatar;
-* group description;
-* member list;
-* add member;
-* remove member;
-* promote/demote administrator;
-* leave group;
-* group permissions;
-* group settings.
-
-All mutations must use backend authorization.
-
----
-
-# 29. MEMBERSHIP CHANGES
-
-React to membership events in real time.
-
-When the user:
-
-* joins;
-* leaves;
-* is removed;
-* is promoted;
-* is demoted;
-* loses access;
-
-update the relevant UI and cache.
-
-If access is revoked, remove protected data from active UI state.
-
----
-
-# 30. CONVERSATION SETTINGS
-
-Implement conversation-level controls where supported:
-
-* mute;
-* archive;
-* pin;
-* mark read/unread;
-* delete conversation;
-* clear conversation;
-* notification settings.
-
-Use backend-authoritative state.
-
----
-
-# 31. DISAPPEARING MESSAGES
-
-If the backend supports disappearing messages:
-
-Implement UI for:
-
-* enabling/disabling;
-* selecting supported duration;
-* displaying current state;
-* explaining expiration;
-* handling changes.
-
-Do not implement deletion timers purely in the frontend.
-
-The backend remains authoritative for expiration.
-
----
-
-# 32. CALLING ARCHITECTURE
-
-Implement the web client foundation for voice/video calling using the actual backend signaling contract.
-
-Do not invent signaling events.
-
-Support the conceptual lifecycle:
-
-* call initiation;
-* ringing;
-* accepted;
-* connecting;
-* connected;
-* reconnecting;
-* ended;
-* declined;
-* missed;
-* failed.
-
----
-
-# 33. WEBRTC
-
-Where the backend and architecture support WebRTC, implement browser WebRTC integration.
-
-Support:
-
-* `RTCPeerConnection`;
-* local audio;
-* local video;
-* remote media;
-* offer/answer;
-* ICE candidates;
-* connection state;
-* media track management;
-* device selection where supported.
-
-Use secure browser APIs.
-
-Do not transmit media through the application server unless that is explicitly part of the architecture.
-
----
-
-# 34. CALL PERMISSIONS
+Use the ordering fields exposed by the backend contract.
 
 Handle:
 
-* microphone permission;
-* camera permission;
-* permission denial;
-* device unavailable;
-* device changes;
-* browser restrictions.
+* late messages
+* concurrent sends
+* reconnect replay
+* delayed acknowledgements
+* edited messages
+* deleted messages
 
-Provide understandable UI.
-
-Never silently activate microphone/camera.
+Do not reorder an established history unnecessarily when a new event arrives.
 
 ---
 
-# 35. CALL SIGNALING
+# 6. MESSAGE DELIVERY STATES
 
-Integrate with the existing authenticated real-time signaling channel.
+Implement the UI representation of delivery states supported by the backend.
 
-Handle:
+Represent appropriately:
 
-* incoming call;
-* outgoing call;
-* SDP offer;
-* SDP answer;
-* ICE candidate;
-* call acceptance;
-* rejection;
-* cancellation;
-* termination;
-* timeout;
-* connection failure.
+* sending
+* sent
+* delivered
+* read
+* failed
 
-Use the exact event envelope and event names defined by the repository.
+The implementation must not claim delivery or read status unless the backend confirms it.
+
+Avoid excessive animation for status changes.
+
+Ensure status indicators are accessible and not communicated solely through iconography or color.
 
 ---
 
-# 36. CALL SECURITY
+# 7. READ STATE
 
-Validate:
+Implement read-state behavior according to the available backend contract.
 
-* authenticated caller;
-* target user;
-* conversation relationship;
-* block state;
-* call permissions;
-* signaling authorization.
+Support:
 
-Do not accept arbitrary peer identifiers from untrusted clients.
+* marking messages as read
+* read boundaries
+* unread count updates
+* active conversation behavior
+* visibility-aware behavior
+* batching where appropriate
+* avoiding excessive network requests
 
-Use secure transport.
+Do not send one read request for every visible message when the backend supports a read boundary or batch operation.
 
-Never expose private signaling data unnecessarily.
+Do not mark messages as read merely because they were fetched.
+
+Use appropriate viewport/focus semantics.
 
 ---
 
-# 37. CALL UI
+# 8. UNREAD MESSAGE EXPERIENCE
+
+Implement robust unread behavior.
+
+Support:
+
+* unread count
+* unread separator
+* jump-to-unread
+* newly received message indicator
+* unread state after navigation
+* unread state after reconnect
+* unread state across refreshes
+
+Preserve user context when entering a conversation with many unread messages.
+
+Do not automatically scroll the user to the bottom when they are intentionally reading older messages.
+
+---
+
+# 9. SCROLL MANAGEMENT
+
+Implement production-grade conversation scrolling.
+
+Support:
+
+* automatic scroll to newest message when appropriate
+* preserve position while loading older messages
+* new-message indicator when user is away from bottom
+* jump-to-latest action
+* unread boundary navigation
+* smooth scrolling only when appropriate
+* reduced-motion behavior
+
+Determine whether the user is near the bottom using a robust threshold rather than exact pixel equality.
+
+When loading older history:
+
+1. capture relevant scroll metrics
+2. fetch older messages
+3. insert them
+4. restore the user's visual position
+
+The user must not experience a visible jump.
+
+---
+
+# 10. MESSAGE VIRTUALIZATION
+
+Implement virtualization or another scalable rendering strategy for large histories.
+
+The implementation must support:
+
+* dynamic message heights
+* grouped messages
+* replies
+* media previews
+* deleted messages
+* reactions
+* long messages
+* date separators
+
+Do not render an unbounded number of message DOM nodes.
+
+Do not sacrifice accessibility solely for virtualization.
+
+Ensure keyboard navigation and screen-reader behavior remain reasonable.
+
+---
+
+# 11. MESSAGE REPLIES
+
+Implement reply functionality where supported.
 
 Provide:
 
-* incoming call screen;
-* outgoing call screen;
-* active call screen;
-* call controls;
-* mute;
-* camera on/off;
-* speaker/output selection where supported;
-* end call;
-* connection state;
-* participant information.
+* reply action
+* reply preview in composer
+* quoted-message display
+* navigation to original message
+* missing/deleted original handling
+* cancellation of reply mode
 
-For group calling, only implement functionality actually supported by the backend/media architecture.
+The reply relationship must be represented using stable message identifiers.
+
+Do not duplicate complete message payloads unnecessarily in client state.
 
 ---
 
-# 38. CALL FAILURE HANDLING
+# 12. MESSAGE EDITING
 
-Handle:
+Implement message editing where supported.
 
-* permission denied;
-* ICE failure;
-* signaling failure;
-* peer disconnect;
-* network interruption;
-* backend outage;
-* browser incompatibility;
-* device unavailable.
+Provide:
 
-Provide clear recovery behavior.
+* edit action
+* transition into edit mode
+* existing message text
+* save
+* cancel
+* validation
+* mutation state
+* server reconciliation
+* edited indicator
+* failure recovery
 
-Do not leave microphone/camera tracks active after a call ends.
+Do not allow editing after the backend rejects the operation.
 
----
-
-# 39. CALL RESOURCE CLEANUP
-
-On call termination:
-
-* close peer connection;
-* stop local tracks;
-* remove remote tracks;
-* clear signaling subscriptions;
-* clear timers;
-* reset call state;
-* release device resources.
-
-This cleanup must also happen on:
-
-* navigation;
-* component unmount;
-* authentication loss;
-* unexpected disconnect.
+Respect backend authorization and edit-window rules.
 
 ---
 
-# 40. REAL-TIME RESILIENCE
+# 13. MESSAGE DELETION
 
-The advanced frontend must remain robust under:
+Implement deletion UX according to backend capabilities.
 
-* duplicate events;
-* out-of-order events;
-* reconnects;
-* stale tabs;
-* browser suspension;
-* multiple tabs;
-* delayed API responses;
-* API failures;
-* WebSocket failure.
+Support applicable distinctions such as:
 
-Never assume an event will arrive exactly once.
+* delete for self
+* delete for everyone
+* unavailable deletion
+* deleted message presentation
 
----
+Provide confirmation for destructive actions when appropriate.
 
-# 41. MULTI-TAB BEHAVIOR
+After successful deletion:
 
-Where appropriate, coordinate multiple browser tabs.
+* update local cache
+* reconcile WebSocket events
+* preserve timeline position
+* preserve references from replies where possible
 
-Avoid:
-
-* duplicate push registration;
-* duplicate WebSocket work where unnecessary;
-* conflicting selected state;
-* duplicated notifications.
-
-Use browser-native coordination mechanisms only where justified and supported.
-
-Do not create unnecessary complexity.
+Never permanently remove server-authoritative data solely because the user clicked delete before the mutation succeeds.
 
 ---
 
-# 42. CACHE INVALIDATION
+# 14. REACTIONS
 
-Ensure cached data is invalidated or updated after:
+Implement message reactions.
 
-* logout;
-* membership changes;
-* blocking;
-* profile updates;
-* settings changes;
-* conversation deletion;
-* message deletion;
-* authorization changes.
+Support:
 
-Private data must not remain accessible after session termination.
+* adding reaction
+* removing reaction
+* reaction picker
+* current-user reaction state
+* reaction counts
+* real-time reaction updates
+* optimistic updates only where safe
+* rollback on failure
 
----
+Prevent duplicate reactions when the backend enforces one reaction per user.
 
-# 43. PERFORMANCE
+The reaction interface must be keyboard accessible.
 
-Optimize the application for production-scale conversations.
-
-Pay particular attention to:
-
-* large message lists;
-* media-heavy conversations;
-* rapid real-time events;
-* large group conversations;
-* search;
-* settings;
-* WebRTC;
-* reconnect storms.
-
-Use virtualization where appropriate.
-
-Avoid unnecessary rerenders.
-
-Do not put rapidly changing ephemeral state into global server caches.
+Do not make reaction controls unusable on touch-oriented browser widths.
 
 ---
 
-# 44. ACCESSIBILITY
+# 15. MESSAGE CONTEXT MENU
 
-Complete accessibility across advanced functionality.
+Implement accessible message actions.
 
-Ensure:
+Actions should include only capabilities supported by the backend and user authorization.
 
-* media controls are keyboard accessible;
-* dialogs have correct focus management;
-* menus are accessible;
-* call controls are labeled;
-* notification settings are accessible;
-* search results are navigable;
-* message actions are keyboard accessible;
-* screen readers receive meaningful state updates.
+Potential actions:
 
-Respect reduced motion.
+* reply
+* react
+* edit
+* delete
+* forward
+* copy
+* save
+* pin
+* search
+* report
 
----
+The menu must:
 
-# 45. RESPONSIVE ADVANCED UI
+* support keyboard navigation
+* support touch interaction
+* position safely near viewport boundaries
+* close on outside interaction
+* restore focus correctly
+* avoid blocking the message timeline unnecessarily
 
-Verify advanced features on:
-
-* desktop;
-* tablet;
-* mobile web.
-
-Special attention:
-
-* media viewer;
-* attachment picker;
-* message action menus;
-* search;
-* settings;
-* group administration;
-* incoming calls;
-* active calls.
-
-Avoid UI that becomes unusable because of browser viewport or virtual keyboard behavior.
+Do not expose unauthorized actions.
 
 ---
 
-# 46. ERROR RECOVERY
+# 16. MESSAGE SELECTION
 
-Every advanced workflow must have recovery.
+Implement message selection architecture.
 
-Examples:
+Support:
 
-### Media
+* selecting one message
+* selecting multiple messages where applicable
+* selection toolbar
+* deselection
+* bulk actions supported by the backend
+* keyboard accessibility
 
-Retry upload or processing.
+Selection must not interfere with ordinary scrolling.
 
-### Search
-
-Retry request.
-
-### Notifications
-
-Retry registration or explain permission state.
-
-### Settings
-
-Retry failed mutation and preserve intended value.
-
-### Group management
-
-Show server rejection without corrupting local state.
-
-### Calls
-
-Provide retry/end-call recovery.
+Do not keep large message-selection structures in global state unnecessarily.
 
 ---
 
-# 47. SECURITY REVIEW
+# 17. FORWARDING
 
-Perform a frontend security audit.
+Implement forwarding UX according to the available backend contracts.
 
-Check for:
+Support:
 
-* XSS;
-* unsafe URL handling;
-* token leakage;
-* private data persistence;
-* authorization assumptions;
-* insecure WebSocket handling;
-* unsafe media rendering;
-* malicious filenames;
-* DOM injection;
-* open redirects;
-* untrusted notification payloads;
-* WebRTC signaling abuse;
-* sensitive logs.
+* select message
+* choose destination conversation
+* multiple destinations where supported
+* confirmation
+* sending state
+* success
+* failure
+* cancellation
 
-Do not assume backend validation makes unsafe frontend behavior acceptable.
+Do not transmit private message contents to unauthorized destinations.
+
+The server remains authoritative for forwarding permissions.
 
 ---
 
-# 48. PRIVACY REVIEW
+# 18. PINNED MESSAGES
 
-Verify that the frontend does not unnecessarily expose:
+Implement pinned-message UI where supported.
 
-* message content;
-* media URLs;
-* notification payloads;
-* tokens;
-* user identifiers;
-* private profile data;
-* search history.
+Support:
 
-Review:
+* pin
+* unpin
+* pinned indicator
+* pinned message panel
+* navigation to pinned message
+* authorization errors
+* real-time updates
 
-* local storage;
-* session storage;
-* IndexedDB;
-* browser cache;
-* logs;
-* error reporting;
-* analytics.
+If multiple pinned messages are supported, represent them efficiently.
 
-Persist private data only when explicitly required.
+Do not load complete conversation history merely to display pinned messages.
 
 ---
 
-# 49. OBSERVABILITY
+# 19. SAVED MESSAGES
 
-Complete frontend observability.
+Implement saved-message UX where supported.
 
-Track appropriate technical metrics:
+Support:
 
-* API failures;
-* WebSocket failures;
-* synchronization failures;
-* media upload failures;
-* media playback failures;
-* search failures;
-* notification registration failures;
-* call setup failures;
-* WebRTC connection failures;
-* client exceptions.
+* save
+* unsave
+* saved indicator
+* saved-message access
+* navigation to source conversation
+* deleted-source handling
 
-Never record private message content or credentials unnecessarily.
+Maintain a clear distinction between:
 
----
+* a saved message
+* a pinned message
+* a locally bookmarked UI state
 
-# 50. TESTING — MEDIA
-
-Add tests for:
-
-* file validation;
-* upload initialization;
-* progress;
-* completion;
-* processing state;
-* failure;
-* retry;
-* media authorization errors;
-* image viewer;
-* video player;
-* audio player;
-* document rendering.
+Use server-authoritative state for persistent saved messages.
 
 ---
 
-# 51. TESTING — SEARCH
+# 20. TYPING INDICATORS
 
-Test:
+Implement real-time typing indicators.
 
-* search input;
-* debounce;
-* cancellation;
-* results;
-* pagination;
-* filters;
-* navigation to message;
-* unavailable result;
-* authorization changes;
-* backend failure.
+Support:
 
----
+* local typing detection
+* throttled typing events
+* start/stop behavior
+* timeout recovery
+* remote typing display
+* multiple typing participants for groups
+* cleanup on disconnect
 
-# 52. TESTING — SETTINGS
+Do not emit a network event on every keystroke.
 
-Test:
+Use appropriate debounce/throttle behavior.
 
-* loading settings;
-* changing settings;
-* failed mutations;
-* rollback;
-* synchronization;
-* logout cleanup.
+Typing indicators must never prevent message delivery.
 
 ---
 
-# 53. TESTING — GROUPS
+# 21. PRESENCE
 
-Test:
+Implement presence display according to backend capabilities.
 
-* member loading;
-* member changes;
-* administrator actions;
-* permission denial;
-* real-time membership events;
-* revoked access.
+Support states such as:
 
----
+* online
+* offline
+* last seen
+* unavailable/private
 
-# 54. TESTING — CALLING
+Respect privacy settings.
 
-Test:
+Do not infer online status from a stale client connection.
 
-* incoming call;
-* outgoing call;
-* accept;
-* reject;
-* end;
-* signaling events;
-* permission denial;
-* peer connection failure;
-* cleanup;
-* authentication loss.
+Use server-authoritative presence events.
 
-Mock browser WebRTC APIs appropriately for unit/component tests.
-
-Use real browser E2E tests where the repository's environment supports them.
+Avoid high-frequency rerendering of large contact lists because of presence changes.
 
 ---
 
-# 55. END-TO-END TESTING
+# 22. GROUP CONVERSATION EXPERIENCE
 
-Expand E2E coverage to include at minimum:
+Implement group messaging UX.
 
-1. authenticate;
-2. open conversation;
-3. send text;
-4. receive real-time message;
-5. upload image;
-6. display image;
-7. send document;
-8. search messages;
-9. edit message;
-10. delete message;
-11. react;
-12. reply;
-13. change notification setting;
-14. change privacy setting;
-15. manage group membership where supported;
-16. reconnect;
-17. synchronize;
-18. initiate call where supported;
-19. receive call;
-20. end call;
-21. logout;
-22. verify protected state is cleared.
+Support:
+
+* group header
+* group avatar
+* group name
+* member count
+* participant information
+* group message rendering
+* sender identity
+* sender avatar where appropriate
+* typing participants
+* read/delivery semantics
+* group actions
+
+The UI must remain usable for large groups.
+
+Do not render the complete member list into the DOM if it can become large.
+
+Use virtualization or pagination where appropriate.
 
 ---
 
-# 56. PRODUCTION BUILD
+# 23. GROUP MEMBER INTERACTION
 
-Ensure:
+Implement the frontend foundation for:
 
-* production build succeeds;
-* type checking succeeds;
-* linting succeeds;
-* tests pass;
-* environment configuration is validated;
-* no development-only assumptions remain;
-* no mock provider remains on production paths;
-* no placeholder components remain.
+* viewing members
+* searching members
+* member profile preview
+* group roles
+* permissions
+* administrator indicators
+* moderation actions exposed to authorized users
 
----
+Never determine administrative authorization solely from frontend state.
 
-# 57. BROWSER COMPATIBILITY
-
-Verify supported browsers according to the project's actual requirements.
-
-Pay particular attention to:
-
-* WebSocket;
-* WebRTC;
-* media playback;
-* notifications;
-* file APIs;
-* responsive behavior.
-
-Provide graceful fallback where a capability is unsupported.
+All sensitive actions must be validated by the backend.
 
 ---
 
-# 58. CODE QUALITY
+# 24. CONVERSATION SEARCH
 
-Maintain:
+Implement conversation-level search.
 
-* strict TypeScript;
-* reusable components;
-* clear feature boundaries;
-* predictable state ownership;
-* testable services;
-* minimal duplication;
-* explicit error handling.
+Support:
 
-Avoid:
+* search input
+* debounce
+* loading
+* result ranking as provided by backend
+* empty state
+* errors
+* result navigation
+* keyboard navigation
+* cancellation of stale requests
 
-* giant components;
-* giant Zustand stores;
-* arbitrary global state;
-* duplicated API clients;
-* duplicated WebSocket connections;
-* unsafe type assertions;
-* `any`;
-* hidden side effects.
+Avoid firing requests for every keystroke.
+
+Do not expose private conversations through client-side search results that the backend did not authorize.
 
 ---
 
-# 59. IMPLEMENTATION ORDER
+# 25. MESSAGE SEARCH
 
-Unless repository dependencies require another safe order:
+Implement message search according to the repository's search API.
 
-1. inspect current implementation;
-2. complete media attachment workflow;
-3. implement media upload progress;
-4. implement media processing states;
-5. implement image/video/audio/document UI;
-6. implement advanced message actions;
-7. implement forwarding;
-8. complete search;
-9. implement search navigation;
-10. implement notification preferences;
-11. implement browser notification integration;
-12. implement profile;
-13. implement settings;
-14. implement privacy controls;
-15. implement blocking/reporting where supported;
-16. implement group administration;
-17. implement conversation settings;
-18. implement disappearing-message UI where supported;
-19. implement call state architecture;
-20. implement WebRTC integration where supported;
-21. implement call signaling;
-22. implement call UI;
-23. implement call cleanup;
-24. complete security review;
-25. complete privacy review;
-26. optimize performance;
-27. add comprehensive tests;
-28. run production build;
-29. run complete validation;
-30. inspect final diff.
+Support:
+
+* global message search where available
+* conversation-specific search
+* query input
+* filters exposed by backend
+* result pagination
+* navigation to matching message
+* highlighting of search terms where safe
+* deleted/missing message handling
+
+When navigating to a result in a conversation:
+
+* load the required history range
+* position the timeline appropriately
+* highlight the target temporarily
+* preserve user context
+
+Do not assume the target message is already loaded.
 
 ---
 
-# 60. VALIDATION
+# 26. REAL-TIME MESSAGE EVENTS
 
-Before declaring this phase complete:
+Integrate all supported message events into the client.
 
-* run formatting;
-* run lint;
-* run TypeScript checking;
-* run unit tests;
-* run component tests;
-* run integration tests;
-* run E2E tests;
-* run accessibility tests;
-* run production build;
-* verify authentication;
-* verify API integration;
-* verify WebSocket integration;
-* verify media workflows;
-* verify search;
-* verify notifications;
-* verify settings;
-* verify group management;
-* verify calling where supported;
-* verify cleanup behavior.
+Handle events such as:
 
-Fix all actual failures.
+* new message
+* message acknowledgement
+* message edited
+* message deleted
+* reaction changed
+* delivery update
+* read update
+* message pinned
+* message unpinned
+* message saved
+* message unsaved
+* typing started
+* typing stopped
+* presence changed
+* conversation updated
 
-Do not claim validation that was not executed.
+Each event must:
 
----
-
-# 61. FINAL REPOSITORY REVIEW
-
-Inspect the final repository and verify:
-
-* no duplicate implementations;
-* no dead experimental code;
-* no unused provider integrations;
-* no placeholder components;
-* no TODO/FIXME implementation gaps;
-* no secrets;
-* no debug logging;
-* no private-data logging;
-* no broken imports;
-* no unnecessary dependency changes;
-* no accidental modifications.
-
-Preserve unrelated existing work.
+* validate payload
+* identify target resource
+* update only affected state
+* deduplicate repeated events
+* handle unknown or unsupported versions safely
 
 ---
 
-# 62. FINAL COMPLETION REPORT
+# 27. RECONNECT RECONCILIATION
 
-At the end report only what actually exists.
+Implement correct behavior after WebSocket reconnect.
 
-### Implemented
+The client must not assume it received every event while disconnected.
 
-List completed functionality.
+After reconnect:
 
-### Modified
+* establish authenticated connection
+* determine synchronization boundary
+* request missing events or data according to backend contract
+* reconcile message state
+* reconcile unread counts
+* reconcile conversation metadata
+* reconcile presence/typing where applicable
 
-List modified files.
+Do not simply reload the entire application after every reconnect.
 
-### Created
-
-List created files.
-
-### Media
-
-Describe implemented upload, processing, playback, and access behavior.
-
-### Search
-
-Describe implemented search functionality.
-
-### Notifications
-
-Describe notification functionality.
-
-### Settings and Privacy
-
-Describe implemented settings/privacy controls.
-
-### Groups
-
-Describe implemented group-management functionality.
-
-### Calling
-
-Describe actual calling/WebRTC functionality implemented.
-
-### API
-
-List endpoints integrated.
-
-### WebSocket
-
-List events integrated.
-
-### Tests
-
-List tests actually added and executed.
-
-### Validation
-
-List commands actually executed and their results.
-
-### Remaining
-
-List only genuine work that belongs to later phases.
-
-Never claim implementation merely because a component or file was created.
+Use incremental synchronization where the backend supports it.
 
 ---
 
-# 63. NON-NEGOTIABLE RULES
+# 28. OFFLINE MESSAGE UX
+
+Implement the UI needed for offline or degraded connectivity.
+
+Pending messages must remain visible.
+
+Failed messages must remain actionable.
+
+The user must understand whether a message is:
+
+* still sending
+* sent
+* delivered
+* failed
+
+Do not display a successful state while the server has not acknowledged the message.
+
+If offline queueing is supported by the backend/client architecture, preserve message ordering and idempotency.
+
+Never silently lose locally entered content.
+
+---
+
+# 29. NOTIFICATION UX
+
+Implement web notification integration only where supported by the repository and browser permission model.
+
+Support:
+
+* notification permission state
+* in-app notification indicators
+* unread counts
+* notification preferences
+* notification suppression while actively viewing a conversation where appropriate
+* safe notification content
+
+Never expose private message content unnecessarily in telemetry or logs.
+
+Do not request browser notification permission immediately on application startup without an appropriate user interaction and product flow.
+
+---
+
+# 30. MEDIA PLACEHOLDERS AND INTEGRATION CONTRACTS
+
+Prepare the messaging UI for media without fabricating unsupported functionality.
+
+Message rendering architecture must accommodate:
+
+* images
+* video
+* audio
+* voice messages
+* documents
+* stickers
+* GIFs
+* link previews
+
+Where backend/media functionality is already available, integrate it.
+
+Where it belongs to another implementation scope, establish clean typed boundaries without fake uploads or fake URLs.
+
+Media rendering must account for:
+
+* loading
+* failed loading
+* authorization failure
+* responsive dimensions
+* unsafe content
+* accessibility
+* bandwidth
+
+---
+
+# 31. LINK PREVIEW UX
+
+Integrate link previews when backend functionality exists.
+
+Support:
+
+* preview loading
+* successful preview
+* failed preview
+* safe external navigation
+* malicious URL handling
+* long titles
+* missing metadata
+
+Do not perform arbitrary URL fetching directly from the browser to generate previews.
+
+Use the server-side preview contract.
+
+---
+
+# 32. MESSAGE CONTENT SAFETY
+
+Treat all message content as untrusted input.
+
+Safely render:
+
+* text
+* URLs
+* emoji
+* usernames
+* quoted text
+* metadata
+
+Prevent:
+
+* XSS
+* unsafe HTML
+* javascript URLs
+* unsafe protocol handling
+* DOM injection
+
+External links must use safe navigation behavior.
+
+Do not blindly trust server-provided HTML.
+
+---
+
+# 33. CACHE CONSISTENCY
+
+Maintain consistent TanStack Query state across:
+
+* conversation list
+* active conversation
+* message history
+* contacts
+* profile
+* unread counts
+* search results
+
+When mutations succeed:
+
+* update directly affected cache entries
+* invalidate only affected queries
+* reconcile real-time events
+* avoid duplicate network requests
+
+When optimistic updates are used:
+
+* snapshot previous state
+* apply update
+* rollback on failure
+* reconcile with server response
+
+---
+
+# 34. PERFORMANCE AND LARGE-SCALE UX
+
+Optimize for:
+
+* 10,000+ message histories
+* large conversation lists
+* large groups
+* frequent real-time events
+* rapid typing
+* rapid reactions
+* repeated presence changes
+
+Use:
+
+* virtualization
+* memoized row components where justified
+* selective Zustand subscriptions
+* targeted query updates
+* stable callbacks where useful
+* event batching
+* debounced search
+* throttled typing events
+* incremental rendering
+
+Do not optimize by making behavior unreliable.
+
+---
+
+# 35. ACCESSIBILITY
+
+Ensure advanced messaging functionality is accessible.
+
+Provide:
+
+* keyboard-accessible message actions
+* accessible reaction picker
+* accessible context menus
+* accessible unread indicators
+* screen-reader announcements for new messages where appropriate
+* accessible typing status
+* accessible delivery/read state
+* focus restoration
+* keyboard shortcuts that do not conflict with browser behavior
+
+Do not announce every message to assistive technology in a way that creates unusable noise.
+
+Provide meaningful status semantics.
+
+---
+
+# 36. SECURITY AND PRIVACY
+
+Protect message confidentiality within the frontend architecture.
 
 Never:
 
-* invent backend contracts;
-* invent WebSocket events;
-* invent WebRTC signaling;
-* invent API capabilities;
-* create fake media processing;
-* create fake notifications;
-* create fake search results;
-* fake successful calls;
-* bypass backend authorization;
-* expose private media;
-* store credentials insecurely;
-* weaken privacy to simplify UI;
-* persist private content unnecessarily;
-* use placeholder implementations;
-* use pseudo-code;
-* leave TODO/FIXME implementation gaps;
-* silently swallow errors;
-* claim tests passed when they were not run;
-* claim a feature is complete when only the UI exists;
-* duplicate existing architecture;
-* replace working code unnecessarily.
+* log message contents
+* expose private message content through analytics
+* persist unnecessary message data
+* place message contents into URLs
+* trust client-side authorization
+* render unsanitized HTML
+* expose private search results
+* reveal blocked users' information through UI bugs
+
+Respect:
+
+* blocked-user behavior
+* privacy settings
+* disappearing-message behavior where supported
+* deletion semantics
+* account logout
+* session invalidation
+
+---
+
+# 37. TESTING
+
+Add comprehensive tests for advanced messaging behavior.
+
+Cover:
+
+* optimistic send
+* acknowledgement reconciliation
+* duplicate event handling
+* failed send
+* retry
+* ordering
+* pagination
+* scroll restoration
+* unread boundary
+* reply
+* edit
+* delete
+* reaction
+* forwarding
+* pinning
+* saved messages
+* typing indicators
+* presence
+* search
+* reconnect
+* offline state
+* accessibility
+* group messaging
+* large-list behavior
+
+Include integration tests for:
 
-Every advanced frontend capability must integrate with the actual backend implementation.
+* HTTP + WebSocket interaction
+* cache updates
+* authentication transitions
+* reconnect synchronization
 
-The frontend must remain one coherent production-grade application.
+Add browser tests for critical user journeys when Playwright is available.
 
-All contracts must remain consistent across:
+---
 
-* REST;
-* WebSockets;
-* authentication;
-* authorization;
-* messages;
-* conversations;
-* receipts;
-* presence;
-* synchronization;
-* media;
-* notifications;
-* search;
-* groups;
-* settings;
-* calling;
-* WebRTC;
-* errors;
-* pagination;
-* IDs;
-* timestamps.
+# 38. FAILURE AND RECOVERY TESTING
 
-The result must be production-ready, maintainable, secure, accessible, responsive, observable, testable, and consistent with the rest of the platfor
+Explicitly test:
 
-You are operating in Senior Engineering Team Mode.
+* network disconnect during send
+* network disconnect during history loading
+* WebSocket reconnect during active conversation
+* duplicate message events
+* duplicate acknowledgement
+* out-of-order events
+* expired authentication
+* server validation failure
+* authorization failure
+* search cancellation
+* deleted message referenced by reply
+* unavailable conversation
+* removed group membership
 
-Build the remaining production-ready web frontend for an enterprise-scale global real-time messaging and communication platform comparable in architectural scope to WhatsApp.
+The UI must fail safely and preserve user-entered information whenever possible.
 
-The platform is an original implementation.
+---
 
-Do not copy proprietary source code, internal architecture, branding, or confidential implementation details from WhatsApp or any other proprietary platform.
+# 39. TYPESCRIPT AND CODE QUALITY
 
-This prompt is completely independent and may be executed in a separate conversation.
+Maintain strict typing.
 
-The frontend must consume the established backend APIs, WebSocket contracts, authentication model, authorization model, media architecture, notification architecture, search architecture, call architecture, and synchronization contracts.
+Do not use:
 
-Do not redesign backend APIs.
+* `any`
+* unsafe casts
+* index-based message identity
+* duplicated message types
+* untyped WebSocket payloads
+* untyped API responses
+
+Create discriminated unions where they improve correctness.
+
+Validate external data at application boundaries.
 
-Do not redesign the database.
+Keep domain transformations explicit.
 
-Do not implement backend code.
+Avoid giant hooks containing unrelated responsibilities.
 
-Do not implement mobile code.
+---
 
-Do not implement infrastructure implementation code.
+# 40. DOCUMENTATION
 
-Do not generate Terraform.
+Update documentation for:
 
-Do not generate Kubernetes manifests.
-
-Do not generate CI/CD workflows.
-
-────────────────────────────────────────
-
-MISSION
-
-Complete the production-ready web frontend for:
-
-• Advanced messaging
-• Groups
-• Communities
-• Stories/status
-• Media
-• Notifications
-• Search
-• Voice calls
-• Video calls
-• Group calls
-• Device management
-• Privacy
-• Security
-• Business accounts
-• Administration
-• Moderation
-• Real-time synchronization
-• Offline synchronization
-• Accessibility
-• Performance
-• Production hardening
-
-The frontend must remain consistent with the established architecture and backend contracts.
-
-────────────────────────────────────────
-
-TECHNOLOGY STACK
-
-Framework:
-
-• Next.js
-• React
-• TypeScript
-
-Styling:
-
-• Tailwind CSS
-• shadcn/ui
-• CSS variables
-
-State:
-
-• Zustand
-
-Server State:
-
-• TanStack Query
-
-Forms:
-
-• React Hook Form
-• Zod
-
-Real-Time:
-
-• WebSockets
-• Socket.IO client where appropriate
-
-Animation:
-
-• Framer Motion
-
-Icons:
-
-• Lucide React
-
-Testing:
-
-• Jest
-• React Testing Library
-• Playwright
-• Accessibility testing tools
-
-────────────────────────────────────────
-
-ADVANCED MESSAGING EXPERIENCE
-
-Complete the messaging experience.
-
-Implement:
-
-• Replies
-• Forwarding
-• Mentions
-• Reactions
-• Editing
-• Deletion
-• Message selection
-• Multi-select actions
-• Copy
-• Retry failed messages
-• Message information
-• Delivery details
-• Read details
-• Context menus
-• Keyboard shortcuts
-• Message search
-• Jump to message
-• Scroll-to-referenced-message
-• Unread separators
-• Date separators
-
-Support efficient rendering of large message histories.
-
-Use virtualization where appropriate.
-
-────────────────────────────────────────
-
-MESSAGE COMPOSER
-
-Complete the composer.
-
-Support:
-
-• Rich message composition where appropriate
-• Emoji picker
-• Mentions
-• Reply mode
-• Attachment picker
-• Drag and drop
-• Paste handling
-• Voice-message preparation where browser capabilities permit
-• Draft persistence
-• Character limits
-• Keyboard shortcuts
-• Send state
-• Retry state
-• Upload state
-
-The composer must behave correctly during:
-
-• Offline mode
-• Reconnection
-• Slow uploads
-• Failed requests
-• WebSocket interruptions
-
-────────────────────────────────────────
-
-MESSAGE SYNCHRONIZATION
-
-Integrate the frontend with backend synchronization.
-
-Support:
-
-• Initial conversation synchronization
-• Incremental synchronization
-• Delta updates
-• Synchronization cursors
-• Missed events
-• Reconnection
-• Message reconciliation
-• Duplicate prevention
-• Delivery-state reconciliation
-• Read-state reconciliation
-
-The frontend must not assume every WebSocket event arrives exactly once.
-
-────────────────────────────────────────
-
-OPTIMISTIC MESSAGE STATE
-
-Implement:
-
-• Temporary message IDs
-• Pending messages
-• Server reconciliation
-• Failed messages
-• Retry
-• Duplicate prevention
-• Ordering correction
-
-Ensure optimistic state does not permanently diverge from server state.
-
-────────────────────────────────────────
-
-GROUP EXPERIENCE
-
-Complete group interfaces.
-
-Support:
-
-• Group creation
-• Group details
-• Group avatar
-• Group description
-• Group settings
-• Member management
-• Member roles
-• Add members
-• Remove members
-• Leave group
-• Admin controls
-• Group permissions
-• Group notifications
-• Group media
-
-Conditionally display actions based on backend authorization.
-
-Frontend visibility must never replace backend authorization.
-
-────────────────────────────────────────
-
-COMMUNITY EXPERIENCE
-
-Implement:
-
-• Community list
-• Community overview
-• Community groups
-• Community channels where appropriate
-• Community membership
-• Community administrators
-• Community settings
-• Community announcements
-• Community notifications
-
-Provide clear navigation between:
-
-• Direct conversations
-• Groups
-• Communities
-• Channels
-
-────────────────────────────────────────
-
-STORIES / STATUS EXPERIENCE
-
-Implement:
-
-• Stories tray
-• Story creation
-• Story composer
-• Text story
-• Image story
-• Video story
-• Story viewer
-• Story navigation
-• Viewer list where authorized
-• Story reactions where supported
-• Story deletion
-• Story privacy settings
-• Expiration states
-
-Support efficient story media loading.
-
-Do not request content the backend does not authorize.
-
-────────────────────────────────────────
-
-MEDIA EXPERIENCE
-
-Complete media interfaces for:
-
-• Images
-• Videos
-• Audio
-• Voice messages
-• Documents
-• Stickers
-• GIFs
-• Thumbnails
-
-Implement:
-
-• Upload progress
-• Upload cancellation
-• Upload retry
-• Preview
-• Media validation feedback
-• Failed uploads
-• Download states
-• Media viewer
-• Image zoom
-• Video controls
-• Audio controls
-• Document preview where supported
-
-Use direct object-storage upload contracts where provided by the backend.
-
-────────────────────────────────────────
-
-MEDIA VIEWER
-
-Implement a production media viewer supporting:
-
-• Images
-• Videos
-• Audio
-• Documents where supported
-• Gallery navigation
-• Zoom
-• Fullscreen
-• Download where authorized
-• Loading states
-• Failure states
-• Keyboard controls
-• Accessible controls
-
-Ensure private media does not become permanently exposed through frontend state.
-
-────────────────────────────────────────
-
-NOTIFICATION EXPERIENCE
-
-Complete:
-
-• Notification center
-• Unread counts
-• Notification grouping
-• Notification preferences
-• Security notifications
-• Message notifications
-• Call notifications
-• Group notifications
-• Community notifications
-• Business notifications
-
-Support:
-
-• Read/unread
-• Navigation to related resources
-• Loading states
-• Empty states
-• Error states
-
-────────────────────────────────────────
-
-SEARCH EXPERIENCE
-
-Complete search for:
-
-• Users
-• Contacts
-• Groups
-• Communities
-• Conversations
-• Business accounts
-• Messages where permitted
-
-Support:
-
-• Instant search
-• Autocomplete
-• Search suggestions
-• Recent searches
-• Search history management
-• Filters
-• Result grouping
-• Loading states
-• Empty states
-• Error states
-• Keyboard navigation
-
-Do not display search results the backend has not authorized.
-
-────────────────────────────────────────
-
-CALL EXPERIENCE
-
-Implement production-ready call interfaces.
-
-Support:
-
-• Incoming call screen
-• Outgoing call screen
-• Ringing
-• Connecting
-• Active call
-• Reconnecting
-• Call failure
-• Call ended
-• Missed call
-
-Voice:
-
-• Microphone control
-• Speaker/device selection
-• Mute
-• End call
-
-Video:
-
-• Camera toggle
-• Camera preview
-• Participant video
-• Video layout
-• Screen layout
-• End call
-
-Group calls:
-
-• Participant grid
-• Active speaker
-• Participant states
-• Call controls
-• Reconnection states
-
-Use the established WebRTC/signaling architecture.
-
-Do not implement a parallel signaling protocol.
-
-────────────────────────────────────────
-
-CALL QUALITY UI
-
-Reflect backend/client call state where appropriate.
-
-Support graceful UI for:
-
-• Poor network
-• Reconnecting
-• Microphone unavailable
-• Camera unavailable
-• Permission denied
-• Device unavailable
-• Connection failure
-
-Do not expose sensitive diagnostics unnecessarily.
-
-────────────────────────────────────────
-
-DEVICE MANAGEMENT
-
-Complete the device-management experience.
-
-Support:
-
-• Device list
-• Device details
-• Device platform
-• Last activity
-• Device naming
-• Remote logout
-• Device revocation
-• Security alerts
-
-Protect sensitive device information.
-
-────────────────────────────────────────
-
-PRIVACY SETTINGS
-
-Complete privacy controls.
-
-Support UI for:
-
-• Last seen
-• Online status
-• Profile visibility
-• Read receipts
-• Group invitations
-• Contact discovery
-• Blocking
-• Story privacy
-• Notification privacy
-
-Use backend-provided state as the source of truth.
-
-────────────────────────────────────────
-
-SECURITY SETTINGS
-
-Implement:
-
-• Password change
-• Password reset
-• MFA settings where supported
-• Passkey management where supported
-• Active sessions
-• Devices
-• Security notifications
-• Account recovery
-
-Provide strong confirmation flows for sensitive actions.
-
-────────────────────────────────────────
-
-OFFLINE EXPERIENCE
-
-Complete browser offline handling.
-
-Support:
-
-• Offline indicator
-• Pending messages
-• Reconnection state
-• Retry controls
-• Cached conversations where appropriate
-• Synchronization progress
-• Network error recovery
-
-Do not claim capabilities that browser APIs cannot reliably provide.
-
-────────────────────────────────────────
-
-REAL-TIME RESILIENCE
-
-Implement robust WebSocket behavior.
-
-Support:
-
-• Automatic reconnection
-• Exponential backoff
-• Connection state
-• Event replay/reconciliation
-• Duplicate-event handling
-• Missed-event synchronization
-• Clean disconnect
-• Authentication renewal
-
-The UI must remain functional during temporary WebSocket outages.
-
-────────────────────────────────────────
-
-BUSINESS ACCOUNT EXPERIENCE
-
-Implement frontend foundations for:
-
-• Business profiles
-• Business information
-• Business hours
-• Business users
-• Business roles
-• Business permissions
-• Business conversations
-• Business catalog foundations
-• Automated-response configuration where supported
-
-Keep business interfaces isolated from consumer account UI where appropriate.
-
-────────────────────────────────────────
-
-ADMINISTRATION EXPERIENCE
-
-Implement administration frontend foundations.
-
-Support:
-
-• User management
-• Account management
-• Device investigation
-• Group investigation
-• Business management
-• Reports
-• Moderation
-• Feature flags
-• System settings
-• Audit logs
-
-Administrative routes must have frontend protections while relying on backend authorization as the final security boundary.
-
-────────────────────────────────────────
-
-MODERATION EXPERIENCE
-
-Implement:
-
-• Report queues
-• Report details
-• Moderation cases
-• Case status
-• Evidence references where permitted
-• Administrative actions
-• Appeals
-• Audit history
-
-Respect E2EE limitations.
-
-Do not expose protected message content that the backend does not provide.
-
-────────────────────────────────────────
-
-FEATURE FLAGS
-
-Integrate the frontend feature-flag system.
-
-Support:
-
-• Global flags
-• Percentage rollout
-• User targeting
-• Region targeting
-• Platform targeting
-• Kill switches
-• Experiments where appropriate
-
-Sensitive flags must be evaluated server-side.
-
-Frontend flags must not be treated as security controls.
-
-────────────────────────────────────────
-
-INTERNATIONALIZATION
-
-Implement frontend localization architecture supporting:
-
-• Multiple languages
-• Locale detection
-• Locale persistence
-• Date formatting
-• Time formatting
-• Number formatting
-• Relative timestamps
-• RTL layouts
-• Localized notifications
-• Accessibility-friendly translations
-
-Do not hard-code user-visible strings throughout feature modules.
-
-────────────────────────────────────────
-
-ACCESSIBILITY
-
-Complete accessibility support targeting WCAG 2.2 AA.
-
-Implement:
-
-• Keyboard navigation
-• Screen-reader support
-• ARIA
-• Focus management
-• Focus restoration
-• Accessible dialogs
-• Accessible context menus
-• Accessible message actions
-• Accessible call controls
-• Reduced motion
-• High contrast
-• Sufficient color contrast
-
-Test accessibility continuously.
-
-────────────────────────────────────────
-
-RESPONSIVE DESIGN
-
-Optimize for:
-
-• Desktop
-• Tablet
-• Mobile browser
-• Narrow windows
-• Large displays
-
-Ensure the core messaging experience remains usable across supported viewport sizes.
-
-────────────────────────────────────────
-
-PERFORMANCE
-
-Optimize:
-
-• Message virtualization
-• Conversation virtualization
-• Lazy loading
-• Code splitting
-• Dynamic imports
-• Image optimization
-• Media loading
-• Query caching
-• Prefetching
-• Memoization
-• Event batching
-• WebSocket processing
-• Rendering performance
-
-Avoid unnecessary client-side state duplication.
-
-────────────────────────────────────────
-
-ERROR HANDLING
-
-Provide UI for:
-
-• Authentication errors
-• Authorization errors
-• Network errors
-• WebSocket errors
-• Upload failures
-• Call failures
-• Search failures
-• Synchronization failures
-• Server errors
-• Offline state
-
-Provide recovery actions where appropriate.
-
-────────────────────────────────────────
-
-STATE MANAGEMENT
-
-Use TanStack Query for server state.
-
-Use Zustand for client-owned state.
-
-Maintain clear boundaries.
-
-Do not duplicate the same server state in multiple independent stores.
-
-Synchronize:
-
-• Messages
-• Conversations
-• Notifications
-• Groups
-• Communities
-• Stories
-• Devices
-• Search
-• Calls
-
-through appropriate query/cache mechanisms.
-
-────────────────────────────────────────
-
-API CLIENT
-
-Complete the typed API client.
-
-Support:
-
-• Authentication
-• Requests
-• Responses
-• Error normalization
-• Request cancellation
-• Retry
-• Pagination
-• Cursor pagination
-• File uploads
-• Download authorization
-• Request correlation IDs
-
-────────────────────────────────────────
-
-WEBSOCKET CLIENT
-
-Complete the WebSocket client architecture.
-
-Support:
-
-• Authentication
-• Connection state
-• Reconnection
-• Subscriptions
-• Message events
-• Delivery events
-• Read events
-• Presence
-• Typing
-• Group events
-• Community events
-• Notification events
-• Call signaling
-
-Ensure cleanup of subscriptions to prevent memory leaks.
-
-────────────────────────────────────────
-
-THEMING
-
-Complete:
-
-• Light theme
-• Dark theme
-• System theme
-• Theme persistence
-• Accessible contrast
-• Reduced motion
-
-Use centralized design tokens.
-
-────────────────────────────────────────
-
-ANIMATION
-
-Use Framer Motion where it improves UX.
-
-Support:
-
-• Page transitions
-• Conversation transitions
-• Drawers
-• Dialogs
-• Message interactions
-• Story transitions
-• Notifications
-• Micro-interactions
-
-Animations must respect reduced-motion preferences.
-
-Do not animate excessively.
-
-────────────────────────────────────────
-
-TESTING
-
-Generate comprehensive frontend tests.
-
-UNIT TESTS
-
-• Utilities
-• State logic
-• Validation
-• Formatting
-• Feature-flag behavior
-
-COMPONENT TESTS
-
-• Message components
-• Composer
-• Conversation list
-• Group controls
-• Story viewer
-• Notifications
-• Search
-• Call controls
-• Settings
-
-INTEGRATION TESTS
-
-• Authentication
-• API client
-• TanStack Query
-• WebSocket client
-• Media upload
-• Synchronization
-
-END-TO-END TESTS
-
-• Registration
-• Login
-• Messaging
-• Reactions
-• Replies
-• Editing
-• Deletion
-• Groups
-• Communities
-• Media
-• Stories
-• Calls
-• Search
-• Notifications
-• Device management
-• Privacy settings
-
-ACCESSIBILITY TESTS
-
-• Keyboard navigation
-• Focus management
-• Dialogs
-• Forms
-• Navigation
-• Screen-reader semantics
-
-PERFORMANCE TESTS
-
-• Large conversation lists
-• Large message histories
-• High-frequency WebSocket events
-• Large media uploads
-• Reconnection
-• Rendering performance
-
-────────────────────────────────────────
-
-DOCUMENTATION
-
-Generate:
-
-• Frontend architecture documentation
-• Feature documentation
-• Component documentation
-• Design system documentation
-• API usage documentation
-• WebSocket usage documentation
-• State management standards
-• Accessibility standards
-• Responsive design standards
-• Testing standards
-• Performance standards
-• Internationalization standards
-
-────────────────────────────────────────
-
-PROJECT INDEX
-
-Update the frontend Project Index with:
-
-• Completed features
-• Generated pages
-• Generated layouts
-• Components
-• Hooks
-• Stores
-• Query integrations
-• API integrations
-• WebSocket integrations
-• Media integrations
-• Call integrations
-• Tests
-• Dependencies
-• Remaining work
-• Current milestone
-
-────────────────────────────────────────
-
-IMPLEMENTATION MILESTONES
-
-Implement incrementally.
-
-FRONTEND MILESTONE 1
-
-Advanced messaging, message actions, synchronization, and reconciliation.
-
-FRONTEND MILESTONE 2
-
-Groups, communities, and membership management.
-
-FRONTEND MILESTONE 3
-
-Media, stories/status, and notification experience.
-
-FRONTEND MILESTONE 4
-
-Search, device management, privacy, and security settings.
-
-FRONTEND MILESTONE 5
-
-Voice calls, video calls, group calls, and WebRTC integration.
-
-FRONTEND MILESTONE 6
-
-Business accounts, administration, moderation, and feature flags.
-
-FRONTEND MILESTONE 7
-
-Internationalization, accessibility, offline behavior, and responsive hardening.
-
-FRONTEND MILESTONE 8
-
-Performance optimization, automated testing, security testing, and production readiness.
-
-Each milestone should contain approximately 20–40 files where practical.
-
-Every milestone must compile before proceeding.
-
-────────────────────────────────────────
-
-OUTPUT FORMAT
-
-For every generated file provide:
-
-1. Exact file path
-2. Complete file contents
-
-Never truncate code.
-
-Never summarize code instead of generating it.
-
-Never generate pseudo-code.
-
-Never generate placeholder files.
-
-Never generate TODO implementations.
-
-When modifying an existing file:
-
-1. Provide the exact file path.
-2. Explain why it must change.
-3. Provide the complete updated file.
-
-Never regenerate unchanged files.
-
-────────────────────────────────────────
-
-SCOPE RESTRICTION
-
-This volume completes the remaining web frontend.
-
-Do not implement:
-
-• Backend code
-• Mobile code
-• Kubernetes
-• Terraform
-• CI/CD infrastructure
-
-Consume the established backend contracts exactly.
-
-Do not redesign APIs or database structures.
-
-────────────────────────────────────────
-
-QUALITY BAR
-
-Treat the frontend as a globally used production communication application.
-
-Assume:
-
-• Large conversation histories
-• High-frequency real-time events
-• Multiple active devices
-• Unreliable networks
-• Large media
-• High notification volume
-• Voice/video calls
-• Strict accessibility requirements
-• Strong privacy requirements
-• Strict security requirements
-
-Prioritize:
-
-• Performance
-• Accessibility
-• Security
-• Correct state synchronization
-• Real-time responsiveness
-• Resilience
-• Maintainability
-• Excellent user experience
-• Production readine
-
-You are operating in Senior Engineering Team Mode.
-
-Build the remaining production-ready web frontend for an enterprise-scale global real-time messaging and communication platform comparable in architectural scope to WhatsApp.
-
-The platform is an original implementation.
-
-Do not copy proprietary source code, internal architecture, branding, or confidential implementation details from WhatsApp or any other proprietary platform.
-
-This prompt is completely independent and may be executed in a separate conversation.
-
-The frontend must consume the established backend APIs, WebSocket contracts, authentication model, authorization model, media architecture, notification architecture, search architecture, call architecture, and synchronization contracts.
-
-Do not redesign backend APIs.
-
-Do not redesign the database.
-
-Do not implement backend code.
-
-Do not implement mobile code.
-
-Do not implement infrastructure implementation code.
-
-Do not generate Terraform.
-
-Do not generate Kubernetes manifests.
-
-Do not generate CI/CD workflows.
-
-────────────────────────────────────────
-
-MISSION
-
-Complete the production-ready web frontend for:
-
-• Advanced messaging
-• Groups
-• Communities
-• Stories/status
-• Media
-• Notifications
-• Search
-• Voice calls
-• Video calls
-• Group calls
-• Device management
-• Privacy
-• Security
-• Business accounts
-• Administration
-• Moderation
-• Real-time synchronization
-• Offline synchronization
-• Accessibility
-• Performance
-• Production hardening
-
-The frontend must remain consistent with the established architecture and backend contracts.
-
-────────────────────────────────────────
-
-TECHNOLOGY STACK
-
-Framework:
-
-• Next.js
-• React
-• TypeScript
-
-Styling:
-
-• Tailwind CSS
-• shadcn/ui
-• CSS variables
-
-State:
-
-• Zustand
-
-Server State:
-
-• TanStack Query
-
-Forms:
-
-• React Hook Form
-• Zod
-
-Real-Time:
-
-• WebSockets
-• Socket.IO client where appropriate
-
-Animation:
-
-• Framer Motion
-
-Icons:
-
-• Lucide React
-
-Testing:
-
-• Jest
-• React Testing Library
-• Playwright
-• Accessibility testing tools
-
-────────────────────────────────────────
-
-ADVANCED MESSAGING EXPERIENCE
-
-Complete the messaging experience.
-
-Implement:
-
-• Replies
-• Forwarding
-• Mentions
-• Reactions
-• Editing
-• Deletion
-• Message selection
-• Multi-select actions
-• Copy
-• Retry failed messages
-• Message information
-• Delivery details
-• Read details
-• Context menus
-• Keyboard shortcuts
-• Message search
-• Jump to message
-• Scroll-to-referenced-message
-• Unread separators
-• Date separators
-
-Support efficient rendering of large message histories.
-
-Use virtualization where appropriate.
-
-────────────────────────────────────────
-
-MESSAGE COMPOSER
-
-Complete the composer.
-
-Support:
-
-• Rich message composition where appropriate
-• Emoji picker
-• Mentions
-• Reply mode
-• Attachment picker
-• Drag and drop
-• Paste handling
-• Voice-message preparation where browser capabilities permit
-• Draft persistence
-• Character limits
-• Keyboard shortcuts
-• Send state
-• Retry state
-• Upload state
-
-The composer must behave correctly during:
-
-• Offline mode
-• Reconnection
-• Slow uploads
-• Failed requests
-• WebSocket interruptions
-
-────────────────────────────────────────
-
-MESSAGE SYNCHRONIZATION
-
-Integrate the frontend with backend synchronization.
-
-Support:
-
-• Initial conversation synchronization
-• Incremental synchronization
-• Delta updates
-• Synchronization cursors
-• Missed events
-• Reconnection
-• Message reconciliation
-• Duplicate prevention
-• Delivery-state reconciliation
-• Read-state reconciliation
-
-The frontend must not assume every WebSocket event arrives exactly once.
-
-────────────────────────────────────────
-
-OPTIMISTIC MESSAGE STATE
-
-Implement:
-
-• Temporary message IDs
-• Pending messages
-• Server reconciliation
-• Failed messages
-• Retry
-• Duplicate prevention
-• Ordering correction
-
-Ensure optimistic state does not permanently diverge from server state.
-
-────────────────────────────────────────
-
-GROUP EXPERIENCE
-
-Complete group interfaces.
-
-Support:
-
-• Group creation
-• Group details
-• Group avatar
-• Group description
-• Group settings
-• Member management
-• Member roles
-• Add members
-• Remove members
-• Leave group
-• Admin controls
-• Group permissions
-• Group notifications
-• Group media
-
-Conditionally display actions based on backend authorization.
-
-Frontend visibility must never replace backend authorization.
-
-────────────────────────────────────────
-
-COMMUNITY EXPERIENCE
-
-Implement:
-
-• Community list
-• Community overview
-• Community groups
-• Community channels where appropriate
-• Community membership
-• Community administrators
-• Community settings
-• Community announcements
-• Community notifications
-
-Provide clear navigation between:
-
-• Direct conversations
-• Groups
-• Communities
-• Channels
-
-────────────────────────────────────────
-
-STORIES / STATUS EXPERIENCE
-
-Implement:
-
-• Stories tray
-• Story creation
-• Story composer
-• Text story
-• Image story
-• Video story
-• Story viewer
-• Story navigation
-• Viewer list where authorized
-• Story reactions where supported
-• Story deletion
-• Story privacy settings
-• Expiration states
-
-Support efficient story media loading.
-
-Do not request content the backend does not authorize.
-
-────────────────────────────────────────
-
-MEDIA EXPERIENCE
-
-Complete media interfaces for:
-
-• Images
-• Videos
-• Audio
-• Voice messages
-• Documents
-• Stickers
-• GIFs
-• Thumbnails
-
-Implement:
-
-• Upload progress
-• Upload cancellation
-• Upload retry
-• Preview
-• Media validation feedback
-• Failed uploads
-• Download states
-• Media viewer
-• Image zoom
-• Video controls
-• Audio controls
-• Document preview where supported
-
-Use direct object-storage upload contracts where provided by the backend.
-
-────────────────────────────────────────
-
-MEDIA VIEWER
-
-Implement a production media viewer supporting:
-
-• Images
-• Videos
-• Audio
-• Documents where supported
-• Gallery navigation
-• Zoom
-• Fullscreen
-• Download where authorized
-• Loading states
-• Failure states
-• Keyboard controls
-• Accessible controls
-
-Ensure private media does not become permanently exposed through frontend state.
-
-────────────────────────────────────────
-
-NOTIFICATION EXPERIENCE
-
-Complete:
-
-• Notification center
-• Unread counts
-• Notification grouping
-• Notification preferences
-• Security notifications
-• Message notifications
-• Call notifications
-• Group notifications
-• Community notifications
-• Business notifications
-
-Support:
-
-• Read/unread
-• Navigation to related resources
-• Loading states
-• Empty states
-• Error states
-
-────────────────────────────────────────
-
-SEARCH EXPERIENCE
-
-Complete search for:
-
-• Users
-• Contacts
-• Groups
-• Communities
-• Conversations
-• Business accounts
-• Messages where permitted
-
-Support:
-
-• Instant search
-• Autocomplete
-• Search suggestions
-• Recent searches
-• Search history management
-• Filters
-• Result grouping
-• Loading states
-• Empty states
-• Error states
-• Keyboard navigation
-
-Do not display search results the backend has not authorized.
-
-────────────────────────────────────────
-
-CALL EXPERIENCE
-
-Implement production-ready call interfaces.
-
-Support:
-
-• Incoming call screen
-• Outgoing call screen
-• Ringing
-• Connecting
-• Active call
-• Reconnecting
-• Call failure
-• Call ended
-• Missed call
-
-Voice:
-
-• Microphone control
-• Speaker/device selection
-• Mute
-• End call
-
-Video:
-
-• Camera toggle
-• Camera preview
-• Participant video
-• Video layout
-• Screen layout
-• End call
-
-Group calls:
-
-• Participant grid
-• Active speaker
-• Participant states
-• Call controls
-• Reconnection states
-
-Use the established WebRTC/signaling architecture.
-
-Do not implement a parallel signaling protocol.
-
-────────────────────────────────────────
-
-CALL QUALITY UI
-
-Reflect backend/client call state where appropriate.
-
-Support graceful UI for:
-
-• Poor network
-• Reconnecting
-• Microphone unavailable
-• Camera unavailable
-• Permission denied
-• Device unavailable
-• Connection failure
-
-Do not expose sensitive diagnostics unnecessarily.
-
-────────────────────────────────────────
-
-DEVICE MANAGEMENT
-
-Complete the device-management experience.
-
-Support:
-
-• Device list
-• Device details
-• Device platform
-• Last activity
-• Device naming
-• Remote logout
-• Device revocation
-• Security alerts
-
-Protect sensitive device information.
-
-────────────────────────────────────────
-
-PRIVACY SETTINGS
-
-Complete privacy controls.
-
-Support UI for:
-
-• Last seen
-• Online status
-• Profile visibility
-• Read receipts
-• Group invitations
-• Contact discovery
-• Blocking
-• Story privacy
-• Notification privacy
-
-Use backend-provided state as the source of truth.
-
-────────────────────────────────────────
-
-SECURITY SETTINGS
-
-Implement:
-
-• Password change
-• Password reset
-• MFA settings where supported
-• Passkey management where supported
-• Active sessions
-• Devices
-• Security notifications
-• Account recovery
-
-Provide strong confirmation flows for sensitive actions.
-
-────────────────────────────────────────
-
-OFFLINE EXPERIENCE
-
-Complete browser offline handling.
-
-Support:
-
-• Offline indicator
-• Pending messages
-• Reconnection state
-• Retry controls
-• Cached conversations where appropriate
-• Synchronization progress
-• Network error recovery
-
-Do not claim capabilities that browser APIs cannot reliably provide.
-
-────────────────────────────────────────
-
-REAL-TIME RESILIENCE
-
-Implement robust WebSocket behavior.
-
-Support:
-
-• Automatic reconnection
-• Exponential backoff
-• Connection state
-• Event replay/reconciliation
-• Duplicate-event handling
-• Missed-event synchronization
-• Clean disconnect
-• Authentication renewal
-
-The UI must remain functional during temporary WebSocket outages.
-
-────────────────────────────────────────
-
-BUSINESS ACCOUNT EXPERIENCE
-
-Implement frontend foundations for:
-
-• Business profiles
-• Business information
-• Business hours
-• Business users
-• Business roles
-• Business permissions
-• Business conversations
-• Business catalog foundations
-• Automated-response configuration where supported
-
-Keep business interfaces isolated from consumer account UI where appropriate.
-
-────────────────────────────────────────
-
-ADMINISTRATION EXPERIENCE
-
-Implement administration frontend foundations.
-
-Support:
-
-• User management
-• Account management
-• Device investigation
-• Group investigation
-• Business management
-• Reports
-• Moderation
-• Feature flags
-• System settings
-• Audit logs
-
-Administrative routes must have frontend protections while relying on backend authorization as the final security boundary.
-
-────────────────────────────────────────
-
-MODERATION EXPERIENCE
-
-Implement:
-
-• Report queues
-• Report details
-• Moderation cases
-• Case status
-• Evidence references where permitted
-• Administrative actions
-• Appeals
-• Audit history
-
-Respect E2EE limitations.
-
-Do not expose protected message content that the backend does not provide.
-
-────────────────────────────────────────
-
-FEATURE FLAGS
-
-Integrate the frontend feature-flag system.
-
-Support:
-
-• Global flags
-• Percentage rollout
-• User targeting
-• Region targeting
-• Platform targeting
-• Kill switches
-• Experiments where appropriate
-
-Sensitive flags must be evaluated server-side.
-
-Frontend flags must not be treated as security controls.
-
-────────────────────────────────────────
-
-INTERNATIONALIZATION
-
-Implement frontend localization architecture supporting:
-
-• Multiple languages
-• Locale detection
-• Locale persistence
-• Date formatting
-• Time formatting
-• Number formatting
-• Relative timestamps
-• RTL layouts
-• Localized notifications
-• Accessibility-friendly translations
-
-Do not hard-code user-visible strings throughout feature modules.
-
-────────────────────────────────────────
-
-ACCESSIBILITY
-
-Complete accessibility support targeting WCAG 2.2 AA.
-
-Implement:
-
-• Keyboard navigation
-• Screen-reader support
-• ARIA
-• Focus management
-• Focus restoration
-• Accessible dialogs
-• Accessible context menus
-• Accessible message actions
-• Accessible call controls
-• Reduced motion
-• High contrast
-• Sufficient color contrast
-
-Test accessibility continuously.
-
-────────────────────────────────────────
-
-RESPONSIVE DESIGN
-
-Optimize for:
-
-• Desktop
-• Tablet
-• Mobile browser
-• Narrow windows
-• Large displays
-
-Ensure the core messaging experience remains usable across supported viewport sizes.
-
-────────────────────────────────────────
-
-PERFORMANCE
-
-Optimize:
-
-• Message virtualization
-• Conversation virtualization
-• Lazy loading
-• Code splitting
-• Dynamic imports
-• Image optimization
-• Media loading
-• Query caching
-• Prefetching
-• Memoization
-• Event batching
-• WebSocket processing
-• Rendering performance
-
-Avoid unnecessary client-side state duplication.
-
-────────────────────────────────────────
-
-ERROR HANDLING
-
-Provide UI for:
-
-• Authentication errors
-• Authorization errors
-• Network errors
-• WebSocket errors
-• Upload failures
-• Call failures
-• Search failures
-• Synchronization failures
-• Server errors
-• Offline state
-
-Provide recovery actions where appropriate.
-
-────────────────────────────────────────
-
-STATE MANAGEMENT
-
-Use TanStack Query for server state.
-
-Use Zustand for client-owned state.
-
-Maintain clear boundaries.
-
-Do not duplicate the same server state in multiple independent stores.
-
-Synchronize:
-
-• Messages
-• Conversations
-• Notifications
-• Groups
-• Communities
-• Stories
-• Devices
-• Search
-• Calls
-
-through appropriate query/cache mechanisms.
-
-────────────────────────────────────────
-
-API CLIENT
-
-Complete the typed API client.
-
-Support:
-
-• Authentication
-• Requests
-• Responses
-• Error normalization
-• Request cancellation
-• Retry
-• Pagination
-• Cursor pagination
-• File uploads
-• Download authorization
-• Request correlation IDs
-
-────────────────────────────────────────
-
-WEBSOCKET CLIENT
-
-Complete the WebSocket client architecture.
-
-Support:
-
-• Authentication
-• Connection state
-• Reconnection
-• Subscriptions
-• Message events
-• Delivery events
-• Read events
-• Presence
-• Typing
-• Group events
-• Community events
-• Notification events
-• Call signaling
-
-Ensure cleanup of subscriptions to prevent memory leaks.
-
-────────────────────────────────────────
-
-THEMING
-
-Complete:
-
-• Light theme
-• Dark theme
-• System theme
-• Theme persistence
-• Accessible contrast
-• Reduced motion
-
-Use centralized design tokens.
-
-────────────────────────────────────────
-
-ANIMATION
-
-Use Framer Motion where it improves UX.
-
-Support:
-
-• Page transitions
-• Conversation transitions
-• Drawers
-• Dialogs
-• Message interactions
-• Story transitions
-• Notifications
-• Micro-interactions
-
-Animations must respect reduced-motion preferences.
-
-Do not animate excessively.
-
-────────────────────────────────────────
-
-TESTING
-
-Generate comprehensive frontend tests.
-
-UNIT TESTS
-
-• Utilities
-• State logic
-• Validation
-• Formatting
-• Feature-flag behavior
-
-COMPONENT TESTS
-
-• Message components
-• Composer
-• Conversation list
-• Group controls
-• Story viewer
-• Notifications
-• Search
-• Call controls
-• Settings
-
-INTEGRATION TESTS
-
-• Authentication
-• API client
-• TanStack Query
-• WebSocket client
-• Media upload
-• Synchronization
-
-END-TO-END TESTS
-
-• Registration
-• Login
-• Messaging
-• Reactions
-• Replies
-• Editing
-• Deletion
-• Groups
-• Communities
-• Media
-• Stories
-• Calls
-• Search
-• Notifications
-• Device management
-• Privacy settings
-
-ACCESSIBILITY TESTS
-
-• Keyboard navigation
-• Focus management
-• Dialogs
-• Forms
-• Navigation
-• Screen-reader semantics
-
-PERFORMANCE TESTS
-
-• Large conversation lists
-• Large message histories
-• High-frequency WebSocket events
-• Large media uploads
-• Reconnection
-• Rendering performance
-
-────────────────────────────────────────
-
-DOCUMENTATION
-
-Generate:
-
-• Frontend architecture documentation
-• Feature documentation
-• Component documentation
-• Design system documentation
-• API usage documentation
-• WebSocket usage documentation
-• State management standards
-• Accessibility standards
-• Responsive design standards
-• Testing standards
-• Performance standards
-• Internationalization standards
-
-────────────────────────────────────────
-
-PROJECT INDEX
-
-Update the frontend Project Index with:
-
-• Completed features
-• Generated pages
-• Generated layouts
-• Components
-• Hooks
-• Stores
-• Query integrations
-• API integrations
-• WebSocket integrations
-• Media integrations
-• Call integrations
-• Tests
-• Dependencies
-• Remaining work
-• Current milestone
-
-────────────────────────────────────────
-
-IMPLEMENTATION MILESTONES
-
-Implement incrementally.
-
-FRONTEND MILESTONE 1
-
-Advanced messaging, message actions, synchronization, and reconciliation.
-
-FRONTEND MILESTONE 2
-
-Groups, communities, and membership management.
-
-FRONTEND MILESTONE 3
-
-Media, stories/status, and notification experience.
-
-FRONTEND MILESTONE 4
-
-Search, device management, privacy, and security settings.
-
-FRONTEND MILESTONE 5
-
-Voice calls, video calls, group calls, and WebRTC integration.
-
-FRONTEND MILESTONE 6
-
-Business accounts, administration, moderation, and feature flags.
-
-FRONTEND MILESTONE 7
-
-Internationalization, accessibility, offline behavior, and responsive hardening.
-
-FRONTEND MILESTONE 8
-
-Performance optimization, automated testing, security testing, and production readiness.
-
-Each milestone should contain approximately 20–40 files where practical.
-
-Every milestone must compile before proceeding.
-
-────────────────────────────────────────
-
-OUTPUT FORMAT
-
-For every generated file provide:
-
-1. Exact file path
-2. Complete file contents
-
-Never truncate code.
-
-Never summarize code instead of generating it.
-
-Never generate pseudo-code.
-
-Never generate placeholder files.
-
-Never generate TODO implementations.
-
-When modifying an existing file:
-
-1. Provide the exact file path.
-2. Explain why it must change.
-3. Provide the complete updated file.
-
-Never regenerate unchanged files.
-
-────────────────────────────────────────
-
-SCOPE RESTRICTION
-
-This volume completes the remaining web frontend.
-
-Do not implement:
-
-• Backend code
-• Mobile code
-• Kubernetes
-• Terraform
-• CI/CD infrastructure
-
-Consume the established backend contracts exactly.
-
-Do not redesign APIs or database structures.
-
-────────────────────────────────────────
-
-QUALITY BAR
-
-Treat the frontend as a globally used production communication application.
-
-Assume:
-
-• Large conversation histories
-• High-frequency real-time events
-• Multiple active devices
-• Unreliable networks
-• Large media
-• High notification volume
-• Voice/video calls
-• Strict accessibility requirements
-• Strong privacy requirements
-• Strict security requirements
-
-Prioritize:
-
-• Performance
-• Accessibility
-• Security
-• Correct state synchronization
-• Real-time responsiveness
-• Resilience
-• Maintainability
-• Excellent user experience
-• Production readiness
+* messaging architecture
+* message lifecycle
+* optimistic state
+* cache reconciliation
+* WebSocket events
+* reconnect behavior
+* scroll architecture
+* virtualization
+* search
+* group messaging
+* accessibility behavior
+* testing strategy
+
+Documentation must match actual code.
+
+---
+
+# 41. IMPLEMENTATION AND INTEGRATION RULES
+
+Before coding:
+
+1. inspect the repository
+2. inspect existing messaging components
+3. inspect message API contracts
+4. inspect WebSocket event contracts
+5. inspect conversation models
+6. inspect group models
+7. inspect authentication state
+8. inspect query/state architecture
+9. inspect existing UI primitives
+10. inspect existing tests
+
+Then implement only this scope.
+
+Preserve compatible behavior.
+
+Do not replace working infrastructure without a clear technical reason.
+
+Do not invent backend endpoints.
+
+Do not invent WebSocket event names.
+
+Do not fabricate server responses.
+
+Do not leave temporary mock data in production paths.
+
+If a required backend capability is genuinely absent, build the frontend integration boundary around the actual repository capabilities and report the exact limitation.
+
+---
+
+# 42. FINAL IMPLEMENTATION REPORT
+
+Before finishing:
+
+* run typecheck
+* run lint
+* run formatting validation
+* run relevant unit tests
+* run integration tests
+* run accessibility tests where available
+* run browser tests where available
+* run production build
+
+Resolve introduced failures.
+
+Report:
+
+* exact files created
+* exact files modified
+* message architecture
+* real-time architecture
+* state/cache changes
+* optimistic update behavior
+* scrolling/virtualization implementation
+* search implementation
+* group messaging implementation
+* accessibility work
+* security/privacy work
+* performance work
+* tests added
+* validation commands
+* validation results
+* repository limitations
+* backend capabilities required but unavailable
+* scope intentionally left for later implementation
+
+Do not claim tests passed unless they were actually executed.
+
+# FRONTEND VOLUME 2 COMPLETION STANDARD
+
+This volume is complete only when the web application provides a production-quality advanced messaging experience with:
+
+* reliable message sending
+* optimistic state
+* idempotent reconciliation
+* delivery/read states
+* replies
+* editing
+* deletion
+* reactions
+* forwarding
+* pinning
+* saved messages
+* message selection
+* contextual actions
+* unread handling
+* robust scrolling
+* scalable message rendering
+* typing indicators
+* presence
+* group messaging
+* group member UX
+* conversation search
+* message search
+* reconnect reconciliation
+* offline/degraded-state behavior
+* notification integration
+* secure message rendering
+* accessibility
+* automated testing
+* strict TypeScript correctness
+* production build validation
+* accurate documentation
+
+No pseudo-code, placeholders, fake APIs, TODO/FIXME markers, intentionally omitted implementations, or unfinished production paths are permitted.
+
+Do not use phrases such as:
+
+* “implement similarly”
+* “left as an exercise”
+* “for brevity”
+* “remaining code omitted”
+* “placeholder”
+* “TODO”
+
+Every implemented file must contain complete production-quality code appropriate for its responsibility.
+
+# IMPLEMENTATION REPORT FORMAT
+
+At completion, report:
+
+1. **Implementation Summary**
+2. **Files Created**
+3. **Files Modified**
+4. **Messaging Architecture**
+5. **Real-Time Behavior**
+6. **State and Cache Reconciliation**
+7. **User Experience**
+8. **Security and Privacy**
+9. **Accessibility**
+10. **Performance**
+11. **Testing**
+12. **Validation Commands**
+13. **Validation Results**
+14. **Repository Limitations**
+15. **Remaining Scope Outside This Volume**
+
+Stop only after the implementation and validation are complete.

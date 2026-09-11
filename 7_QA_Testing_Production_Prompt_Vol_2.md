@@ -1,1568 +1,1544 @@
-# QA PROMPT — VOLUME 2
+# WHATSAPP — QA VOLUME 2
 
-## End-to-End, Performance, Resilience, Disaster Recovery, and Production Readiness
+## ROLE
 
-You are operating as the **Principal QA Engineer, Staff Test Architect, Performance Engineer, Reliability Engineer, Security Test Engineer, Disaster Recovery Engineer, and Production Readiness Engineer** for an enterprise-grade real-time communication platform.
+Act as a Principal QA Engineer, Staff SDET, Distributed Systems Test Engineer, Security Test Engineer, Performance Engineer, Reliability Engineer, Chaos Engineer, Mobile Test Engineer, Frontend Test Engineer, Backend Test Engineer, Accessibility Engineer, and Release Validation Engineer working as one senior engineering team.
 
-Your task is to inspect the **actual repository and deployed/testable environments** and implement the advanced validation layer required to determine whether the platform is genuinely ready for production operation.
+You are performing the final quality, resilience, security, performance, and release validation of a global, production-grade real-time communication platform comparable in capability to WhatsApp, Telegram, Signal, Messenger, Discord, and Microsoft Teams.
 
-This is an implementation task.
+You are not writing a testing tutorial or a superficial test suite.
 
-Do not merely describe test plans.
-
-Do not create pseudo-tests, placeholder scenarios, TODOs, fake load tests, simulated success without validating the actual system, or reports that claim functionality was validated when it was not.
-
-The actual repository and actual executable environments are the source of truth.
+You are implementing the advanced validation system required to determine whether the repository is genuinely production-ready.
 
 ---
 
-# 1. OPERATING MODE
+# PROJECT
 
-Before modifying anything:
+The platform supports:
 
-1. Inspect the repository.
-2. Inspect the testing infrastructure already implemented.
-3. Inspect CI/CD.
-4. Inspect deployment manifests and infrastructure configuration.
-5. Inspect backend services.
-6. Inspect workers.
-7. Inspect frontend.
-8. Inspect mobile applications where available.
-9. Inspect PostgreSQL/Prisma.
-10. Inspect Redis.
-11. Inspect Kafka/Redpanda.
-12. Inspect BullMQ.
-13. Inspect media processing.
-14. Inspect S3/CDN integration.
-15. Inspect search.
-16. Inspect notifications.
-17. Inspect WebSockets/Socket.IO.
-18. Inspect calling/signaling.
-19. Inspect observability.
-20. Inspect health/readiness endpoints.
-21. Inspect backup and recovery configuration.
-22. Inspect actual QA Volume 1 testing infrastructure already present in the repository.
+* Individual messaging
+* Group messaging
+* Profiles
+* Contacts
+* Presence
+* Typing indicators
+* Delivery/read states
+* Replies
+* Reactions
+* Editing
+* Deletion
+* Forwarding
+* Pinned messages
+* Saved messages
+* Media
+* Documents
+* Voice messages
+* Stickers
+* GIFs
+* Link previews
+* Search
+* Push notifications
+* Multi-device synchronization
+* Offline synchronization
+* Blocking
+* Reporting
+* Privacy controls
+* Disappearing messages
+* Moderation
+* Administration
+* Analytics
+* Media storage and delivery
 
-Do not assume that every architecture feature exists.
+Target operating characteristics include:
 
-Test what is actually implemented.
-
-If functionality is absent, do not manufacture tests that pretend it exists.
-
----
-
-# 2. PRIMARY OBJECTIVE
-
-Build the advanced quality-validation layer covering:
-
-* complete end-to-end workflows
-* cross-service validation
-* multi-device behavior
-* real-time reliability
-* performance
-* load
-* stress
-* soak testing
-* concurrency
-* reconnect storms
-* queue backpressure
-* dependency failures
-* database failures
-* Redis failures
-* Kafka/Redpanda failures
-* worker failures
-* media-processing failures
-* notification failures
-* search failures
-* disaster recovery
-* backup restoration
-* deployment safety
-* rollback
-* security resilience
-* observability validation
-* production readiness
-
-The goal is to establish evidence that the system behaves correctly under both normal and abnormal operating conditions.
+* Hundreds of millions of registered users
+* Tens of millions of daily active users or greater
+* Very large concurrent WebSocket populations
+* High message throughput
+* Large media volumes
+* Global traffic
+* Multi-region deployment
+* High availability
+* Horizontal scalability
+* Fault tolerance
+* Disaster recovery
 
 ---
 
-# 3. TEST ENVIRONMENT SAFETY
+# TECHNOLOGY DIRECTION
 
-All advanced tests must execute only against:
+Use the repository's actual implementation and dependency versions as the source of truth.
 
-* local
-* ephemeral
-* CI
-* development
-* dedicated test
-* staging
-* explicitly approved non-production
+The technology direction includes:
 
-environments.
-
-Never target production with destructive, stress, chaos, migration, or recovery tests.
-
-Implement explicit environment guards for dangerous test suites.
-
-Dangerous suites must fail closed if they detect a production environment.
-
----
-
-# 4. END-TO-END TEST ARCHITECTURE
-
-Build or strengthen a complete E2E test framework using the repository's existing tools where possible.
-
-The E2E architecture must support:
-
-* isolated test users
-* isolated conversations
-* controlled devices
-* deterministic fixtures
-* database cleanup
-* API authentication
-* WebSocket connections
-* event observation
-* queue observation where appropriate
-* media workflows
-* notifications through safe test providers
-* search indexing
-* browser workflows
-* mobile workflows where practical
-
-Avoid arbitrary sleeps.
-
-Use explicit event/state polling with bounded timeouts.
-
-Every E2E failure must produce actionable diagnostics.
+* Next.js
+* React
+* TypeScript
+* Tailwind
+* TanStack Query
+* Zustand
+* React Native
+* Expo
+* React Navigation
+* NestJS
+* Node.js
+* REST
+* WebSockets
+* Socket.IO
+* PostgreSQL
+* Prisma
+* Redis
+* BullMQ
+* Kafka or Redpanda
+* OpenSearch or Elasticsearch
+* S3-compatible object storage
+* CloudFront or equivalent CDN
+* FFmpeg
+* FCM
+* APNs
+* Docker
+* Kubernetes
+* Helm
+* Terraform
+* GitHub Actions
+* OpenTelemetry
+* Prometheus
+* Grafana
+* Loki
+* Tempo
+* Jest
+* Supertest
+* Swagger/OpenAPI
 
 ---
 
-# 5. CRITICAL USER JOURNEYS
+# SOURCE OF TRUTH
 
-Implement complete end-to-end scenarios for the actual product.
+Before modifying or adding tests:
 
-At minimum validate:
+1. Inspect the entire repository.
+2. Inspect all existing tests.
+3. Inspect test utilities and fixtures.
+4. Inspect backend modules.
+5. Inspect frontend applications.
+6. Inspect mobile applications.
+7. Inspect API contracts.
+8. Inspect WebSocket contracts.
+9. Inspect event schemas.
+10. Inspect database schemas.
+11. Inspect queues.
+12. Inspect Redis usage.
+13. Inspect media workflows.
+14. Inspect search workflows.
+15. Inspect notification workflows.
+16. Inspect infrastructure.
+17. Inspect CI/CD.
+18. Identify critical test gaps.
+19. Identify flaky tests.
+20. Identify tests that provide false confidence.
+21. Identify production risks not covered by automation.
 
-## Authentication
+The repository is the source of truth.
 
-* registration
-* login
-* session establishment
-* authenticated application access
-* logout
-* session invalidation
-* reauthentication where applicable
+Do not invent functionality that does not exist.
 
-## Direct Messaging
-
-* user A authenticates
-* user B authenticates
-* conversation is created/opened
-* A sends a message
-* B receives it
-* delivery state updates
-* B reads it
-* read state propagates
-* conversation list updates
-
-## Message Lifecycle
-
-Validate:
-
-* send
-* retry
-* edit
-* reaction
-* reply
-* forward
-* delete-for-self
-* delete-for-everyone
-
-where implemented.
-
-## Group Messaging
-
-* create group
-* add member
-* member receives group event
-* send message
-* delivery/read behavior
-* administrator action
-* member removal
-* authorization after removal
-
-## Multi-Device
-
-* user signs in on Device A
-* same user signs in on Device B
-* send from A
-* receive/synchronize on B
-* read on B
-* state synchronization to A
-* disconnect one device
-* reconnect
-* catch up
+Do not rewrite correct existing tests unnecessarily.
 
 ---
 
-# 6. OFFLINE AND RECONNECT E2E
+# 1. QA OBJECTIVE
 
-Build real network-disruption scenarios where the test environment permits.
+Complete the advanced QA and production validation system.
+
+Focus on:
+
+* Distributed-system correctness
+* End-to-end consistency
+* Concurrency
+* Resilience
+* Chaos testing
+* Performance
+* Scalability
+* Security regression
+* Privacy
+* Accessibility
+* Mobile reliability
+* Browser compatibility
+* Disaster recovery validation
+* Deployment validation
+* Release gates
+* Production-readiness verification
+
+The objective is to find failures that unit and basic integration tests cannot detect.
+
+---
+
+# 2. DISTRIBUTED SYSTEM TESTING
+
+Validate interactions between:
+
+* API services
+* WebSocket services
+* PostgreSQL
+* Redis
+* Kafka/Redpanda
+* BullMQ
+* Search
+* Object storage
+* Media processors
+* Notification providers
 
 Test:
 
-* device disconnect
-* API unavailable
-* WebSocket unavailable
-* Redis unavailable
-* reconnect
-* message retry
-* synchronization
-* duplicate event handling
-* cursor recovery
-* stale local state
-* eventual consistency
+* Delayed dependencies
+* Duplicate events
+* Missing events
+* Reordered events
+* Consumer restarts
+* Partial failures
+* Network failures
+* Dependency recovery
 
-Verify that reconnect does not create duplicate messages or duplicate side effects.
+Verify the system converges toward the correct state.
 
 ---
 
-# 7. REAL-TIME E2E VALIDATION
+# 3. CROSS-SERVICE CONTRACT TESTING
 
-Validate complete event paths:
-
-database mutation → event publication → broker → consumer → routing → WebSocket → client state.
-
-Test:
-
-* message events
-* conversation events
-* receipt events
-* typing events
-* presence events
-* membership changes
-* synchronization events
-* device events
-
-Verify event ordering where ordering is part of the contract.
-
-Verify that duplicate events do not create duplicate UI state or durable records.
-
----
-
-# 8. MULTI-INSTANCE WEBSOCKET TESTING
-
-If the deployment supports horizontal scaling:
-
-Run tests against multiple backend/WebSocket instances.
+Implement contract tests for critical service boundaries.
 
 Validate:
 
-* client connected to instance A
-* event generated through instance B
-* client still receives event
-* presence synchronization
-* typing indicators
-* room membership
-* reconnect
-* connection routing
-* Redis adapter/pubsub behavior
+* REST request/response schemas
+* WebSocket event schemas
+* Event-stream schemas
+* Queue payloads
+* Database-facing contracts
+* Media-processing contracts
+* Notification contracts
 
-Test instance failure while clients are connected.
+Detect incompatible changes before deployment.
 
-Verify clients reconnect and recover state correctly.
+Test backward and forward compatibility where required.
 
 ---
 
-# 9. EVENT BROKER E2E
+# 4. EVENT SCHEMA COMPATIBILITY
 
-Where Kafka/Redpanda exists:
-
-Validate complete event pipelines.
-
-Test:
-
-* producer
-* topic
-* partition
-* consumer
-* side effect
-* acknowledgement/offset
-* retry
-* duplicate event
-* replay
-* dead-letter path
-
-Inject controlled failures and confirm the system recovers without corrupting durable state.
-
----
-
-# 10. QUEUE E2E
-
-For actual BullMQ workflows:
-
-Validate:
-
-* enqueue
-* worker pickup
-* processing
-* success
-* retry
-* backoff
-* timeout
-* dead-letter
-* recovery
-* duplicate job handling
-* worker restart
-
-Test realistic workloads rather than one-job toy scenarios.
-
----
-
-# 11. MEDIA E2E
-
-Where media functionality exists, validate the entire lifecycle:
-
-1. User creates message with media.
-2. Upload authorization is obtained.
-3. File is uploaded.
-4. Backend records media.
-5. Processing begins.
-6. Worker processes the file.
-7. Variants/thumbnails are generated where applicable.
-8. Processing status changes.
-9. Recipient receives the message.
-10. Recipient accesses the media.
-11. Unauthorized user is denied.
-12. Cleanup/lifecycle behavior occurs where applicable.
-
-Test failed uploads and processing failures.
-
-Test retry recovery.
-
----
-
-# 12. SEARCH E2E
-
-Validate:
-
-1. Create searchable content.
-2. Persistence succeeds.
-3. Event/job is emitted.
-4. Search index is updated.
-5. User searches.
-6. Result appears.
-7. Authorization is enforced.
-8. Edit propagates.
-9. Delete propagates.
-10. Unauthorized users cannot discover private content.
-
-Test eventual consistency using bounded polling.
-
----
-
-# 13. NOTIFICATION E2E
-
-Using a safe test provider or adapter:
-
-Validate:
-
-* token registration
-* token rotation
-* notification creation
-* notification preference filtering
-* multi-device delivery
-* logout behavior
-* invalid-token handling
-* provider failure
-* retry
-* notification privacy
-
-Do not send real user notifications.
-
----
-
-# 14. CALLING E2E
-
-If calling is implemented:
-
-Validate the signaling lifecycle:
-
-* caller starts call
-* recipient receives call
-* recipient accepts
-* call state changes
-* participant disconnects
-* call terminates
-* timeout
-* rejection
-* cancellation
-* reconnect
-
-Test authorization on every signaling operation.
-
-Where actual WebRTC media testing is impractical in CI, separate:
-
-* signaling E2E
-* controlled media integration tests
-* manual/device validation
-
-Do not claim full media-path validation unless it was actually performed.
-
----
-
-# 15. PERFORMANCE TESTING STRATEGY
-
-Establish performance tests for critical endpoints and workflows.
-
-Measure at minimum:
-
-* throughput
-* latency
-* p50
-* p95
-* p99
-* error rate
-* saturation
-* resource utilization
-
-Identify realistic workloads from the actual application.
-
-Do not optimize exclusively for average latency.
-
----
-
-# 16. API LOAD TESTING
-
-Load-test critical APIs such as:
-
-* authentication
-* conversation retrieval
-* message history
-* message creation
-* receipts
-* search
-* media metadata
-* synchronization
-* group operations
-
-where implemented.
-
-Measure behavior under:
-
-* normal load
-* expected peak
-* elevated load
-* saturation
-
-Establish explicit thresholds based on actual environment capacity rather than arbitrary universal numbers.
-
----
-
-# 17. REAL-TIME LOAD TESTING
-
-Test realistic WebSocket workloads.
-
-Measure:
-
-* concurrent connections
-* connection establishment rate
-* messages/sec
-* events/sec
-* broadcast/fanout
-* presence updates
-* typing events
-* reconnect rate
-* server CPU
-* memory
-* network
-* Redis utilization
-
-Test multiple backend instances where supported.
-
----
-
-# 18. RECONNECT STORM TESTING
-
-Simulate many clients reconnecting simultaneously.
-
-Scenarios:
-
-* backend restart
-* network interruption
-* load balancer disruption
-* Redis interruption
-* rolling deployment
-
-Measure:
-
-* reconnection success
-* authentication load
-* synchronization load
-* duplicate events
-* queue growth
-* database load
-* recovery time
-
-Verify the system does not collapse under a synchronized reconnect storm.
-
----
-
-# 19. MESSAGE FANOUT TESTING
-
-Test realistic direct and group fanout.
-
-Include:
-
-* small groups
-* medium groups
-* large groups where supported
-* multiple devices per recipient
-
-Measure:
-
-* event publication
-* consumer throughput
-* WebSocket delivery
-* database impact
-* Redis impact
-* notification fallback
-* queue growth
-
-Verify that one large group cannot exhaust shared resources.
-
----
-
-# 20. CONCURRENCY AND RACE TESTING
-
-Build stress scenarios for:
-
-* concurrent message creation
-* duplicate sends
-* simultaneous edits
-* simultaneous deletes
-* receipt advancement
-* group membership changes
-* device registration
-* session revocation
-* reactions
-* synchronization
-
-Verify transactional integrity and monotonic state.
-
----
-
-# 21. SOAK TESTING
-
-Create long-running tests for actual critical workloads.
-
-Where practical, run for extended periods and observe:
-
-* memory leaks
-* connection leaks
-* worker leaks
-* queue growth
-* Redis key growth
-* database connection exhaustion
-* event lag
-* CPU saturation
-* storage growth
-* search index growth
-
-Tests must produce measurable results.
-
----
-
-# 22. STRESS TESTING
-
-Gradually exceed expected capacity.
-
-Determine:
-
-* saturation point
-* failure mode
-* recovery behavior
-* error behavior
-* queue behavior
-* database behavior
-* autoscaling response
-* WebSocket behavior
-
-The goal is not merely to make the system fail.
-
-The goal is to determine whether failure is controlled, observable, and recoverable.
-
----
-
-# 23. BACKPRESSURE TESTING
-
-Intentionally create conditions where downstream systems are slower than producers.
-
-Examples:
-
-* slow Kafka consumers
-* slow workers
-* slow search indexing
-* slow media processing
-* notification provider delays
-* database pressure
+Test event evolution.
 
 Verify:
 
-* queues grow predictably
-* memory remains bounded
-* retries do not amplify failures uncontrollably
-* critical APIs remain available
-* noncritical functionality degrades gracefully
-* recovery occurs after dependency normalization
+* New consumers can process older events.
+* Older consumers fail safely when encountering supported newer versions.
+* Required fields remain compatible.
+* Optional fields evolve safely.
+* Version identifiers are honored.
+* Unknown fields do not break consumers.
+
+Test representative event replay.
+
+---
+
+# 5. MESSAGE CONSISTENCY TESTING
+
+Build end-to-end consistency scenarios.
+
+For a single message verify:
+
+* Database persistence
+* Outbox creation
+* Event publication
+* Recipient delivery
+* Delivery state
+* Read state
+* Multi-device synchronization
+* Search indexing where applicable
+* Notification behavior
+* Cache updates
+
+Introduce controlled delays and failures at each stage.
+
+Verify eventual convergence.
+
+---
+
+# 6. CONCURRENCY STRESS TESTING
+
+Create tests for high-concurrency operations.
+
+Test simultaneous:
+
+* Message sends
+* Reactions
+* Edits
+* Deletes
+* Reads
+* Group membership changes
+* Device synchronization
+* Authentication attempts
+* Media uploads
+
+Verify:
+
+* No duplicate business effects
+* No lost updates
+* No invalid states
+* No authorization bypass
+* Correct idempotency
+
+---
+
+# 7. RACE CONDITION TESTING
+
+Explicitly test races such as:
+
+* Delete vs edit
+* Edit vs reaction
+* Membership removal vs message send
+* Block vs message send
+* Device revoke vs synchronization
+* Account deletion vs message processing
+* Media deletion vs download
+* Session expiration vs API request
+
+Validate the repository's defined precedence and consistency semantics.
+
+---
+
+# 8. IDEMPOTENCY STRESS TESTING
+
+Repeatedly execute identical operations.
+
+Cover:
+
+* Message submission
+* Reactions
+* Read receipts
+* Delivery receipts
+* Group membership changes
+* Media processing
+* Notifications
+* Account deletion
+* Data export
+* Queue jobs
+* Event consumption
+
+Verify retries do not multiply business effects.
+
+---
+
+# 9. OFFLINE/RECONNECT STRESS TESTING
+
+Simulate:
+
+* Intermittent network
+* Long offline periods
+* Rapid reconnects
+* Multiple reconnects
+* Connection loss during send
+* Connection loss during synchronization
+* Connection loss during media upload
+* Application backgrounding during synchronization
+
+Verify:
+
+* No message duplication
+* No missing messages
+* Correct reconciliation
+* Correct ordering semantics
+* Correct read/delivery state
+* Correct local state
+
+---
+
+# 10. MULTI-DEVICE CONSISTENCY TESTING
+
+Create scenarios with:
+
+* Multiple web sessions
+* Multiple mobile devices
+* Simultaneous activity
+* One device offline
+* Device revocation
+* Session expiration
+* New-device login
+
+Verify synchronization of:
+
+* Messages
+* Delivery
+* Read state
+* Reactions
+* Edits
+* Deletes
+* Conversation metadata
+* Privacy settings
+* Account state
+
+---
+
+# 11. GROUP CONSISTENCY STRESS TESTING
+
+Test groups with representative large membership populations.
+
+Validate:
+
+* Membership propagation
+* Permission changes
+* Message delivery
+* Fan-out
+* Read state
+* Presence
+* Group metadata
+* Member removal
+* Concurrent membership changes
+
+Verify removed members cannot continue receiving unauthorized private group events.
+
+---
+
+# 12. WEBSOCKET SCALE TESTING
+
+Build scalable WebSocket load tests.
+
+Support configurable:
+
+* Connection count
+* Message rate
+* Subscription count
+* Group membership
+* Connection lifetime
+* Reconnection rate
+* Geographic distribution
+
+Measure:
+
+* Connection success rate
+* Connection establishment latency
+* Event latency
+* Message delivery latency
+* Disconnect rate
+* Reconnect success
+* Server resource utilization
+
+---
+
+# 13. RECONNECT STORM TESTING
+
+Simulate:
+
+* Regional outage recovery
+* Load balancer restart
+* Pod rollout
+* Network restoration
+* Mobile network recovery
+
+Generate large populations reconnecting simultaneously.
+
+Verify:
+
+* Authentication remains available.
+* Redis remains stable.
+* Database connection pools remain healthy.
+* WebSocket servers recover.
+* Message synchronization remains correct.
+* Rate limiting prevents overload.
+* The system does not enter a cascading failure.
+
+---
+
+# 14. API LOAD TESTING
+
+Test critical APIs under sustained load.
+
+Include:
+
+* Authentication
+* Conversation retrieval
+* Message history
+* Message creation
+* Read state
+* Search
+* Profile operations
+* Group operations
+* Media operations
+
+Measure:
+
+* P50
+* P95
+* P99
+* Throughput
+* Error rate
+* Saturation
+
+---
+
+# 15. DATABASE LOAD TESTING
+
+Test PostgreSQL under representative workloads.
+
+Include:
+
+* Message writes
+* Message reads
+* Conversation history
+* Delivery state updates
+* Read state updates
+* Group membership
+* Search-related queries
+* Account operations
+
+Measure:
+
+* Query latency
+* Connection usage
+* Lock contention
+* CPU
+* Memory
+* Storage
+* I/O
+* Replica lag
+
+Identify problematic queries.
+
+---
+
+# 16. REDIS LOAD TESTING
+
+Test:
+
+* Presence
+* Typing
+* Sessions
+* Rate limiting
+* Caching
+* Idempotency
+* Distributed coordination
+
+Measure:
+
+* Latency
+* Memory
+* Throughput
+* Connection usage
+* Evictions
+* Failover behavior
+
+Verify Redis degradation does not cause catastrophic application failure.
+
+---
+
+# 17. EVENT BROKER LOAD TESTING
+
+Test Kafka/Redpanda under representative workloads.
+
+Measure:
+
+* Publish throughput
+* Consumer throughput
+* Consumer lag
+* Partition distribution
+* Broker utilization
+* Disk usage
+* Replication health
+
+Test scaling and consumer recovery.
+
+---
+
+# 18. QUEUE LOAD TESTING
+
+Stress BullMQ workloads.
+
+Test:
+
+* Notification jobs
+* Media jobs
+* Search jobs
+* Cleanup jobs
+* Export jobs
+* Deletion jobs
+
+Measure:
+
+* Queue depth
+* Job latency
+* Worker utilization
+* Retry rate
+* Failure rate
+
+Verify autoscaling behavior.
+
+---
+
+# 19. MEDIA LOAD TESTING
+
+Test realistic:
+
+* Image uploads
+* Video uploads
+* Audio uploads
+* Voice messages
+* Document uploads
+* Thumbnail generation
+* Transcoding
+
+Measure:
+
+* Upload throughput
+* Processing time
+* Queue latency
+* Worker utilization
+* Storage throughput
+* CDN delivery
+
+Test large files and concurrent uploads.
+
+---
+
+# 20. SEARCH LOAD TESTING
+
+Test:
+
+* User search
+* Message search
+* Conversation search
+* High query concurrency
+* Large result sets
+* Index lag
+* Reindexing
+
+Measure:
+
+* Search latency
+* Throughput
+* CPU
+* Memory
+* Disk
+* Shard health
+
+---
+
+# 21. NOTIFICATION LOAD TESTING
+
+Test high-volume notification generation.
+
+Verify:
+
+* Deduplication
+* Provider throttling
+* Retry
+* Token cleanup
+* Multi-device behavior
+
+Simulate FCM/APNs degradation.
+
+---
+
+# 22. CHAOS TESTING FOUNDATION
+
+Create controlled resilience tests.
+
+Support failure injection for:
+
+* Pod termination
+* Node termination
+* Redis failure
+* Database failure
+* Broker failure
+* Queue worker failure
+* Search failure
+* Object storage failure
+* Notification-provider failure
+* Network latency
+* Network packet loss
+* Dependency timeout
+
+Every chaos test must define:
+
+* Target
+* Expected behavior
+* Abort condition
+* Recovery procedure
+* Validation criteria
+
+---
+
+# 23. KUBERNETES FAILURE TESTING
+
+Test:
+
+* Pod eviction
+* Pod crash
+* Node drain
+* Node termination
+* Deployment rollback
+* Autoscaling failure
+* Readiness failure
+* Liveness failure
+
+Verify service continuity.
 
 ---
 
 # 24. DATABASE FAILURE TESTING
 
-In a safe environment, test:
-
-* temporary database unavailability
-* connection exhaustion
-* transaction failure
-* deadlock/retry behavior
-* slow queries
-* connection recovery
-* application restart while transactions are active
+Test controlled database failures.
 
 Verify:
 
-* no silent data corruption
-* correct errors
-* bounded retries
-* recovery
-* observability
+* Detection
+* Connection recovery
+* Failover
+* Application behavior
+* Error handling
+* Retry behavior
+* Data integrity
+
+Ensure failed database operations do not create duplicate messages.
 
 ---
 
 # 25. REDIS FAILURE TESTING
 
+Test Redis:
+
+* Restart
+* Failover
+* Network interruption
+* High latency
+* Memory pressure
+
+Verify:
+
+* Sessions recover appropriately.
+* Presence recovers.
+* Rate limiting degrades safely.
+* Idempotency behavior remains correct.
+* BullMQ recovers where applicable.
+
+---
+
+# 26. BROKER FAILURE TESTING
+
 Test:
 
-* Redis unavailable
+* Broker restart
+* Partition disruption
+* Consumer restart
+* Consumer lag
+* Replica failure
+
+Verify:
+
+* Events are not silently lost.
+* Consumers recover.
+* Duplicate events are handled safely.
+* Business state remains correct.
+
+---
+
+# 27. SEARCH FAILURE TESTING
+
+Disable or degrade search.
+
+Verify:
+
+* Messaging remains functional.
+* Search failures are isolated.
+* Indexing catches up after recovery.
+* No unauthorized fallback query path is introduced.
+
+---
+
+# 28. MEDIA FAILURE TESTING
+
+Test:
+
+* Object-storage errors
+* Processing worker failure
+* Transcoding failure
+* CDN origin failure
+* Signed URL expiration
+* Partial upload
+* Interrupted download
+
+Verify:
+
+* Retry behavior
+* Cleanup
+* Recovery
+* User-visible errors
+* Authorization
+
+---
+
+# 29. SECURITY PENETRATION-STYLE TESTING
+
+Implement automated security regression scenarios for:
+
+* Authentication bypass
+* Authorization bypass
+* IDOR
+* Privilege escalation
+* Session abuse
+* Token replay
+* Rate-limit bypass
+* SSRF
+* Path traversal
+* Injection
+* Unsafe file upload
+* Malicious media
+* Sensitive data leakage
+
+Do not introduce destructive exploitation against production systems.
+
+---
+
+# 30. PRIVACY REGRESSION TESTING
+
+Verify private information never crosses authorization boundaries.
+
+Test:
+
+* Conversations
+* Messages
+* Profiles
+* Presence
+* Last seen
+* Media
+* Search
+* Notifications
+* Reports
+* Account exports
+
+Test with multiple users, devices, and authorization states.
+
+---
+
+# 31. DATA RETENTION TESTING
+
+Test:
+
+* Message retention
+* Disappearing messages
+* Deleted messages
+* Media expiration
+* Account deletion
+* Export expiration
+* Audit retention
+
+Verify cleanup jobs actually remove or anonymize data according to implemented policies.
+
+---
+
+# 32. CACHE CONSISTENCY TESTING
+
+Test:
+
+* Cache hit
+* Cache miss
+* Stale cache
+* Cache invalidation
+* Cache rebuild
 * Redis restart
-* connection loss
-* cache loss
-* presence loss
-* rate-limit state loss where acceptable
-* Socket.IO adapter disruption
-* BullMQ dependency disruption
 
-Verify that Redis is not incorrectly treated as the authoritative durable data source.
-
-Critical durable operations must remain safe.
+Verify stale cache cannot override authoritative database state.
 
 ---
 
-# 26. KAFKA/REDPANDA FAILURE TESTING
-
-Where applicable:
+# 33. SEARCH EVENTUAL CONSISTENCY TESTING
 
 Test:
 
-* broker unavailable
-* producer timeout
-* consumer restart
-* consumer lag
-* duplicate delivery
-* partition reassignment
-* temporary broker failure
-* dead-letter path
-
-Verify:
-
-* transactional business state remains correct
-* outbox recovery works
-* consumers are idempotent
-* events are not silently lost
-* recovery is observable
+1. Create message.
+2. Verify database.
+3. Delay indexing.
+4. Verify search does not incorrectly expose unauthorized data.
+5. Allow indexing.
+6. Verify search converges.
+7. Delete message.
+8. Delay deletion indexing.
+9. Verify authorization and deletion behavior remain correct.
 
 ---
 
-# 27. WORKER FAILURE TESTING
+# 34. NOTIFICATION PRIVACY TESTING
 
-Kill/restart workers during:
+Verify notification payloads respect:
 
-* media processing
-* notifications
-* search indexing
-* event processing
-* cleanup
-* other actual asynchronous operations
+* Privacy settings
+* Muted conversations
+* Locked/private states where implemented
+* Device settings
+* Notification preferences
 
-Verify:
+Test notifications across:
 
-* job recovery
-* retries
-* idempotency
-* no duplicate durable side effects
-* no permanently orphaned jobs
-* DLQ behavior
+* Web
+* iOS
+* Android
 
 ---
 
-# 28. DEPLOYMENT FAILURE TESTING
+# 35. ACCESSIBILITY REGRESSION TESTING
 
-Validate deployment safety.
+Perform automated accessibility testing for critical web and mobile flows.
 
-Test:
+Cover:
 
-* rolling deployment
-* pod/container restart
-* one instance unavailable
-* readiness failure
-* liveness failure
-* old/new application compatibility
-* database migration compatibility
-* worker version compatibility
-* event schema compatibility
-
-Verify existing clients do not break unexpectedly during deployment.
-
----
-
-# 29. ROLLBACK TESTING
-
-Where rollback is supported:
-
-Perform safe rollback validation.
-
-Verify:
-
-* application rollback
-* configuration rollback
-* database compatibility
-* event compatibility
-* worker compatibility
-* frontend compatibility
-* mobile/backend compatibility where applicable
-
-Do not perform destructive rollback operations against production.
-
----
-
-# 30. DATABASE MIGRATION SAFETY
-
-Test actual migrations using:
-
-### Clean database
-
-Apply all migrations from the beginning.
-
-### Existing database
-
-Apply migrations against representative data.
+* Authentication
+* Conversation list
+* Messaging
+* Search
+* Settings
+* Profile
+* Media viewer
+* Group management
 
 Validate:
 
-* migration success
-* application compatibility
-* rollback strategy where supported
-* expand/contract behavior
-* index creation safety
-* data preservation
-* constraint behavior
-
-Identify migrations that could cause unacceptable downtime or locking.
+* Focus
+* Labels
+* Semantics
+* Contrast
+* Keyboard access
+* Screen-reader compatibility
+* Reduced motion
 
 ---
 
-# 31. BACKUP VALIDATION
+# 36. BROWSER COMPATIBILITY TESTING
 
-Do not merely verify that backups are configured.
+Where supported by the project:
 
-Actually validate recoverability in a safe environment.
+Test critical web flows across current supported browsers.
 
-For PostgreSQL:
+Validate:
 
-* create backup
-* restore backup
-* validate schema
-* validate representative records
-* validate relationships
-* validate application compatibility
+* Authentication
+* Messaging
+* WebSocket behavior
+* Media
+* Notifications
+* Search
+* Settings
 
-For other durable systems where backup/restore is applicable, test their recovery mechanisms.
-
-A backup that cannot be restored successfully must not be considered a validated backup.
+Do not claim support for browsers not actually tested or supported by project policy.
 
 ---
 
-# 32. DISASTER RECOVERY TESTING
+# 37. MOBILE DEVICE MATRIX
 
-Create controlled DR exercises.
+Define a realistic mobile validation matrix.
 
-Test scenarios such as:
+Cover:
 
-* primary database failure
-* Redis loss
-* broker loss
-* search loss
-* object storage disruption
-* worker fleet loss
-* application region/zone failure where supported
+* iOS
+* Android
+* Different screen sizes
+* Different OS versions supported by the application
+* Low-memory devices where practical
+* Slow networks
+* Background restrictions
+
+Test critical messaging flows across the matrix.
+
+---
+
+# 38. MOBILE RESOURCE TESTING
 
 Measure:
 
-* RTO
-* RPO
-* recovery sequence
-* data integrity
-* dependency recovery
-* client recovery
-* observability
-
-Do not invent RTO/RPO values.
-
-Use the actual documented targets or clearly identify targets that require an engineering decision.
-
----
-
-# 33. DATA INTEGRITY VALIDATION
-
-After failure/recovery tests, verify:
-
-* user records
-* conversations
-* memberships
-* messages
-* receipts
-* reactions
-* media metadata
-* devices
-* sessions
-* notification tokens
-* search state
-* event state
-* queue state
-
-No recovery exercise is complete until data integrity is checked.
-
----
-
-# 34. SECURITY RESILIENCE TESTING
-
-Test security controls under pressure.
-
-Validate:
-
-* rate limits under load
-* authentication abuse
-* WebSocket abuse
-* oversized messages
-* malformed events
-* malicious uploads
-* unauthorized fanout
-* privilege escalation attempts
-* session revocation during active connections
-* blocked users attempting communication
-* removed members attempting group access
-
-Ensure security controls remain enforced when the system is degraded.
-
----
-
-# 35. OBSERVABILITY VALIDATION
-
-Do not merely test that telemetry libraries are installed.
-
-Generate controlled failures and confirm that operators can identify them.
-
-Validate:
-
-* application errors
-* WebSocket failures
-* database failures
-* Redis failures
-* Kafka lag
-* BullMQ failures
-* media failures
-* search failures
-* notification failures
-* authentication failures
-* elevated latency
-* elevated error rates
-
-Verify:
-
-* logs
-* metrics
-* traces
-* dashboards
-* alerts
-
-are actually useful.
-
----
-
-# 36. ALERT VALIDATION
-
-For every critical production alert:
-
-1. Trigger the condition safely.
-2. Confirm telemetry changes.
-3. Confirm alert condition activates.
-4. Confirm alert contains actionable information.
-5. Confirm recovery clears or resolves the condition appropriately.
-
-Avoid alert tests that create uncontrolled notification storms.
-
----
-
-# 37. SLO / SLI VALIDATION
-
-Where SLOs/SLIs are defined, validate that they can actually be measured.
-
-Potential dimensions include:
-
-* API availability
-* API latency
-* message-send success
-* message delivery latency
-* synchronization success
-* WebSocket connection success
-* event processing latency
-* queue processing latency
-* media processing success
-* search availability
-
-Do not invent business targets without repository/project evidence.
-
-If targets are missing, document the missing operational requirement rather than fabricating values.
-
----
-
-# 38. RESOURCE EXHAUSTION TESTING
-
-Test controlled exhaustion of:
-
+* Memory
 * CPU
-* memory
-* database connections
-* Redis connections
-* Kafka connections
+* Battery
+* Network usage
+* Startup time
+* Message rendering
+* Large conversation scrolling
+* Media playback
+* Media upload
+
+Identify:
+
+* Memory leaks
+* Excessive rerenders
+* Unbounded caches
+* Battery-intensive polling
+* Network waste
+
+---
+
+# 39. LARGE-CONVERSATION TESTING
+
+Test conversations containing:
+
+* Large message counts
+* Large media counts
+* Long histories
+* Many reactions
+* Many replies
+
+Verify:
+
+* Timeline virtualization
+* Pagination
+* Search
+* Scrolling
+* Memory
+* Synchronization
+* Rendering performance
+
+---
+
+# 40. LARGE-MEDIA TESTING
+
+Test:
+
+* Large images
+* Long videos
+* Long audio
+* Large documents
+
+Verify:
+
+* Upload limits
+* Processing limits
+* Timeouts
+* Memory usage
+* Storage behavior
+* CDN delivery
+* Client handling
+
+---
+
+# 41. ACCESS CONTROL MATRIX TESTING
+
+Create a test matrix covering:
+
+* Anonymous
+* Authenticated user
+* Conversation member
+* Non-member
+* Group administrator
+* Moderator
+* Platform administrator
+* Blocked user
+* Restricted user
+* Revoked device
+* Deleted account
+
+Verify each sensitive operation against each applicable role.
+
+---
+
+# 42. RELEASE CANDIDATE VALIDATION
+
+Create a release validation workflow that verifies:
+
+* Build succeeds
+* Tests pass
+* Security checks pass
+* Contracts remain compatible
+* Database migrations are safe
+* Images are valid
+* Infrastructure is valid
+* Deployment succeeds
+* Smoke tests pass
+* Rollback is available
+
+A release must not be considered production-ready merely because compilation succeeds.
+
+---
+
+# 43. SMOKE TEST SUITE
+
+Create a fast post-deployment smoke suite.
+
+Cover:
+
+* Health
+* Authentication
+* User retrieval
+* Conversation retrieval
+* Message send
+* Message receive
+* WebSocket connection
+* Database connectivity
+* Redis connectivity
+* Queue processing
+* Search
+* Media authorization
+
+Keep smoke tests deterministic and fast enough for deployment gates.
+
+---
+
+# 44. POST-DEPLOYMENT VALIDATION
+
+After deployment, validate:
+
+* Application health
+* Error rates
+* Latency
 * WebSocket connections
-* queue workers
-* disk
-* network bandwidth
+* Message throughput
+* Database health
+* Redis health
+* Queue depth
+* Broker lag
+* Search health
+* Media health
+* Notification health
 
-Verify graceful failure.
-
-Applications must not enter uncontrolled retry loops.
-
----
-
-# 39. CLIENT PERFORMANCE
-
-Where practical, measure frontend/mobile behavior under realistic data volumes.
-
-Validate:
-
-* large conversation lists
-* large message histories
-* media-heavy conversations
-* large groups
-* many notifications
-* reconnects
-* synchronization
-* low-memory conditions where testable
-
-Look for:
-
-* excessive rendering
-* memory leaks
-* unnecessary network traffic
-* duplicated event processing
-* unbounded local state
-* inefficient pagination
+Use automated checks where practical.
 
 ---
 
-# 40. MOBILE RESILIENCE
+# 45. CANARY VALIDATION
 
-If mobile is implemented, test:
+For canary deployments, validate:
 
-* app backgrounding
-* app termination
-* app restart
-* network loss
-* network recovery
-* push notification arrival
-* deep link opening
-* session restoration
-* WebSocket reconnect
-* synchronization
-* media upload interruption
-* permission changes
+* Error rate
+* Latency
+* Crash rate
+* WebSocket stability
+* Message delivery
+* Queue behavior
+* Database behavior
 
-Validate both Android and iOS behavior where the repository/toolchain permits.
+Compare canary behavior against the stable version.
 
-Do not claim platform validation that was not executed.
+Automatically block promotion when defined thresholds are exceeded.
 
 ---
 
-# 41. BROWSER RESILIENCE
+# 46. REGRESSION AFTER MIGRATIONS
 
-For the web application test:
+When database migrations are introduced:
 
-* tab suspension
-* tab restoration
-* network loss
-* reconnect
-* multiple tabs
-* duplicate connections
-* stale authentication
-* expired sessions
-* browser refresh
-* deep links
-* large message histories
+1. Validate schema.
+2. Validate backward compatibility.
+3. Run application tests.
+4. Run integration tests.
+5. Run migration tests.
+6. Verify rollback/recovery strategy.
+7. Validate production deployment ordering.
 
-Verify state recovery.
+Prevent schema changes from breaking older application instances during rolling deployments.
 
 ---
 
-# 42. DATA VOLUME TESTING
+# 47. TEST DATA PRIVACY
 
-Use realistic large datasets to validate:
+Ensure test data does not contain:
 
-* conversation lists
-* message history
-* search
-* unread counters
-* groups
-* user devices
-* notification tokens
-* media metadata
+* Real user information
+* Real credentials
+* Production tokens
+* Production media
+* Sensitive personal information
 
-Test pagination and query performance.
-
-Identify N+1 queries and unbounded queries where possible.
+Use synthetic data.
 
 ---
 
-# 43. SEARCH PERFORMANCE
+# 48. TEST SECURITY
 
-Where search exists, test:
+Protect:
 
-* concurrent searches
-* large index
-* complex queries
-* malformed queries
-* authorization filters
-* pagination
-* indexing lag
-* reindex operations
+* Test credentials
+* CI secrets
+* Test databases
+* Test storage
+* Test logs
+* Test artifacts
 
-Ensure search degradation does not expose unauthorized data.
+Do not expose credentials through:
 
----
-
-# 44. MEDIA PERFORMANCE
-
-Where media processing exists, test realistic:
-
-* image uploads
-* video uploads
-* audio/voice uploads
-* documents
-
-Measure:
-
-* upload latency
-* processing latency
-* worker throughput
-* CPU/memory usage
-* queue depth
-* failure rate
-* retry behavior
-* storage growth
-
-Use synthetic test media.
+* Logs
+* Screenshots
+* CI artifacts
+* Failure messages
+* Reports
 
 ---
 
-# 45. TEST DATA LIFECYCLE
+# 49. TEST OBSERVABILITY
 
-Advanced test suites must clean up after themselves.
+Ensure failed tests provide actionable diagnostics.
 
-Ensure:
+Capture where appropriate:
 
-* temporary users are removed
-* conversations are removed
-* media objects are removed
-* search documents are removed
-* queues are drained
-* Redis state is cleaned
-* test topics/consumer groups are isolated
-* temporary resources are destroyed
+* Logs
+* Traces
+* HTTP requests
+* WebSocket events
+* Database diagnostics
+* Screenshots
+* Videos
+* Device logs
+* Performance metrics
 
-Never leave uncontrolled test resources running.
+Avoid storing sensitive payloads unnecessarily.
 
 ---
 
-# 46. PERFORMANCE REGRESSION BASELINES
+# 50. TEST FLAKINESS GOVERNANCE
 
-Store meaningful performance results in a form that CI or engineering can compare over time.
+Identify flaky tests.
 
 Track:
 
-* latency
-* throughput
-* error rate
-* resource utilization
+* Failure frequency
+* Retry frequency
+* Runtime
+* Ownership
+* Root cause
 
-Do not fail builds because of tiny measurement noise.
+Do not permanently hide flaky tests with retries.
 
-Define sensible regression thresholds based on actual measurements and environment variability.
-
----
-
-# 47. SECURITY REGRESSION SUITE
-
-Integrate the most important security tests into repeatable CI/release validation.
-
-At minimum maintain regression coverage for:
-
-* auth bypass
-* IDOR/BOLA
-* privilege escalation
-* malicious input
-* malicious uploads
-* WebSocket authorization
-* search authorization
-* media authorization
-* rate-limit bypass
-* sensitive-data leakage
-
-When a security defect is fixed, add a regression test whenever practical.
+Retries may be used diagnostically, but underlying flakiness must be corrected.
 
 ---
 
-# 48. RELEASE CANDIDATE VALIDATION
+# 51. TEST EXECUTION OPTIMIZATION
 
-Create a repeatable release-validation workflow.
+Optimize test execution without reducing meaningful coverage.
 
-A release candidate should be validated against:
+Use:
 
-* build
-* migrations
-* API
-* authentication
-* authorization
-* messaging
-* synchronization
-* WebSocket
-* queues
-* media
-* notifications
-* search
-* calling where implemented
-* security
-* accessibility
-* E2E critical journeys
-* smoke tests
-* observability
-* deployment health
+* Parallel execution
+* Test sharding
+* Targeted test selection
+* Dependency-aware execution
+* Reusable fixtures
+* Cached dependencies where safe
+
+Maintain deterministic behavior.
 
 ---
 
-# 49. PRODUCTION SMOKE TESTS
+# 52. PRODUCTION READINESS TEST MATRIX
 
-Create safe post-deployment smoke tests where appropriate.
+Create a final matrix covering:
 
-They must:
+| Area              | Validation                     |
+| ----------------- | ------------------------------ |
+| Authentication    | Functional + Security          |
+| Authorization     | Functional + Security          |
+| Messaging         | Functional + Concurrency       |
+| WebSocket         | Functional + Load              |
+| Groups            | Functional + Scale             |
+| Multi-device      | Synchronization                |
+| Offline           | Recovery                       |
+| Media             | Functional + Security + Load   |
+| Search            | Functional + Security + Load   |
+| Notifications     | Functional + Privacy + Failure |
+| Privacy           | Security                       |
+| Moderation        | Authorization                  |
+| Database          | Integrity + Failure            |
+| Redis             | Failure + Load                 |
+| Broker            | Failure + Load                 |
+| Queues            | Failure + Load                 |
+| Infrastructure    | Deployment + Recovery          |
+| Mobile            | Lifecycle + Performance        |
+| Web               | Compatibility + Accessibility  |
+| Security          | Regression                     |
+| Disaster Recovery | Restore + Failover             |
 
-* use dedicated synthetic accounts
-* avoid real user data
-* avoid destructive operations
-* validate basic application health
-* validate authentication
-* validate core messaging
-* validate real-time connectivity
-* validate critical dependencies
-
-Make these tests safe to run after every deployment.
-
----
-
-# 50. FINAL PRODUCTION READINESS GATE
-
-Create an objective readiness checklist based on actual repository capabilities.
-
-Evaluate:
-
-### Functional
-
-* critical user journeys pass
-* API contracts pass
-* WebSocket flows pass
-* synchronization passes
-* media passes
-* notifications pass
-* search passes
-* calling passes where implemented
-
-### Security
-
-* authorization tests pass
-* security regressions pass
-* secrets are protected
-* abuse controls are active
-
-### Reliability
-
-* retries work
-* idempotency works
-* duplicate events are safe
-* recovery works
-* graceful degradation works
-
-### Performance
-
-* critical workloads have measured performance
-* saturation behavior is understood
-* no unacceptable regression is present
-
-### Operations
-
-* logs work
-* metrics work
-* traces work
-* alerts work
-* dashboards work
-* health checks work
-
-### Disaster Recovery
-
-* backups have been restored successfully
-* recovery procedures are executable
-* RTO/RPO evidence exists where targets are defined
-
-### Deployment
-
-* migrations are safe
-* rollout is safe
-* rollback is understood
-* configuration is validated
+Implement actual automated coverage for applicable rows.
 
 ---
 
-# 51. DEFECT CLASSIFICATION
+# 53. FINAL SYSTEM VALIDATION
 
-Create clear classification for discovered defects:
+Perform an end-to-end production-readiness validation.
 
-* Blocker
-* Critical
-* High
-* Medium
-* Low
+Verify:
 
-Prioritize issues based on:
-
-* data loss
-* security
-* privacy
-* authentication
-* authorization
-* messaging correctness
-* service availability
-* corruption
-* operational recovery
-* user impact
-
-Do not artificially downgrade defects merely to pass a readiness gate.
+* Critical user journeys work.
+* Security boundaries hold.
+* Data remains consistent.
+* Real-time behavior is correct.
+* Offline synchronization converges.
+* Multi-device behavior is correct.
+* Infrastructure failures are handled.
+* Deployment failures are recoverable.
+* Backups are usable.
+* Monitoring detects major failures.
+* CI/CD prevents unacceptable regressions.
 
 ---
 
-# 52. FAILURE EVIDENCE
+# 54. DEFECT TRIAGE
 
-Advanced tests must preserve useful evidence.
+For every discovered defect:
 
-For failures collect where supported:
+1. Reproduce it.
+2. Identify root cause.
+3. Determine affected systems.
+4. Implement the correct fix if within scope.
+5. Add a regression test.
+6. Re-run related tests.
+7. Verify no regression elsewhere.
 
-* logs
-* traces
-* metrics
-* screenshots
-* videos
-* request identifiers
-* event identifiers
-* queue/job identifiers
-* database diagnostics
-* performance measurements
-
-Do not collect sensitive information unnecessarily.
-
-Redact credentials and private user data.
+Do not patch symptoms without understanding the underlying failure.
 
 ---
 
-# 53. TEST EXECUTION PROFILES
+# 55. FINAL CODE AND TEST QUALITY REVIEW
 
-Create clear profiles for:
+Review all newly created and modified tests.
 
-### Fast
+Verify:
 
-Developer/PR-safe validation.
-
-### Integration
-
-Cross-service validation.
-
-### E2E
-
-Critical complete workflows.
-
-### Security
-
-Security regression suite.
-
-### Performance
-
-Load/stress/soak.
-
-### Resilience
-
-Failure injection and recovery.
-
-### Release
-
-Complete release-candidate validation.
-
-### Disaster Recovery
-
-Controlled recovery exercises.
-
-Use the repository's existing tooling when possible.
+* Clear names
+* Deterministic behavior
+* Correct assertions
+* Useful failure messages
+* Proper cleanup
+* Correct isolation
+* No unnecessary mocking
+* No duplicated fixtures
+* No dead tests
+* No disabled tests
+* No hidden retries
+* No production dependencies
 
 ---
 
-# 54. CI/CD INTEGRATION
+# 56. HARD IMPLEMENTATION RULES
 
-Integrate advanced tests intelligently.
+You MUST:
 
-Do not run expensive multi-hour resilience tests on every pull request.
+* Inspect the repository first.
+* Test actual behavior.
+* Test distributed interactions.
+* Test concurrency.
+* Test failures.
+* Test recovery.
+* Test security.
+* Test privacy.
+* Test scalability.
+* Test deployment.
+* Test production-critical workflows.
+* Add regression tests for discovered defects.
+* Integrate advanced validation into CI/CD.
 
-Use appropriate execution layers:
+You MUST NOT:
 
-* pull request
-* merge
-* nightly
-* scheduled
-* release candidate
-* staging
-* manual controlled DR
+* Use pseudo-tests.
+* Fake passing results.
+* Disable failing tests to obtain green CI.
+* Depend on production data.
+* Use arbitrary sleeps.
+* Ignore race conditions.
+* Ignore flaky tests.
+* Ignore security failures.
+* Ignore data consistency failures.
+* Create destructive production tests.
+* Claim scalability without measurement.
+* Claim disaster recovery without exercising recovery.
 
-Dangerous tests must require explicit environment confirmation.
+Never use:
 
----
-
-# 55. TEST ARTIFACT RETENTION
-
-Configure appropriate retention for:
-
-* test reports
-* coverage
-* screenshots
-* traces
-* performance results
-* load-test summaries
-* resilience results
-
-Do not retain sensitive data unnecessarily.
-
----
-
-# 56. NO FALSE POSITIVES
-
-A test must fail when the actual behavior is incorrect.
-
-Do not:
-
-* catch all errors and ignore them
-* accept any HTTP status
-* accept any WebSocket event
-* use empty assertions
-* mock the system under test into success
-* skip failing tests without documented justification
-* disable security validation
-* disable type checking
-* mark tests as passing without execution
-
-If a test cannot currently execute, fail clearly or classify it as an explicit environment limitation.
+* “implement similarly”
+* “left as an exercise”
+* “for brevity”
+* “remaining tests omitted”
+* “TODO”
+* “placeholder”
 
 ---
 
-# 57. NO FALSE NEGATIVES
+# 57. REPOSITORY INTEGRATION
 
-Avoid tests that fail because of irrelevant implementation details.
+Integrate all QA improvements into the existing repository.
 
-Tests should tolerate:
+Requirements:
 
-* legitimate internal refactoring
-* non-contractual ordering
-* harmless generated IDs
-* nonessential formatting differences
+* Preserve correct tests.
+* Modify only necessary files.
+* Maintain test conventions.
+* Maintain dependency compatibility.
+* Maintain CI/CD compatibility.
+* Maintain environment isolation.
+* Maintain reproducibility.
+* Maintain existing application behavior.
+* Update documentation where testing behavior changes.
 
-Assertions should target actual behavior and contracts.
+Every test must compile.
 
----
-
-# 58. ACTUAL REPOSITORY CONSISTENCY
-
-All advanced QA work must remain consistent with the actual implementation of:
-
-* PostgreSQL
-* Prisma
-* Redis
-* Kafka/Redpanda
-* BullMQ
-* REST
-* OpenAPI
-* WebSockets/Socket.IO
-* authentication
-* authorization
-* synchronization
-* media
-* S3/CDN
-* notifications
-* search
-* calling
-* web frontend
-* mobile application
-* infrastructure
-* observability
-* CI/CD
-
-If a test exposes an inconsistency:
-
-1. Determine whether the implementation violates its actual contract.
-2. Determine whether the test incorrectly assumes behavior.
-3. Correct the appropriate side.
-4. Preserve one coherent system.
-5. Never create competing implementations.
+Every test must use actual repository contracts.
 
 ---
 
-# 59. REQUIRED IMPLEMENTATION ORDER
+# 58. VALIDATION REQUIREMENTS
 
-Execute this work in the following order unless the actual repository requires a different dependency-safe sequence:
+Before completion:
 
-1. Audit existing advanced-test capabilities.
-2. Stabilize E2E environment.
-3. Implement critical end-to-end workflows.
-4. Implement multi-device/reconnect testing.
-5. Implement real-time multi-instance testing.
-6. Implement event/queue E2E validation.
-7. Implement media/search/notification E2E where applicable.
-8. Implement calling E2E where applicable.
-9. Implement API performance tests.
-10. Implement WebSocket performance tests.
-11. Implement concurrency testing.
-12. Implement stress testing.
-13. Implement soak testing.
-14. Implement reconnect-storm testing.
-15. Implement backpressure testing.
-16. Implement dependency-failure tests.
-17. Implement deployment/rollback validation.
-18. Implement backup/restore validation.
-19. Implement DR validation.
-20. Implement observability/alert validation.
-21. Implement release-candidate validation.
-22. Implement production smoke tests.
-23. Establish final readiness gates.
-24. Execute full practical validation.
-
----
-
-# 60. FINAL VALIDATION
-
-Run the strongest practical test matrix available.
-
-At minimum execute the relevant:
-
-* unit tests
-* integration tests
-* API tests
-* WebSocket tests
-* event tests
-* queue tests
-* security tests
-* frontend tests
-* mobile tests
-* contract tests
-* E2E tests
-* performance tests
-* resilience tests
-* migration tests
-* backup/restore tests
-* production smoke tests
-
-Do not claim a test was executed if it was not.
-
-Record actual results.
+1. Run formatting.
+2. Run type checking.
+3. Run unit tests.
+4. Run integration tests.
+5. Run API tests.
+6. Run contract tests.
+7. Run WebSocket tests.
+8. Run database tests.
+9. Run Redis tests.
+10. Run queue tests.
+11. Run event tests.
+12. Run frontend tests.
+13. Run mobile tests where environment permits.
+14. Run accessibility tests.
+15. Run security tests.
+16. Run smoke tests.
+17. Run critical end-to-end tests.
+18. Run relevant load tests.
+19. Run relevant resilience tests.
+20. Validate CI/CD integration.
+21. Review failures.
+22. Fix all issues within scope.
+23. Re-run affected suites.
+24. Confirm repository remains clean and consistent.
 
 ---
 
-# 61. FINAL QUALITY AUDIT
+# 59. FINAL IMPLEMENTATION REPORT
 
-Inspect the final repository and verify:
+At completion provide:
 
-* advanced test suites are discoverable
-* test commands work
-* dangerous tests are environment-protected
-* E2E workflows are meaningful
-* multi-device behavior is validated
-* real-time behavior is validated
-* asynchronous pipelines are validated
-* failure recovery is validated
-* performance is measured
-* scalability behavior is understood
-* backups are actually restorable where tested
-* disaster recovery is executable where tested
-* observability is validated
-* alerts are actionable
-* deployment safety is tested
-* security regression coverage exists
-* no fake tests exist
-* no placeholder tests exist
-* no production secrets are committed
-* no production environment is targeted accidentally
-* no false completion claims are made
+## IMPLEMENTED
+
+List all advanced QA capabilities implemented.
+
+## DISTRIBUTED SYSTEMS
+
+Describe:
+
+* Concurrency
+* Idempotency
+* Ordering
+* Event consistency
+* Multi-device synchronization
+* Offline synchronization
+
+## PERFORMANCE
+
+Describe:
+
+* API load
+* WebSocket load
+* Database load
+* Redis load
+* Broker load
+* Queue load
+* Media load
+* Search load
+
+## RESILIENCE
+
+Describe:
+
+* Failure injection
+* Recovery tests
+* Chaos scenarios
+* Regional/failure validation
+
+## SECURITY
+
+Describe:
+
+* Authorization
+* Authentication
+* Privacy
+* SSRF
+* Media security
+* Access-control testing
+* Security regression
+
+## CLIENTS
+
+Describe:
+
+* Web
+* Mobile
+* Accessibility
+* Browser compatibility
+* Device validation
+
+## RELEASE VALIDATION
+
+Describe:
+
+* Smoke tests
+* Canary validation
+* Post-deployment validation
+* Rollback validation
+* Migration validation
+
+## TEST RESULTS
+
+Report:
+
+* Tests executed
+* Tests passed
+* Tests failed
+* Tests skipped
+* Coverage
+* Performance results
+* Known limitations
+
+## FILES CHANGED
+
+List every created, modified, or deleted file with a concise explanation.
+
+## REMAINING ISSUES
+
+Only list genuine unresolved issues that are outside this prompt's scope or require unavailable external infrastructure, device, or provider access.
 
 ---
 
-# 62. FINAL ENGINEERING REPORT
+# QA VOLUME 2 COMPLETION STANDARD
 
-After implementation, provide a concise final report containing:
+This prompt is complete only when the repository contains an advanced production validation system capable of testing:
 
-1. Advanced QA architecture implemented.
-2. E2E workflows implemented.
-3. Performance/load suites implemented.
-4. Resilience/failure suites implemented.
-5. Security validation implemented.
-6. Backup/restore validation performed.
-7. Disaster-recovery validation performed where possible.
-8. Deployment/rollback validation performed.
-9. Observability and alert validation performed.
-10. CI/CD integration completed.
-11. Exact validation commands executed.
-12. Actual results.
-13. Actual performance measurements.
-14. Defects discovered and fixed.
-15. Remaining blockers.
-16. Remaining risks.
-17. Tests that could not be executed and the precise reason.
+* Distributed-system correctness
+* Concurrency
+* Idempotency
+* Event consistency
+* Multi-device synchronization
+* Offline synchronization
+* WebSocket scale
+* API scale
+* Database scale
+* Redis scale
+* Event-broker scale
+* Queue scale
+* Media scale
+* Search scale
+* Notification reliability
+* Security boundaries
+* Privacy boundaries
+* Accessibility
+* Browser compatibility
+* Mobile reliability
+* Chaos scenarios
+* Infrastructure failures
+* Deployment safety
+* Recovery behavior
+* Production release readiness
 
-Do not report unexecuted tests as passing.
+The test system must provide meaningful evidence about whether the platform is production-ready.
 
-Do not report an environment as production-ready merely because the test code exists.
+Tests must be deterministic, isolated, secure, maintainable, observable, and CI-compatible.
 
-The repository's actual state and executed validation are the only basis for completion claims.
+Critical defects discovered during validation must be fixed and protected with regression tests whenever they fall within the scope of this prompt.
 
-# END OF QA VOLUME 2
+Do not stop at test creation.
+
+Execute the validation, analyze failures, fix defects within scope, rerun affected suites, and report the actual result.

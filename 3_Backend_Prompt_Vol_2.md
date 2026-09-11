@@ -1,1474 +1,1074 @@
-# BACKEND IMPLEMENTATION PROMPT — VOLUME 2
+# WHATSAPP — BACKEND VOLUME 2
 
-## Production-Grade Real-Time Communication Platform
+## ROLE
 
-### Contacts, Conversations, Direct Chats, Groups, Membership, Permissions, and Conversation Lifecycle
+Act as a Principal Backend Engineer, Staff Backend Engineer, Distributed Systems Engineer, Real-Time Systems Engineer, Database Architect, Security Engineer, Performance Engineer, SRE, QA Engineer, and Technical Writer working as one senior engineering team.
 
-You are implementing **Volume 2 of the backend** for a production-grade, globally scalable, WhatsApp-like real-time communication platform.
+You are implementing the production messaging and real-time backend of a global communication platform comparable in capability, reliability, and scale to WhatsApp, Telegram, Signal, Messenger, Discord, and Microsoft Teams.
 
-This is an original communication platform inspired by modern real-time messaging products. It is not an implementation of proprietary WhatsApp source code, private infrastructure, undocumented protocols, or proprietary algorithms.
+Do not teach. Do not provide tutorials. Do not produce pseudo-code. Perform the implementation directly in the repository.
 
-This prompt is **fully standalone**. It must be executable without requiring another prompt, previous conversation, architecture document, or previously generated prompt to be present.
-
-The actual repository is the source of truth for existing implementation.
-
-This volume is an implementation unit of **one coherent backend system**. It must integrate with the existing repository and must preserve the identity, authentication, user, device, session, security, error, configuration, database, Redis, observability, and testing conventions already implemented in the repository.
-
-Do not create a competing architecture.
-
-Do not duplicate existing modules.
-
-Do not assume that a previous prompt exists.
+Build production-grade software suitable for a globally distributed, high-scale communication platform.
 
 ---
 
-# 1. PRIMARY OBJECTIVE
+# PROJECT
 
-Implement the production-grade backend domain for:
+Build the backend messaging and real-time communication layer for a platform supporting:
 
-* contacts;
-* contact discovery;
-* direct conversations;
-* group conversations;
-* conversation membership;
-* group roles;
-* group permissions;
-* conversation metadata;
-* participant lifecycle;
-* conversation settings;
-* conversation deletion/archival behavior where appropriate;
-* conversation-level authorization;
-* blocking/privacy enforcement where required for conversation access;
-* conversation-related persistence;
-* conversation domain events.
+* One-to-one conversations
+* Group conversations
+* Message creation
+* Message retrieval
+* Message editing
+* Message deletion
+* Replies
+* Reactions
+* Forwarding
+* Pinned messages
+* Saved messages
+* Message delivery states
+* Read states
+* Message ordering
+* Idempotent message submission
+* Real-time message delivery
+* Presence
+* Typing indicators
+* Multi-device synchronization
+* Offline synchronization
+* Message history
+* Conversation synchronization
+* Unread state
+* Message acknowledgements
+* Device fan-out
+* Connection management
+* WebSocket authentication
+* WebSocket authorization
+* Reconnection
+* Duplicate-event protection
+* Distributed real-time infrastructure
 
-The result must provide a stable foundation for the messaging backend that will be implemented later.
+The system must support:
 
-Do not implement the actual message delivery system in this volume.
+* Hundreds of millions of registered users
+* Tens of millions of daily active users or greater
+* Very large concurrent WebSocket populations
+* Extremely high message throughput
+* Large numbers of conversations
+* Large group conversations
+* Multiple devices per account
+* Global traffic
+* Multi-region deployment
+* Horizontal scaling
+* Fault tolerance
+* Eventual consistency where appropriate
+* Strong consistency where required
 
-Do not create fake message endpoints.
-
-Do not create placeholder messaging services.
-
----
-
-# 2. PRODUCT CONTEXT
-
-The overall platform supports:
-
-* user accounts;
-* multiple authenticated devices;
-* contacts;
-* direct conversations;
-* group conversations;
-* messages;
-* message delivery;
-* read receipts;
-* typing indicators;
-* presence;
-* reactions;
-* replies;
-* forwarding;
-* editing;
-* deletion;
-* media;
-* push notifications;
-* search;
-* privacy;
-* blocking/reporting;
-* multi-device synchronization;
-* voice/video calls.
-
-This volume focuses specifically on the **relationship between users and conversations**.
-
-The resulting conversation domain must be suitable for high-volume messaging and must provide authoritative authorization information for later message operations.
+Do not implement frontend or mobile application code in this volume.
 
 ---
 
-# 3. REQUIRED TECHNOLOGY STACK
+# TECHNOLOGY DIRECTION
 
-Use the repository's existing compatible implementation of:
+Use the following backend technology direction unless the repository contains a technically justified implementation that must be preserved:
 
-* Node.js;
-* NestJS;
-* TypeScript;
-* PostgreSQL;
-* Prisma;
-* Redis;
-* Kafka or Redpanda;
-* BullMQ where genuinely required;
-* WebSockets/Socket.IO where integration requires it;
-* OpenTelemetry;
-* Prometheus;
-* structured logging.
+* Node.js
+* TypeScript
+* NestJS
+* REST
+* WebSockets
+* Socket.IO
+* PostgreSQL
+* Prisma
+* Redis
+* BullMQ
+* Kafka or Redpanda
+* OpenTelemetry
+* Prometheus
+* Grafana
+* Loki
+* Tempo
+* Jest
+* Supertest
+* Docker
+* Kubernetes
 
-Do not introduce a new framework or database abstraction when the repository already contains a compatible implementation.
+PostgreSQL is the authoritative durable data store for transactional messaging data.
+
+Redis is used for low-latency distributed state and coordination.
+
+Kafka or Redpanda is used for durable asynchronous event distribution where appropriate.
+
+Socket.IO is used for the real-time transport abstraction where appropriate.
+
+Do not make Redis the authoritative source for durable messages.
+
+Do not make WebSocket memory state the authoritative source for user or message state.
 
 ---
 
-# 4. FIRST ACTION — INSPECT THE ACTUAL REPOSITORY
+# SOURCE OF TRUTH
 
-Before making changes:
+The repository is the source of truth.
 
-1. Inspect the complete relevant backend structure.
-2. Inspect the existing identity/user/device/session implementation.
+Before modifying anything:
+
+1. Inspect the complete backend structure.
+2. Inspect existing NestJS modules.
 3. Inspect Prisma schema and migrations.
-4. Inspect existing API conventions.
-5. Inspect authentication and authorization guards.
-6. Inspect error handling.
-7. Inspect Redis conventions.
-8. Inspect event infrastructure.
-9. Inspect logging/tracing.
-10. Inspect existing tests.
-11. Identify any existing contact or conversation functionality.
-12. Identify any existing WebSocket infrastructure.
-13. Identify any existing privacy/blocking functionality.
+4. Inspect account, authentication, session, device, and contact implementations.
+5. Inspect Redis infrastructure.
+6. Inspect event infrastructure.
+7. Inspect queue infrastructure.
+8. Inspect API conventions.
+9. Inspect WebSocket infrastructure already present.
+10. Inspect tests.
+11. Inspect configuration.
+12. Inspect documentation.
+13. Identify existing contracts that must remain compatible.
+14. Identify partially implemented messaging or conversation functionality.
 
-Use existing implementations wherever compatible.
+Do not blindly replace existing code.
 
-If the repository already contains part of this functionality:
+Preserve correct existing functionality.
 
-* extend it;
-* repair it if necessary;
-* preserve compatible behavior;
-* migrate it safely where required.
-
-Do not create duplicate `Conversation`, `Contact`, or membership systems.
+Use the repository's actual implementation as the integration source of truth.
 
 ---
 
-# 5. DOMAIN BOUNDARIES
+# 1. BACKEND IMPLEMENTATION BOUNDARY
 
-Keep these responsibilities clearly separated.
+Implement the messaging and real-time backend.
 
-## Contacts
+This volume owns:
 
-Responsible for:
+* Conversation domain
+* Direct conversations
+* Group conversation foundation
+* Message domain
+* Message persistence
+* Message creation
+* Message retrieval
+* Message editing
+* Message deletion
+* Replies
+* Reactions
+* Forwarding
+* Pinning
+* Saved-message foundation
+* Message delivery states
+* Read states
+* Unread state
+* Message ordering
+* Idempotency
+* Real-time WebSocket transport
+* Connection lifecycle
+* Presence
+* Typing indicators
+* Multi-device synchronization
+* Offline synchronization
+* Message events
+* Message fan-out
+* Conversation synchronization
 
-* discovering users;
-* representing user relationships where applicable;
-* contact metadata;
-* contact visibility/privacy rules.
+Do not implement the full media system.
 
-## Conversations
+Do not implement the full notification system.
 
-Responsible for:
+Do not implement search indexing.
 
-* direct conversations;
-* groups;
-* conversation metadata;
-* membership;
-* roles;
-* permissions;
-* lifecycle.
+Do not implement advanced moderation.
 
-## Messaging
-
-Not implemented here.
-
-Messaging will consume the conversation authorization and membership contracts established by this volume.
-
-## Identity
-
-Remains responsible for:
-
-* users;
-* devices;
-* sessions;
-* authentication.
-
-Do not move authentication responsibility into conversations.
-
----
-
-# 6. CONTACT MODEL
-
-Implement a production-grade contact model appropriate to the product.
-
-A contact relationship may contain concepts such as:
-
-* owner user;
-* target user;
-* local nickname;
-* favorite/pinned state if product requirements justify it;
-* relationship state;
-* created timestamp;
-* updated timestamp.
-
-Determine whether contacts should represent:
-
-1. a server-side relationship;
-2. locally imported contacts;
-3. both.
-
-Do not store unnecessary copies of a user's entire profile.
-
-The authoritative user identity remains in the identity domain.
+Create integration contracts for those systems.
 
 ---
 
-# 7. CONTACT DISCOVERY
+# 2. CONVERSATION DOMAIN
 
-Implement secure user discovery mechanisms appropriate to the product.
+Implement a production-grade conversation domain.
 
-Potential discovery identifiers include:
+Support:
 
-* username/handle;
-* normalized phone number;
-* normalized email where applicable.
+* Direct conversations
+* Group conversation foundation
+* Conversation creation
+* Conversation lookup
+* Conversation membership
+* Conversation metadata
+* Conversation status
+* Last-message references
+* Unread state
+* User-specific conversation state
 
-Apply privacy controls.
+Every conversation must have a stable identifier.
 
-Do not allow unrestricted enumeration of the entire user database.
+Do not derive conversation identity from mutable user attributes.
 
-Protect discovery endpoints against:
+For direct conversations, prevent accidental creation of duplicate conversations between the same participants.
 
-* brute force;
-* automated enumeration;
-* high-volume probing;
-* identifier harvesting.
-
-Use appropriate:
-
-* rate limits;
-* authorization;
-* normalization;
-* response minimization.
-
-Do not reveal whether a private identifier belongs to a user when product privacy rules prohibit that disclosure.
+Use database constraints and transactional logic to guarantee uniqueness.
 
 ---
 
-# 8. CONTACT OPERATIONS
+# 3. CONVERSATION MEMBERSHIP
 
-Implement real functionality for appropriate operations such as:
+Implement membership management.
 
-* add contact;
-* update contact metadata;
-* remove contact;
-* list contacts;
-* retrieve contact;
-* search contacts;
-* discover eligible users.
+A membership must support:
 
-Only implement operations supported by the actual product model.
+* Conversation ID
+* User ID
+* Membership status
+* Joined timestamp
+* Left timestamp where applicable
+* Role
+* Last-read position
+* Notification preferences where appropriate
+* Muted state where appropriate
+* Pinned state where appropriate
 
-Do not create meaningless endpoints.
+Design membership so future group administration can add:
 
-Enforce ownership server-side.
+* Owner
+* Administrator
+* Moderator
+* Member
+* Restricted member
 
-A user must never be able to modify another user's contact records by manipulating an ID.
+without redesigning the core conversation model.
 
----
-
-# 9. DIRECT CONVERSATION MODEL
-
-Implement a canonical direct conversation model.
-
-A direct conversation represents communication between two users.
-
-The system must guarantee that the same pair of users cannot accidentally create multiple canonical direct conversations unless the product explicitly supports multiple independent threads.
-
-For a standard direct-message model:
-
-```text
-User A + User B = one canonical direct conversation
-```
-
-This uniqueness must be enforced at the database level, not only through application checks.
+All membership-sensitive operations must validate current membership.
 
 ---
 
-# 10. DIRECT CONVERSATION CREATION
+# 4. MESSAGE DATA MODEL
 
-Implement an idempotent direct-conversation creation/retrieval operation.
+Implement the durable message model.
 
-When a user requests a direct conversation with another eligible user:
+A message must support, where applicable:
 
-1. validate the target;
-2. verify privacy/blocking restrictions;
-3. normalize the participant pair;
-4. resolve an existing conversation;
-5. otherwise create it atomically;
-6. return the canonical conversation.
+* Message ID
+* Conversation ID
+* Sender ID
+* Sender device/session context where required
+* Client-generated message identifier
+* Message type
+* Content payload
+* Created timestamp
+* Updated timestamp
+* Deleted timestamp
+* Edited timestamp
+* Reply reference
+* Forwarding metadata
+* Version
+* Sequence/order information
+* Status metadata where appropriate
 
-Concurrent requests must not produce duplicate direct conversations.
+Do not store all future message types as arbitrary unvalidated JSON.
 
-Use:
+Use typed message categories and validation.
 
-* database uniqueness constraints;
-* transactions;
-* conflict handling;
+Design the model so future message types can include:
 
-as appropriate.
+* Text
+* Media
+* Documents
+* Audio
+* Voice messages
+* Stickers
+* GIFs
+* Location
+* Contacts
+* System messages
 
-Do not rely only on:
-
-```text
-find → if absent → create
-```
-
-because concurrent requests can race.
-
----
-
-# 11. DIRECT CONVERSATION AUTHORIZATION
-
-Every direct conversation operation must verify that the authenticated user is one of the participants.
-
-Never trust a client-provided:
-
-* user ID;
-* participant ID;
-* ownership flag;
-* membership flag.
-
-Resolve authorization from authoritative database state.
-
-Prepare reusable authorization services/guards for future messaging operations.
+without destabilizing the message domain.
 
 ---
 
-# 12. GROUP CONVERSATION MODEL
+# 5. MESSAGE IDENTIFIERS
 
-Implement groups with persistent concepts equivalent to:
+Implement separate identifiers for:
 
-## Group/Conversation
+* Server message identity
+* Client-generated idempotency identity
+* Conversation ordering
+* Event identity
 
-Contains:
+Do not use one identifier for all purposes.
 
-* conversation ID;
-* type;
-* title/name;
-* description where supported;
-* avatar/media reference where supported;
-* creator/owner;
-* status;
-* timestamps.
+Client-generated identifiers must support retries without producing duplicate messages.
 
-## ConversationMember
+Server identifiers must remain immutable.
 
-Contains concepts such as:
-
-* conversation ID;
-* user ID;
-* role;
-* membership status;
-* joined timestamp;
-* left timestamp;
-* mute/settings state where appropriate;
-* permissions metadata where required.
-
-The exact schema must follow repository conventions.
+Event identifiers must be unique across distributed producers.
 
 ---
 
-# 13. GROUP ROLES
+# 6. MESSAGE CREATION
 
-Implement a clear role model.
+Implement message creation with transactional guarantees.
 
-At minimum support appropriate equivalents of:
+A message submission must:
 
-* owner;
-* administrator;
-* member.
+1. Authenticate the sender.
+2. Validate the device/session.
+3. Validate conversation membership.
+4. Validate message content.
+5. Validate message type.
+6. Validate size constraints.
+7. Validate reply references where applicable.
+8. Check idempotency.
+9. Persist the message.
+10. Persist required ordering information.
+11. Create durable event/outbox information.
+12. Update required conversation state.
+13. Return the canonical server representation.
 
-Do not use arbitrary strings throughout the application.
+Do not acknowledge successful creation before durable persistence requirements are satisfied.
 
-Roles should be represented through a stable enum/domain type.
-
-Future group-management operations must be able to determine whether a member can:
-
-* add members;
-* remove members;
-* change group metadata;
-* manage administrators;
-* change group settings;
-* delete/close the group where authorized.
-
----
-
-# 14. GROUP PERMISSIONS
-
-Authorization must be evaluated server-side.
-
-Create explicit permission rules for operations such as:
-
-* view conversation;
-* update group metadata;
-* add members;
-* remove members;
-* promote member;
-* demote administrator;
-* leave group;
-* transfer ownership;
-* manage group settings.
-
-Do not encode permission decisions only in controllers.
-
-Keep business authorization reusable for:
-
-* REST;
-* WebSocket;
-* background workers;
-* future message operations.
+Do not rely on successful WebSocket delivery as proof that the message was stored.
 
 ---
 
-# 15. GROUP CREATION
+# 7. MESSAGE IDEMPOTENCY
 
-Implement real group creation.
+Implement robust message idempotency.
 
-Requirements:
+A client retrying the same logical message must not create duplicates.
 
-* authenticated creator required;
-* valid group metadata;
-* valid initial members;
-* creator automatically becomes owner;
-* appropriate administrator state;
-* duplicate member elimination;
-* membership validation;
-* transactional creation.
+Support:
 
-Group creation must either fully succeed or leave no partially-created group state.
+* Client-generated message IDs
+* Unique constraints
+* Concurrent duplicate requests
+* WebSocket retries
+* REST retries
+* Connection drops during acknowledgement
+* Server retry scenarios
+
+If the same idempotency identity is submitted again:
+
+* Return the existing message where appropriate.
+* Do not create another message.
+* Do not emit duplicate durable creation events.
+* Do not increment conversation counters twice.
+* Do not trigger duplicate downstream work.
+
+The implementation must remain correct across horizontally scaled backend instances.
 
 ---
 
-# 16. GROUP MEMBER ADDITION
+# 8. MESSAGE ORDERING
 
-Implement authorized member addition.
+Implement deterministic conversation ordering.
+
+Messages must have a server-controlled ordering mechanism.
+
+Do not depend solely on:
+
+* Client clocks
+* Local device timestamps
+* WebSocket arrival time
+* Database insertion timing across independent nodes
+
+The ordering model must tolerate concurrent sends.
+
+Document the ordering guarantees.
+
+The system must distinguish:
+
+* Server creation time
+* Client creation time
+* Conversation sequence/order
+* Event processing time
+
+Do not claim global total ordering across all conversations.
+
+Ordering guarantees should be scoped appropriately.
+
+---
+
+# 9. MESSAGE RETRIEVAL
+
+Implement message history APIs.
+
+Support:
+
+* Conversation history
+* Cursor-based pagination
+* Forward pagination where required
+* Backward pagination
+* Latest messages
+* Message lookup
+* Message-by-ID
+* Context around a specific message
+
+Do not use offset pagination for high-volume message history.
+
+Use stable cursors.
+
+Cursors must not expose internal database implementation details unnecessarily.
+
+Validate that the requesting user has access to the conversation before returning messages.
+
+---
+
+# 10. MESSAGE EDITING
+
+Implement message editing.
+
+Support:
+
+* Sender authorization
+* Editability rules
+* Edit timestamps
+* Message versioning where appropriate
+* Updated content validation
+* Event emission
+* Real-time propagation
+* Multi-device synchronization
+
+Prevent unauthorized users from editing another user's messages.
+
+Do not silently overwrite audit-relevant state where version history is required.
+
+Define clear behavior for edits occurring concurrently with deletes.
+
+---
+
+# 11. MESSAGE DELETION
+
+Implement message deletion.
+
+Support appropriate deletion modes such as:
+
+* Delete for sender
+* Delete for participants where product policy permits
+* Administrative deletion foundation
+
+Deletion must be authorization-aware.
+
+Do not physically destroy durable message records when doing so would break:
+
+* Ordering
+* References
+* Auditing
+* Synchronization
+* Compliance requirements
+* Event processing
+
+Use tombstone or equivalent semantics where required.
+
+Deleted content must not be returned through ordinary message retrieval APIs.
+
+---
+
+# 12. REPLIES
+
+Implement message replies.
+
+A reply must reference a stable source message.
 
 Validate:
 
-* target user exists;
-* target is eligible;
-* target is not already an active member;
-* requester has permission;
-* group is active;
-* membership limits where applicable.
+* Source message existence
+* Conversation compatibility
+* Authorization
+* Message visibility
 
-Do not silently create duplicate memberships.
+Do not allow a user to create a reply reference to a message in an unrelated unauthorized conversation.
 
-Use database constraints to reinforce uniqueness.
+Support deleted-message references without leaking deleted content.
 
 ---
 
-# 17. GROUP MEMBER REMOVAL
+# 13. REACTIONS
 
-Implement authorized removal.
+Implement message reactions.
 
-Consider:
+Support:
 
-* owner;
-* administrator;
-* ordinary member;
-* removing self;
-* removing another member;
-* removing an administrator;
-* removing the owner;
-* ownership transfer.
+* Reaction creation
+* Reaction removal
+* Reaction replacement
+* User-specific reaction state
+* Aggregated reaction counts
 
-Do not permit privilege escalation through malformed requests.
+Enforce uniqueness so one user cannot unintentionally create duplicate identical reactions.
 
-A user must not be able to remove a higher-privileged member unless the product's role rules explicitly allow it.
+Design reaction updates for high-concurrency messages.
 
----
-
-# 18. LEAVING GROUPS
-
-Implement self-service group leaving.
-
-When a member leaves:
-
-* mark membership appropriately;
-* preserve historical membership where needed;
-* prevent future authorization as an active member;
-* preserve referential integrity;
-* generate the appropriate domain event.
-
-If the leaving user is the owner, enforce a deterministic ownership rule.
-
-Do not leave a group with an invalid ownership state.
+Emit real-time reaction events.
 
 ---
 
-# 19. OWNERSHIP TRANSFER
+# 14. FORWARDING
 
-If group ownership transfer is supported, implement it transactionally.
+Implement the backend foundation for forwarding messages.
 
-The operation must:
+Forwarding must:
 
-1. verify current owner;
-2. verify target is an eligible active member;
-3. update ownership;
-4. update roles;
-5. preserve membership;
-6. emit the appropriate event.
+* Validate source access
+* Validate destination membership
+* Avoid exposing unauthorized source content
+* Preserve required provenance metadata
+* Avoid accidentally mutating the original message
+* Create a new message identity
 
-Do not allow a non-owner to transfer ownership.
-
----
-
-# 20. CONVERSATION METADATA
-
-Implement editable conversation metadata appropriate to the product.
-
-Potential fields:
-
-* name/title;
-* description;
-* avatar/media reference;
-* group settings;
-* privacy-related settings.
-
-Only authorized users may modify group-level metadata.
-
-Direct conversation metadata must not allow one participant to impersonate or modify the other participant's identity.
+Do not copy private internal database identifiers into public forwarding metadata.
 
 ---
 
-# 21. CONVERSATION LISTING
+# 15. PINNED AND SAVED MESSAGE FOUNDATION
 
-Implement authenticated conversation listing.
+Implement foundational support for:
 
-The API must support efficient retrieval suitable for a messaging client.
+* Pinned messages
+* User-saved messages
 
-Return appropriate information such as:
+Pinned messages must be conversation-scoped.
 
-* conversation ID;
-* conversation type;
-* participant/group summary;
-* membership state;
-* metadata;
-* timestamps;
-* muted/pinned/archive state if implemented;
-* relevant synchronization metadata.
+Saved messages must be user-scoped.
 
-Do not include message history in the conversation-list endpoint.
+Validate authorization independently for each operation.
 
-Message retrieval belongs to the messaging domain.
+Do not assume that a message being saved grants access to the conversation after access is revoked.
+
+Define behavior for deleted messages.
 
 ---
 
-# 22. PAGINATION
+# 16. DELIVERY STATES
 
-Conversation and contact lists must use a stable pagination strategy.
+Implement durable message delivery state foundations.
 
-Prefer cursor-based pagination for high-volume collections.
+Support states such as:
 
-The cursor must be:
+* Accepted
+* Persisted
+* Delivered
+* Read
 
-* opaque;
-* validated;
-* stable;
-* tied to the ordering strategy.
+The exact state model must prevent invalid backwards transitions.
 
-Avoid offset pagination for large, continuously changing conversation lists when it would cause unacceptable performance or duplicate/skipped results.
+Delivery state must be associated with the appropriate:
 
-The pagination contract must be consistent with the existing backend.
+* Message
+* Recipient
+* Device where necessary
+* Timestamp
 
----
+Do not mark a message as delivered merely because it was persisted.
 
-# 23. CONVERSATION ORDERING
-
-Conversation listing must use deterministic ordering.
-
-Use an appropriate server-authoritative field, such as:
-
-* last activity timestamp;
-* conversation update sequence;
-* another canonical ordering value.
-
-Do not depend solely on client clocks.
-
-Prepare the model for later message activity updates.
-
-Do not implement fake message activity merely to populate a field.
+Do not mark it as read merely because a conversation was opened on another device unless product semantics explicitly require it.
 
 ---
 
-# 24. CONVERSATION SETTINGS
+# 17. READ STATE
 
-Where supported, implement user-specific conversation settings separately from shared conversation metadata.
+Implement per-user conversation read state.
 
-Examples:
+Support:
 
-* muted;
-* archived;
-* pinned;
-* notification preferences.
+* Last-read message
+* Last-read sequence
+* Read timestamp
+* Unread calculation
+* Read acknowledgement
+* Multi-device propagation
 
-These are generally **per-user state**, not global conversation state.
+Read state must be monotonic.
 
-Do not store per-user settings directly on the shared conversation record.
+A delayed device event must not move a user's read position backwards.
 
----
-
-# 25. CONVERSATION MEMBER STATE
-
-Distinguish:
-
-* active member;
-* invited/pending member if invitations are supported;
-* left member;
-* removed member;
-* banned member where moderation requires it.
-
-Do not overload one boolean to represent all membership states.
-
-Design the state model so future synchronization and moderation features can distinguish transitions.
+Use server-side validation to reject invalid state transitions.
 
 ---
 
-# 26. DATABASE MODELING
+# 18. UNREAD STATE
 
-Implement appropriate PostgreSQL/Prisma models.
+Implement scalable unread-state handling.
 
-At minimum the domain should support concepts equivalent to:
+Support:
 
-* Contact;
-* Conversation;
-* ConversationMember;
-* GroupRole;
-* ConversationType;
-* MembershipStatus;
-* user-specific conversation settings if required.
+* Per-conversation unread state
+* Per-user unread state
+* Read synchronization
+* Conversation list summaries
+* Efficient retrieval
 
-Use:
+Do not calculate massive unread counts using expensive full message scans on every request.
 
-* foreign keys;
-* uniqueness constraints;
-* indexes;
-* appropriate cascading behavior;
-* timestamps.
+Design the system for incremental updates.
+
+Handle concurrent messages and read acknowledgements safely.
 
 ---
 
-# 27. CRITICAL DATABASE CONSTRAINTS
+# 19. REAL-TIME WEBSOCKET ARCHITECTURE
 
-Enforce database-level uniqueness for:
+Implement the production WebSocket layer.
 
-## Contacts
+Support:
 
-Appropriate unique owner/target relationship.
+* Connection establishment
+* Authentication
+* Session association
+* Device association
+* Connection lifecycle
+* Reconnection
+* Heartbeats
+* Disconnect handling
+* Event delivery
+* Acknowledgements
+* Error handling
+* Backpressure controls
 
-## Direct conversations
+The WebSocket layer must remain horizontally scalable.
 
-Canonical participant-pair uniqueness.
-
-## Group memberships
-
-One active membership per user/conversation according to the selected state model.
-
-Do not rely solely on application logic.
-
----
-
-# 28. INDEXING
-
-Design indexes for actual access patterns.
-
-At minimum consider:
-
-* conversations by member;
-* active memberships by user;
-* members by conversation;
-* contacts by owner;
-* contact lookup by normalized identifier where applicable;
-* direct conversation uniqueness;
-* conversation activity ordering.
-
-Avoid redundant indexes.
-
-Verify query plans for high-frequency operations where practical.
+Do not store authoritative user state only in process memory.
 
 ---
 
-# 29. TRANSACTIONS
+# 20. WEBSOCKET AUTHENTICATION
 
-Use database transactions for operations requiring atomicity.
-
-Examples:
-
-* direct conversation creation;
-* group creation;
-* group membership changes;
-* role changes;
-* ownership transfer;
-* member removal;
-* account-related cleanup.
-
-A group membership change must not leave role/ownership state inconsistent.
-
----
-
-# 30. IDEMPOTENCY
-
-Conversation operations must safely handle repeated requests where appropriate.
-
-Examples:
-
-* create/get direct conversation;
-* add contact;
-* remove contact;
-* add group member;
-* leave group.
-
-Repeated requests must produce deterministic outcomes.
-
-Do not treat a harmless retry as an internal server error.
-
----
-
-# 31. PRIVACY AND BLOCKING INTEGRATION
-
-Conversation creation and access must respect privacy and blocking rules.
-
-If the repository already contains blocking/privacy functionality:
-
-* reuse it;
-* do not duplicate it.
-
-If blocking is not yet implemented, create the minimal domain interface required to enforce conversation-access decisions without implementing a second blocking subsystem.
-
-Conversation authorization must be able to answer questions such as:
-
-* Can user A start a direct conversation with user B?
-* Can user A access this conversation?
-* Can user A add user B to this group?
-
-Do not bypass privacy controls merely because the endpoint is authenticated.
-
----
-
-# 32. ACCOUNT STATE INTEGRATION
-
-Conversation operations must respect user account state.
-
-For example:
-
-* suspended users may not be permitted to create conversations;
-* deleted accounts must not be treated as normal active users;
-* inactive users may require special handling.
-
-Use the identity domain's authoritative account state.
-
-Do not duplicate account status inside conversations unless there is a clear domain reason.
-
----
-
-# 33. EVENT ARCHITECTURE
-
-Implement durable conversation domain events where asynchronous consumers will need them.
-
-Potential events include:
-
-* conversation.created;
-* conversation.updated;
-* conversation.member.added;
-* conversation.member.removed;
-* conversation.member.left;
-* conversation.role.changed;
-* conversation.owner.transferred;
-* contact.created;
-* contact.updated;
-* contact.removed.
-
-Use the repository's canonical event envelope.
-
-Events must contain appropriate:
-
-* event ID;
-* event type;
-* event version;
-* aggregate ID;
-* producer;
-* timestamp;
-* correlation ID;
-* causation ID where applicable;
-* trace context;
-* versioned payload.
-
-Do not publish events containing unnecessary private data.
-
----
-
-# 34. TRANSACTIONAL EVENT DELIVERY
-
-When a database mutation must reliably produce a domain event:
-
-* use the existing transactional outbox infrastructure if present;
-* otherwise implement the smallest correct outbox mechanism required.
-
-The database state and outbox record must be committed atomically.
-
-Do not publish directly to Kafka and then assume the database transaction succeeded.
-
-Do not implement an outbox without a real delivery mechanism.
-
----
-
-# 35. EVENT IDEMPOTENCY
-
-Design downstream consumers to tolerate duplicate events.
-
-Conversation events may be delivered more than once.
-
-Do not make later messaging/realtime services depend on exactly-once delivery.
-
-Use:
-
-* event IDs;
-* aggregate versions where appropriate;
-* idempotent handlers.
-
----
-
-# 36. REDIS
-
-Use Redis only for appropriate ephemeral/high-performance state.
-
-Potential uses:
-
-* conversation access caching;
-* membership caching;
-* rate limiting;
-* short-lived discovery state;
-* distributed coordination.
-
-Do not make Redis the authoritative source for conversation membership.
-
-PostgreSQL remains authoritative.
-
-Every cache must define:
-
-* key;
-* purpose;
-* TTL;
-* invalidation;
-* stale behavior;
-* failure behavior.
-
-A Redis outage must not corrupt conversation state.
-
----
-
-# 37. CACHE INVALIDATION
-
-If conversation or membership data is cached:
-
-Invalidate/update the cache whenever authoritative data changes.
-
-Consider:
-
-* membership changes;
-* role changes;
-* ownership transfer;
-* conversation metadata updates;
-* account deactivation.
-
-Never allow stale authorization cache state to grant access after revocation.
-
-Security-sensitive authorization should fail closed when cache correctness cannot be guaranteed.
-
----
-
-# 38. API DESIGN
-
-Implement versioned REST endpoints following the existing API conventions.
-
-Appropriate endpoints may include:
-
-## Contacts
-
-* list contacts;
-* search contacts;
-* discover users;
-* create contact;
-* update contact;
-* remove contact.
-
-## Conversations
-
-* list conversations;
-* create/retrieve direct conversation;
-* create group;
-* retrieve conversation;
-* update conversation metadata;
-* leave conversation.
-
-## Membership
-
-* list members;
-* add member;
-* remove member;
-* update member role;
-* transfer ownership.
-
-Only implement endpoints justified by the actual domain.
-
----
-
-# 39. AUTHORIZATION
-
-Every endpoint must explicitly enforce:
-
-* authenticated user;
-* conversation membership;
-* role/permission;
-* ownership;
-* account state;
-* privacy/blocking restrictions.
-
-Never use a generic `authenticated = true` check as a substitute for resource authorization.
-
-Test authorization independently.
-
----
-
-# 40. IDOR PROTECTION
-
-Explicitly test for insecure direct object references.
-
-Examples:
-
-User A must not be able to:
-
-* retrieve User B's private contact records;
-* modify User B's contact relationship;
-* retrieve a private conversation where A is not a member;
-* modify another group's metadata;
-* add/remove members from another user's group;
-* transfer ownership of a group they do not own.
-
-Changing an ID in a request must never bypass authorization.
-
----
-
-# 41. INPUT VALIDATION
+Authenticate WebSocket connections using the same security model as the backend.
 
 Validate:
 
-* user IDs;
-* conversation IDs;
-* contact IDs;
-* member IDs;
-* role values;
-* conversation types;
-* membership states;
-* names;
-* descriptions;
-* pagination cursors;
-* metadata sizes.
+* Access token
+* Session
+* Device
+* Account status
 
-Apply maximum lengths and payload limits.
+Reject:
 
-Reject malformed requests before database operations where possible.
+* Expired sessions
+* Revoked sessions
+* Invalid tokens
+* Disabled accounts
+* Unauthorized devices
 
----
+Do not trust client-supplied user IDs.
 
-# 42. SECURITY AGAINST MASS ASSIGNMENT
-
-Do not allow clients to submit arbitrary model fields.
-
-Explicitly map writable fields.
-
-Never accept objects such as:
-
-```text
-{
-  "role": "OWNER",
-  "isAdmin": true,
-  "ownerId": "..."
-}
-```
-
-unless the operation specifically authorizes and validates those fields.
-
-Client DTOs must not map directly into unrestricted Prisma updates.
+The authenticated identity must come from server-side token/session validation.
 
 ---
 
-# 43. GROUP SIZE AND RESOURCE LIMITS
+# 21. WEBSOCKET EVENT CONTRACT
 
-Define configurable group limits appropriate to the platform.
+Establish a versioned event envelope.
 
-The exact limit should be configurable rather than hardcoded throughout business logic.
+Every event should support:
 
-Enforce limits transactionally.
+* Event ID
+* Event type
+* Event version
+* Timestamp
+* Conversation ID where applicable
+* Message ID where applicable
+* Recipient context where applicable
+* Sequence/order information where applicable
+* Correlation ID
+* Payload
 
-Protect against requests attempting to add extremely large numbers of members in one operation.
+Event names must be stable and explicit.
 
-Apply appropriate request-size and operation-rate limits.
+Do not expose internal domain objects directly as WebSocket payloads.
 
----
-
-# 44. ABUSE PREVENTION
-
-Protect against:
-
-* mass contact creation;
-* user enumeration;
-* mass group creation;
-* mass member addition;
-* group invitation abuse;
-* repeated direct-conversation creation;
-* automated discovery;
-* authorization probing.
-
-Use:
-
-* rate limiting;
-* request validation;
-* server-side authorization;
-* audit/security events;
-* configurable thresholds.
-
-Do not block legitimate users through excessively aggressive hardcoded limits.
+Use explicit serializers.
 
 ---
 
-# 45. PRIVACY-AWARE RESPONSES
+# 22. WEBSOCKET ACKNOWLEDGEMENTS
 
-API responses must contain only information the requester is authorized to see.
+Implement explicit acknowledgement semantics.
 
-Do not return:
+Differentiate between:
 
-* private phone numbers;
-* email addresses;
-* internal identifiers;
-* security state;
-* device credentials;
-* private moderation data;
+* Request accepted
+* Message persisted
+* Event delivered to connection
+* Device acknowledged receipt
+* User read state
 
-unless the specific operation requires it and authorization permits it.
+Do not collapse all of these into one generic acknowledgement.
 
-Use dedicated response DTOs.
+Client retries must remain idempotent.
 
-Never return Prisma entities directly.
-
----
-
-# 46. ERROR CONTRACT
-
-Use the backend's canonical error system.
-
-Examples:
-
-* `CONTACT_NOT_FOUND`
-* `USER_NOT_DISCOVERABLE`
-* `CONVERSATION_NOT_FOUND`
-* `NOT_CONVERSATION_MEMBER`
-* `INSUFFICIENT_GROUP_PERMISSION`
-* `GROUP_MEMBER_ALREADY_EXISTS`
-* `GROUP_MEMBER_NOT_FOUND`
-* `GROUP_LIMIT_REACHED`
-* `DIRECT_CONVERSATION_CONFLICT`
-* `CONVERSATION_ACCESS_DENIED`
-* `USER_BLOCKED`
-
-Use stable machine-readable codes.
-
-Do not leak whether a private user exists when privacy rules prohibit disclosure.
+Server acknowledgements must contain enough information for clients to recover after connection loss.
 
 ---
 
-# 47. OBSERVABILITY
+# 23. CONNECTION MANAGEMENT
 
-Instrument important operations.
+Implement distributed connection management.
 
-At minimum measure/log:
+Support:
 
-* contact creation/removal;
-* discovery requests;
-* direct conversation creation;
-* group creation;
-* membership changes;
-* role changes;
-* authorization failures;
-* rate-limit violations;
-* database conflicts;
-* event publication failures.
+* Multiple connections per user
+* Multiple devices
+* Multiple browser sessions
+* Reconnects
+* Duplicate connections
+* Connection expiration
+* Heartbeats
+* Connection cleanup
 
-Use correlation and trace IDs.
+Use Redis or equivalent distributed coordination where necessary.
 
-Do not log private conversation content.
+Do not assume a user is connected to only one application instance.
 
-Do not log unnecessary personal data.
+Do not route authoritative business state through in-memory connection maps.
 
 ---
 
-# 48. METRICS
+# 24. MESSAGE FAN-OUT
 
-Where appropriate expose metrics for:
+Implement scalable fan-out foundations.
 
-* conversation creation rate;
-* group creation rate;
-* membership changes;
-* contact operations;
-* authorization failures;
-* discovery requests;
-* rate-limit rejections;
-* database conflict rates;
-* event publication latency/failure.
+When a message is created:
 
-Metrics should be low-cardinality.
+1. Persist the message.
+2. Generate the durable message event.
+3. Determine authorized recipients.
+4. Determine active recipient devices/connections.
+5. Deliver through appropriate real-time infrastructure.
+6. Record delivery state where required.
+7. Allow disconnected devices to recover through synchronization.
 
-Do not use user IDs or conversation IDs as unbounded metric labels.
+Do not perform unbounded synchronous fan-out inside the request thread.
 
----
+Do not block message persistence on every recipient connection.
 
-# 49. TESTING REQUIREMENTS
-
-Implement meaningful tests.
-
-## Unit tests
-
-Cover:
-
-* direct conversation authorization;
-* group permissions;
-* ownership;
-* role transitions;
-* membership state transitions;
-* contact rules;
-* privacy/blocking decisions;
-* validation;
-* idempotency behavior.
-
-## Integration tests
-
-Cover:
-
-* Prisma persistence;
-* uniqueness constraints;
-* concurrent direct conversation creation;
-* group creation;
-* membership transactions;
-* ownership transfer;
-* Redis cache behavior if implemented;
-* event/outbox behavior.
-
-## API/E2E tests
-
-Cover:
-
-* unauthorized access;
-* authorized access;
-* IDOR attempts;
-* direct conversation creation;
-* duplicate direct conversation requests;
-* group creation;
-* member addition/removal;
-* role changes;
-* owner transfer;
-* leaving a group;
-* contact management;
-* pagination;
-* invalid input;
-* rate limiting.
+Large groups must not cause one application request to synchronously process every connection.
 
 ---
 
-# 50. CONCURRENCY TESTING
+# 25. MULTI-DEVICE SYNCHRONIZATION
 
-Explicitly test race conditions around:
+Implement multi-device message synchronization.
 
-* simultaneous direct conversation creation;
-* simultaneous member addition;
-* simultaneous member removal;
-* simultaneous role changes;
-* simultaneous ownership transfer;
-* concurrent leave/remove operations.
+Support:
 
-Database constraints must remain the final protection against inconsistent state.
+* Device-specific state
+* Message delivery to multiple devices
+* Read-state synchronization
+* Sent-message synchronization
+* Edit synchronization
+* Delete synchronization
+* Reaction synchronization
+* Conversation state synchronization
 
----
+The system must tolerate:
 
-# 51. FAILURE HANDLING
+* Offline devices
+* Delayed devices
+* Reconnected devices
+* Duplicate events
+* Out-of-order events
 
-Handle:
-
-* PostgreSQL unavailable;
-* Redis unavailable;
-* event broker unavailable;
-* duplicate constraints;
-* transaction conflicts;
-* stale membership;
-* revoked account;
-* deleted account;
-* invalid conversation IDs;
-* authorization failures;
-* event publication failures.
-
-Never return a successful mutation if the authoritative transaction failed.
-
-If asynchronous event delivery fails after the database transaction, rely on the outbox/retry mechanism rather than falsely reporting the domain mutation as failed.
+Synchronization must be replay-safe.
 
 ---
 
-# 52. PERFORMANCE
+# 26. OFFLINE SYNCHRONIZATION
 
-Conversation operations must be designed for scale.
+Implement a server-side synchronization model.
+
+Support a cursor or checkpoint representing the client's durable synchronization position.
+
+A synchronization request must allow a device to recover events after:
+
+* Temporary network loss
+* Application restart
+* Device sleep
+* WebSocket disconnect
+* Server restart
+
+Support:
+
+* Sync cursor
+* Event batches
+* Cursor advancement
+* Replay safety
+* Gap detection
+* Snapshot/recovery mechanisms where required
+
+Do not assume the client received an event simply because it was emitted.
+
+---
+
+# 27. SYNC EVENT RETENTION
+
+Define retention behavior for synchronization events.
+
+Events must remain available long enough for normal disconnected-device recovery.
+
+If a client falls behind beyond the retained event window:
+
+* Detect the gap.
+* Do not return misleading partial synchronization.
+* Trigger an appropriate full or partial state recovery mechanism.
+
+Do not allow unbounded event retention.
+
+---
+
+# 28. PRESENCE
+
+Implement scalable presence infrastructure.
+
+Support states such as:
+
+* Online
+* Offline
+* Recently active where appropriate
+* Invisible or privacy-controlled states where applicable
+
+Presence must be treated as ephemeral state.
+
+Use Redis or equivalent distributed low-latency storage.
+
+Do not persist every heartbeat into PostgreSQL.
+
+Implement:
+
+* Heartbeats
+* TTLs
+* Disconnect handling
+* Presence subscriptions
+* Privacy-aware visibility
+
+Avoid broadcasting presence updates unnecessarily.
+
+---
+
+# 29. TYPING INDICATORS
+
+Implement typing indicators as ephemeral real-time state.
+
+Support:
+
+* Start typing
+* Stop typing
+* Automatic expiration
+* Conversation membership validation
+* Multi-device behavior
+* Rate limiting
+
+Typing events must not be persisted as ordinary messages.
+
+Prevent clients from keeping typing state permanently active.
+
+---
+
+# 30. GROUP CONVERSATION FOUNDATION
+
+Implement the messaging-side group foundation.
+
+Support:
+
+* Group membership
+* Membership validation
+* Group message authorization
+* Group recipient resolution
+* Membership changes
+* Member removal foundation
+* Group roles foundation
+
+Design group messaging for large memberships.
+
+Do not perform expensive full-group calculations synchronously for every message.
+
+Prepare the architecture for asynchronous group fan-out.
+
+---
+
+# 31. TRANSACTIONAL OUTBOX
+
+Implement transactional outbox support for durable messaging events.
+
+When a message mutation requires an event:
+
+* Persist the business mutation and outbox record in the same database transaction.
+* Ensure the event cannot be emitted without the corresponding durable mutation.
+* Ensure a successful business mutation cannot permanently lose its event.
+* Make outbox processing idempotent.
+
+Implement:
+
+* Outbox record model
+* Event payload
+* Event type
+* Version
+* Aggregate identifier
+* Creation timestamp
+* Processing state
+* Retry metadata where appropriate
+
+Do not mark an event complete before successful durable handoff.
+
+---
+
+# 32. EVENT PROCESSING
+
+Implement event-processing foundations.
+
+Support:
+
+* Idempotent consumers
+* Event version validation
+* Retry behavior
+* Failure handling
+* Dead-letter handling where appropriate
+* Duplicate-event detection
+* Correlation IDs
+* Trace propagation
+
+Consumers must tolerate duplicate delivery.
+
+Do not rely on exactly-once processing unless the infrastructure actually guarantees it.
+
+Design for at-least-once delivery with idempotent consumers.
+
+---
+
+# 33. DATABASE PERFORMANCE
+
+Review messaging database access for scale.
+
+Implement appropriate indexes for:
+
+* Conversation lookup
+* Conversation membership
+* Message retrieval
+* Message ordering
+* Message lookup by ID
+* Client idempotency lookup
+* Read state
+* Delivery state
+* Reactions
+* Replies
+
+Use query patterns appropriate for large tables.
 
 Avoid:
 
-* N+1 member queries;
-* loading entire groups unnecessarily;
-* unbounded contact searches;
-* offset pagination over massive tables;
-* repeated authorization queries that can be efficiently batched;
-* unnecessary Redis round trips.
+* Full table scans
+* Offset pagination
+* N+1 queries
+* Unbounded joins
+* Loading complete conversations into memory
 
-Use:
+Use selective projections.
 
-* appropriate indexes;
-* selective projections;
-* cursor pagination;
-* batching;
-* transactions;
-* caching where justified.
+Retrieve only required columns.
 
 ---
 
-# 53. DATABASE MIGRATIONS
+# 34. CONCURRENCY AND FAILURE HANDLING
 
-Create proper Prisma migrations for all schema changes.
+Test and protect against:
 
-Validate:
+* Duplicate message submission
+* Concurrent message creation
+* Concurrent edits
+* Concurrent deletes
+* Concurrent reactions
+* Duplicate WebSocket events
+* Reconnect races
+* Duplicate delivery
+* Read-state races
+* Membership changes during sends
+* Redis failure
+* Kafka/Redpanda failure
+* Database transient failures
+* Worker retries
 
-* clean installation;
-* existing database migration;
-* unique constraints;
-* foreign keys;
-* indexes;
-* nullable transitions;
-* deletion behavior.
+Use transactions, constraints, optimistic concurrency, idempotency, and distributed coordination where appropriate.
 
-Do not use destructive schema changes without a safe migration plan.
+Do not solve every concurrency problem using distributed locks.
 
----
-
-# 54. API DOCUMENTATION
-
-Update OpenAPI documentation for all implemented functionality.
-
-Document:
-
-* request DTOs;
-* response DTOs;
-* authorization requirements;
-* error codes;
-* pagination;
-* role/permission behavior;
-* validation constraints.
-
-Documentation must match the actual API.
+Use the simplest correct mechanism for each invariant.
 
 ---
 
-# 55. FUTURE MESSAGE COMPATIBILITY
+# 35. FINAL IMPLEMENTATION REPORT
 
-The conversation domain must provide stable contracts for the future messaging system.
+When implementation is complete, provide:
 
-Future message operations must be able to ask:
+1. **Implementation Summary**
+2. **Conversation Modules**
+3. **Message Modules**
+4. **Database Schema Changes**
+5. **Message Ordering Strategy**
+6. **Idempotency Strategy**
+7. **Delivery and Read-State Implementation**
+8. **WebSocket Architecture**
+9. **Connection Management**
+10. **Multi-Device Synchronization**
+11. **Offline Synchronization**
+12. **Presence and Typing Infrastructure**
+13. **Event and Outbox Infrastructure**
+14. **Redis Changes**
+15. **Performance and Indexing Changes**
+16. **Security Controls**
+17. **Tests Added**
+18. **Validation Commands Executed**
+19. **Validation Results**
+20. **Known Limitations**
+21. **Files and Directories Modified**
 
-```text
-Is user U an active member of conversation C?
-```
+Report failures honestly.
 
-and:
+Do not claim successful validation if commands failed.
 
-```text
-Is device D associated with authenticated user U?
-```
-
-and:
-
-```text
-Is user U authorized to perform operation X in conversation C?
-```
-
-These checks must have clear service/domain interfaces.
-
-Do not force the future messaging module to duplicate membership logic.
-
----
-
-# 56. REAL-TIME COMPATIBILITY
-
-The future WebSocket layer will need to notify clients when:
-
-* conversations are created;
-* group metadata changes;
-* members join;
-* members leave;
-* roles change.
-
-Create appropriate domain events/contracts without implementing the entire real-time notification subsystem in this volume.
-
-The event model must support later delivery to:
-
-* connected devices;
-* offline devices through push notifications;
-* multi-device synchronization.
+Do not claim implementation of functionality that was only designed.
 
 ---
 
-# 57. MULTI-DEVICE COMPATIBILITY
+# BACKEND VOLUME 2 COMPLETION STANDARD
 
-Conversation state is user/account-level domain state.
+This volume is complete only when the repository contains a production-grade messaging and real-time backend capable of securely supporting:
 
-A user may have multiple authenticated devices.
+* Durable conversations
+* High-volume message persistence
+* Idempotent message submission
+* Deterministic conversation ordering
+* Real-time message delivery
+* Delivery/read states
+* Multi-device synchronization
+* Offline recovery
+* Presence
+* Typing indicators
+* Group messaging foundations
+* Durable event propagation
+* Horizontal WebSocket scaling
 
-Do not incorrectly model a conversation as belonging to a single device.
+The implementation must be:
 
-Later synchronization services must be able to distribute conversation changes to all eligible devices.
+* Correct
+* Secure
+* Idempotent
+* Observable
+* Horizontally scalable
+* Failure-aware
+* Testable
+* Production-ready
 
-Device-specific delivery belongs to the real-time/synchronization layer, not the core conversation authorization model.
+Do not leave placeholders.
 
----
+Do not leave TODO/FIXME implementation gaps.
 
-# 58. ACCOUNT DELETION COMPATIBILITY
+Do not use pseudo-code.
 
-Design conversation relationships so account deletion can later be handled safely.
+Do not omit required implementations.
 
-Do not use destructive cascades that would unexpectedly delete entire conversation histories merely because one user is deleted.
+Do not say “implement similarly.”
 
-Conversation/member historical integrity must be considered.
+Do not say “remaining code omitted.”
 
-The exact retention/anonymization strategy must remain compatible with the platform's privacy requirements.
+Do not replace implementation with explanations.
 
----
-
-# 59. NO MESSAGE IMPLEMENTATION
-
-Do not implement:
-
-* sending messages;
-* message retrieval;
-* delivery receipts;
-* read receipts;
-* typing indicators;
-* reactions;
-* replies;
-* forwarding;
-* message editing;
-* message deletion.
-
-The conversation domain only establishes the authorization and persistence foundation those features will use.
-
----
-
-# 60. NO PLACEHOLDERS
-
-Do not leave:
-
-* TODO;
-* FIXME;
-* pseudo-code;
-* empty services;
-* fake repositories;
-* fake events;
-* fake API responses;
-* unimplemented permission checks;
-* pretend database migrations;
-* placeholder authorization.
-
-Every implemented path must be functional.
-
----
-
-# 61. BACKWARD COMPATIBILITY
-
-Preserve existing behavior wherever possible.
-
-If existing repository functionality conflicts with this implementation:
-
-1. inspect the actual behavior;
-2. determine compatibility requirements;
-3. make the smallest safe change;
-4. migrate data when necessary;
-5. preserve API compatibility where practical;
-6. document unavoidable breaking changes.
-
-Never replace working identity/session functionality merely for stylistic reasons.
-
----
-
-# 62. REQUIRED VALIDATION
-
-Before considering this volume complete, actually run the applicable validation.
-
-At minimum:
-
-* TypeScript type checking;
-* linting;
-* formatting checks;
-* Prisma generation;
-* Prisma migration validation;
-* unit tests;
-* integration tests;
-* API/E2E tests;
-* application startup;
-* health checks;
-* relevant performance/query validation.
-
-Fix discovered failures.
-
-Do not claim success without actual validation.
-
----
-
-# 63. IMPLEMENTATION ORDER
-
-Use this implementation sequence unless repository constraints require a different safe order:
-
-1. inspect repository;
-2. inspect existing identity/security contracts;
-3. inspect existing database/event infrastructure;
-4. implement contact domain;
-5. implement secure discovery;
-6. implement conversation schema;
-7. implement membership schema;
-8. implement direct-conversation uniqueness;
-9. implement direct conversation creation;
-10. implement group creation;
-11. implement membership operations;
-12. implement roles and permissions;
-13. implement ownership transfer;
-14. implement conversation settings;
-15. implement conversation listing;
-16. implement authorization;
-17. implement privacy/blocking enforcement;
-18. implement domain events/outbox integration;
-19. implement Redis caching only where justified;
-20. implement API documentation;
-21. implement tests;
-22. execute complete validation;
-23. fix all failures.
-
----
-
-# 64. FINAL ENGINEERING REQUIREMENT
-
-The completed implementation must leave the repository with a real, production-quality conversation and contact backend.
-
-It must be:
-
-* secure;
-* transactional;
-* concurrency-safe;
-* privacy-aware;
-* observable;
-* scalable;
-* testable;
-* multi-device compatible;
-* ready for real-time integration;
-* ready for message authorization;
-* compatible with the identity layer;
-* compatible with future messaging, notification, synchronization, and moderation domains.
-
-Do not merely describe the implementation.
-
-**Inspect the actual repository and implement this backend volume completely.**
+Inspect the repository, implement the scope completely, integrate it, validate it, and report the exact result.

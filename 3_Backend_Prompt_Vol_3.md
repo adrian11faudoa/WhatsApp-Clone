@@ -1,1948 +1,1145 @@
-# BACKEND IMPLEMENTATION PROMPT — VOLUME 3
+# WHATSAPP — BACKEND VOLUME 3
 
-## Production-Grade Real-Time Communication Platform
+## ROLE
 
-### Messaging Engine, Message Persistence, Ordering, Idempotency, Delivery, Read State, Reactions, Replies, Forwarding, Editing, Deletion, and Synchronization Foundations
+Act as a Principal Backend Engineer, Staff Backend Engineer, Distributed Systems Engineer, Media Infrastructure Engineer, Search Engineer, Notification Engineer, Security Engineer, Database Architect, SRE, QA Engineer, Performance Engineer, and Technical Writer working as one senior engineering team.
 
-You are implementing **Volume 3 of the backend** for a production-grade, globally scalable, WhatsApp-like real-time communication platform.
+You are implementing the production media, notification, search, and advanced communication backend of a global real-time communication platform comparable in capability and reliability to WhatsApp, Telegram, Signal, Messenger, Discord, and Microsoft Teams.
 
-This is an original communication platform inspired by modern real-time messaging products. It is not an implementation of proprietary WhatsApp source code, private infrastructure, undocumented protocols, or proprietary algorithms.
+Do not teach. Do not provide tutorials. Do not produce pseudo-code. Perform the implementation directly in the repository.
 
-This prompt is **fully standalone**. It must be executable without requiring another prompt, previous conversation, architecture document, or previously generated prompt to be present.
-
-The actual repository is the source of truth for existing implementation.
-
-This volume is an implementation unit of **one coherent backend system**. It must integrate with the actual repository's existing identity, authentication, users, devices, sessions, contacts, conversations, memberships, authorization, database, Redis, event, error, observability, and testing systems.
-
-Do not create competing implementations.
-
-Do not duplicate existing models or infrastructure.
-
-Do not assume another prompt exists.
+Build production-grade software suitable for a globally distributed communication platform operating at very large scale.
 
 ---
 
-# 1. PRIMARY OBJECTIVE
+# PROJECT
 
-Implement the production-grade messaging engine.
+Implement the backend systems responsible for:
 
-This volume must establish real backend functionality for:
+* Media uploads
+* Media metadata
+* Media processing
+* Image processing
+* Video processing
+* Audio processing
+* Voice-message processing
+* Document uploads
+* Thumbnail generation
+* Media validation
+* Media storage
+* CDN delivery
+* Signed URLs
+* Media access authorization
+* Media lifecycle management
+* Push notifications
+* Notification preferences
+* Notification fan-out
+* Device notification registration
+* Search
+* Message search
+* Conversation search
+* User search
+* Search indexing
+* Search consistency
+* Group management foundations
+* Group administration foundations
+* Stickers
+* GIF integration foundations
+* Link preview foundations
 
-* message creation;
-* message persistence;
-* message retrieval;
-* message pagination;
-* message types;
-* message ordering;
-* client idempotency;
-* message sequence/versioning;
-* delivery state;
-* read state;
-* message edits;
-* message deletion;
-* reactions;
-* replies;
-* forwarding;
-* conversation activity updates;
-* message authorization;
-* message domain events;
-* multi-device synchronization foundations;
-* reliable event publication;
-* message-related caching where justified.
+The platform must support:
 
-The implementation must be production-ready.
+* Hundreds of millions of users
+* Tens of millions of daily active users or greater
+* Very large media volumes
+* Large concurrent upload/download workloads
+* Global CDN traffic
+* Large search indexes
+* High notification throughput
+* Multiple devices per account
+* Multi-region deployment
+* Horizontal scaling
+* Failure recovery
+* Strict authorization and privacy controls
 
-Do not create a CRUD demonstration.
-
-Do not use an in-memory message store.
-
-Do not return fake messages.
-
-Do not implement message delivery through frontend-only logic.
-
----
-
-# 2. PRODUCT CONTEXT
-
-The platform supports:
-
-* individual accounts;
-* multiple devices per account;
-* direct conversations;
-* group conversations;
-* text messages;
-* media messages;
-* audio/voice messages;
-* document messages;
-* replies;
-* forwarding;
-* editing;
-* deletion;
-* reactions;
-* delivery receipts;
-* read receipts;
-* typing indicators;
-* presence;
-* push notifications;
-* real-time synchronization;
-* multi-device synchronization;
-* search;
-* privacy and blocking;
-* voice/video calls.
-
-This volume owns the durable messaging domain.
-
-It does not implement the complete WebSocket gateway, push-notification system, media processing pipeline, or calling system.
-
-It must, however, expose the contracts those systems will consume.
+Do not implement frontend or mobile application code in this volume.
 
 ---
 
-# 3. REQUIRED TECHNOLOGY STACK
+# TECHNOLOGY DIRECTION
 
-Use the repository's existing compatible implementation of:
+Use the following backend technology direction unless the existing repository contains a technically justified implementation that must be preserved:
 
-* Node.js;
-* NestJS;
-* TypeScript;
-* PostgreSQL;
-* Prisma;
-* Redis;
-* Kafka or Redpanda;
-* BullMQ where genuinely required;
-* WebSockets/Socket.IO where integration requires it;
-* OpenTelemetry;
-* Prometheus;
-* structured logging.
+* Node.js
+* TypeScript
+* NestJS
+* REST
+* WebSockets
+* PostgreSQL
+* Prisma
+* Redis
+* BullMQ
+* Kafka or Redpanda
+* Elasticsearch or OpenSearch
+* S3-compatible object storage
+* CloudFront or equivalent CDN
+* FFmpeg
+* Sharp or an equivalent production image-processing library
+* FCM
+* APNs
+* OpenTelemetry
+* Prometheus
+* Grafana
+* Loki
+* Tempo
+* Jest
+* Supertest
+* Docker
+* Kubernetes
 
-Do not replace compatible existing infrastructure.
+PostgreSQL remains the authoritative transactional source for durable application metadata.
 
----
+Object storage is authoritative for binary media objects.
 
-# 4. FIRST ACTION — INSPECT THE ACTUAL REPOSITORY
+Redis is used for low-latency ephemeral state and coordination.
 
-Before making changes:
+Kafka or Redpanda is used for durable asynchronous event distribution where appropriate.
 
-1. Inspect the backend repository.
-2. Inspect the identity implementation.
-3. Inspect users/devices/sessions.
-4. Inspect contacts.
-5. Inspect conversations.
-6. Inspect conversation membership and authorization.
-7. Inspect Prisma schema and migrations.
-8. Inspect event infrastructure.
-9. Inspect outbox implementation.
-10. Inspect Redis conventions.
-11. Inspect API/error conventions.
-12. Inspect logging/tracing.
-13. Inspect tests.
-14. Inspect any existing messaging implementation.
+BullMQ is used for background processing where job semantics are appropriate.
 
-If messaging already exists:
-
-* extend it;
-* repair it;
-* migrate it safely;
-* preserve compatible behavior.
-
-Do not create a second message model or second message service.
+Elasticsearch/OpenSearch is used as a derived search index and is never the authoritative source of application data.
 
 ---
 
-# 5. MESSAGE DOMAIN RESPONSIBILITY
+# SOURCE OF TRUTH
 
-The messaging domain owns:
+The repository is the source of truth.
 
-* canonical message persistence;
-* message identity;
-* conversation association;
-* sender association;
-* message content metadata;
-* ordering;
-* client idempotency;
-* message lifecycle;
-* delivery/read state;
-* reactions;
-* replies;
-* forwarding;
-* edit/delete state;
-* message events.
+Before modifying anything:
 
-The following remain separate domains:
+1. Inspect the existing backend.
+2. Inspect messaging implementation.
+3. Inspect conversation and group modules.
+4. Inspect Prisma schema and migrations.
+5. Inspect Redis infrastructure.
+6. Inspect queue infrastructure.
+7. Inspect event infrastructure.
+8. Inspect storage integrations.
+9. Inspect authentication and authorization.
+10. Inspect WebSocket infrastructure.
+11. Inspect configuration.
+12. Inspect tests.
+13. Inspect API documentation.
+14. Inspect infrastructure configuration relevant to media, search, and notifications.
+15. Identify existing implementation that must remain compatible.
 
-## Identity
+Do not blindly replace existing functionality.
 
-Owns:
-
-* users;
-* devices;
-* sessions;
-* authentication.
-
-## Conversations
-
-Owns:
-
-* conversation existence;
-* membership;
-* group roles;
-* conversation authorization.
-
-## Media
-
-Will own:
-
-* uploads;
-* object storage;
-* transcoding;
-* thumbnails;
-* media scanning;
-* CDN delivery.
-
-## Notifications
-
-Will own:
-
-* push notifications;
-* delivery policies.
-
-## Realtime
-
-Will own:
-
-* WebSocket connections;
-* connected-device delivery.
-
-This volume must integrate with those domains through stable contracts rather than duplicating them.
+Preserve correct existing contracts.
 
 ---
 
-# 6. MESSAGE IDENTIFIERS
+# 1. BACKEND IMPLEMENTATION BOUNDARY
 
-Implement a canonical message ID.
+Implement the backend systems for:
 
-It must be:
+* Media
+* Media uploads
+* Media processing
+* Media access
+* Media delivery
+* Notifications
+* Push notifications
+* Notification preferences
+* Search
+* Search indexing
+* Groups
+* Group administration foundations
+* Stickers
+* GIFs
+* Link previews
 
-* globally unique;
-* safe to expose through APIs;
-* consistent across REST, WebSocket, database, events, and clients.
+This volume must integrate with existing account, device, conversation, and messaging functionality.
 
-Do not use database auto-increment IDs as publicly exposed message identifiers unless the repository already has an explicit secure strategy.
+Do not redesign authentication.
 
-Where internal database sequence values are useful, keep them separate from public identifiers.
+Do not redesign the core message model unnecessarily.
 
----
+Do not rewrite unrelated backend modules.
 
-# 7. CLIENT IDEMPOTENCY
-
-Message sending must support client-generated idempotency.
-
-A client may retry the same send request because of:
-
-* network failure;
-* timeout;
-* connection loss;
-* app suspension;
-* device transition.
-
-The server must not create duplicate messages for a retried logical send.
-
-Support a stable client-generated idempotency key/request ID associated with:
-
-* authenticated user;
-* authenticated device;
-* conversation;
-* logical message submission.
-
-Enforce uniqueness at the database level.
-
-Do not rely solely on Redis for durable idempotency.
+Do not implement frontend or mobile code.
 
 ---
 
-# 8. IDEMPOTENT MESSAGE CREATION
+# 2. MEDIA DOMAIN
 
-The message creation operation must behave deterministically.
+Create a production-grade media domain.
 
-If a client repeats the same valid request:
+Support media categories including:
 
-* return the existing canonical message;
-* do not create a second message;
-* do not emit duplicate logical domain events;
-* do not increment conversation activity twice.
+* Images
+* Videos
+* Audio
+* Voice messages
+* Documents
+* Stickers
+* Thumbnails
+* Preview images
 
-If the same idempotency key is reused with materially different message content, reject it with a stable conflict error.
+Media metadata must include appropriate information such as:
 
-Do not silently associate an idempotency key with a different message.
+* Media ID
+* Owner
+* Message association
+* Media type
+* MIME type
+* Size
+* Storage key
+* Processing state
+* Upload state
+* Hash/checksum where appropriate
+* Width
+* Height
+* Duration
+* Created timestamp
+* Processing timestamps
+* Availability state
 
----
-
-# 9. MESSAGE MODEL
-
-Implement a durable message model capable of representing at minimum:
-
-* message ID;
-* conversation ID;
-* sender user ID;
-* sender device ID where useful;
-* message type;
-* textual content where applicable;
-* reply reference;
-* forwarded reference/metadata;
-* edit state;
-* deletion state;
-* client idempotency key;
-* server creation timestamp;
-* update timestamp;
-* ordering information;
-* version/state metadata.
-
-Do not place all possible message types into one unstructured JSON blob.
-
-Use typed relational fields for data that requires:
-
-* indexing;
-* constraints;
-* authorization;
-* filtering;
-* querying.
-
-Use structured JSON only for genuinely variable metadata.
+Do not trust client-supplied metadata without server validation.
 
 ---
 
-# 10. MESSAGE TYPES
+# 3. MEDIA UPLOAD ARCHITECTURE
 
-Define stable message types.
+Implement secure upload workflows.
 
-At minimum support the architecture's required categories such as:
+Prefer direct-to-object-storage uploads using short-lived signed upload URLs where appropriate.
 
-* text;
-* image;
-* video;
-* audio;
-* voice;
-* document;
-* system/event message where appropriate.
+The workflow should support:
 
-Media-specific persistence must remain compatible with the future media domain.
+1. Authenticated upload initialization.
+2. Authorization validation.
+3. Media metadata creation.
+4. Signed upload generation.
+5. Direct object upload.
+6. Upload completion confirmation.
+7. Object validation.
+8. Asynchronous processing.
+9. Processing status updates.
+10. Final media availability.
 
-Do not implement fake media storage in this volume.
+Do not route large media files unnecessarily through the application server.
 
-A media message may reference a canonical media asset ID even if the media asset service is implemented later.
+Do not trust a client claiming that an object exists.
 
----
-
-# 11. MESSAGE CONTENT
-
-For text messages:
-
-* validate content;
-* enforce maximum size;
-* normalize where appropriate;
-* preserve user-visible content semantics;
-* reject malformed payloads.
-
-Do not perform destructive normalization that unexpectedly changes user content.
-
-Do not trust client-provided rendered HTML.
-
-Messages must not become an XSS vector for web clients.
+Verify uploaded objects through storage APIs and validated metadata.
 
 ---
 
-# 12. EMPTY MESSAGE PROTECTION
+# 4. MEDIA SECURITY
 
-Reject messages that contain no valid content.
+Protect media against:
 
-For example, a message must not be accepted if it contains:
+* Unauthorized access
+* Object enumeration
+* MIME spoofing
+* Malicious file uploads
+* Oversized files
+* Path traversal
+* Executable uploads
+* Content-type confusion
+* Public bucket exposure
+* Long-lived access URLs
 
-* empty text;
-* missing media reference;
-* invalid message type;
-* malformed structured payload.
+Use opaque storage keys.
 
-Do not use a frontend-only validation check.
+Do not derive storage keys directly from user-controlled filenames.
 
-The backend must validate semantic message completeness.
+Validate MIME type using server-side inspection where practical.
 
----
+Apply per-media-type size limits.
 
-# 13. MESSAGE AUTHORIZATION
+Use malware-scanning integration points where required.
 
-Before creating or modifying a message:
-
-1. authenticate the requester;
-2. resolve the authenticated user/device;
-3. verify conversation membership;
-4. verify membership is active;
-5. verify account state;
-6. enforce conversation/privacy/blocking rules where applicable.
-
-Never trust client-provided membership.
-
-Never accept a client-provided sender ID as authoritative.
-
-The sender is derived from authenticated server-side identity.
+Do not expose object-storage credentials to clients.
 
 ---
 
-# 14. GROUP MESSAGE AUTHORIZATION
+# 5. MEDIA STORAGE
 
-For groups:
-
-* only active members may send;
-* group permissions must be respected;
-* restricted groups must prevent unauthorized posting;
-* removed/left members must not be able to continue sending.
-
-Reuse the repository's conversation permission system.
-
-Do not duplicate group role logic inside messaging.
-
----
-
-# 15. MESSAGE ORDERING
-
-Implement a server-authoritative ordering strategy.
-
-Messages must have a deterministic order within a conversation.
-
-Do not rely exclusively on:
-
-* client timestamps;
-* device clocks;
-* arrival order at individual WebSocket servers.
-
-The ordering strategy must remain correct when:
-
-* multiple devices send concurrently;
-* users send from different geographic regions;
-* requests are retried;
-* network latency differs;
-* messages arrive out of order.
-
-Use an appropriate database-backed sequence/version/ordering mechanism.
-
----
-
-# 16. CONVERSATION SEQUENCE
-
-Where the architecture requires a conversation-local sequence, implement it atomically.
-
-A valid message creation must receive a unique ordering position within its conversation.
-
-The allocation mechanism must handle concurrent sends.
-
-Do not implement:
-
-```text
-read current sequence
-increment in application code
-write sequence
-```
-
-without concurrency protection.
-
-Use a transactional/atomic strategy appropriate for PostgreSQL.
-
----
-
-# 17. MESSAGE TIMESTAMPS
-
-Persist:
-
-* server-created timestamp;
-* appropriate update timestamp.
-
-Client timestamps may be retained as metadata if product behavior requires them, but they must never override the authoritative server ordering.
-
-Use UTC.
-
-Do not allow clients to fabricate authoritative creation times.
-
----
-
-# 18. MESSAGE RETRIEVAL
-
-Implement authenticated message retrieval.
-
-The API must:
-
-* verify conversation membership;
-* return only authorized messages;
-* use efficient queries;
-* support pagination;
-* avoid loading unbounded message history;
-* return stable ordering.
-
-Do not allow a user to retrieve messages from a conversation they cannot access.
-
----
-
-# 19. MESSAGE PAGINATION
-
-Use cursor-based pagination.
-
-Support navigation such as:
-
-* newest messages;
-* older messages;
-* newer messages when synchronization requires it.
-
-The cursor must encode enough information to provide deterministic pagination without exposing internal database implementation details.
-
-Avoid offset pagination for large message histories.
-
----
-
-# 20. PAGINATION CONSISTENCY
-
-Pagination must tolerate concurrent message creation.
-
-A user retrieving older messages should not experience uncontrolled duplication or omission merely because new messages arrive.
-
-Use the canonical message ordering strategy.
-
-Do not depend on timestamps alone if timestamp collisions are possible.
-
----
-
-# 21. MESSAGE DELIVERY STATE
-
-Implement durable delivery state.
-
-At minimum distinguish:
-
-* sent/accepted;
-* delivered;
-* read.
-
-Where necessary support:
-
-* failed;
-* deleted.
-
-Do not confuse:
-
-* server accepted;
-* delivered to a device;
-* delivered to all required recipient devices;
-* read by a recipient.
-
-The data model must permit future multi-device semantics.
-
----
-
-# 22. DELIVERY RECEIPTS
-
-Implement authenticated delivery-receipt operations.
-
-A receipt must:
-
-* identify the relevant conversation/message;
-* identify the receiving user/device where required;
-* be validated against actual membership;
-* be monotonic where appropriate;
-* be idempotent.
-
-A client must not be able to mark another user's messages as delivered.
-
----
-
-# 23. READ RECEIPTS
-
-Implement authenticated read-state updates.
-
-Support an efficient representation.
-
-For high-volume conversations, consider storing a per-user conversation read position rather than inserting one row for every message if the product semantics allow it.
-
-Where per-message state is required, implement it with appropriate indexes and constraints.
-
-The design must support efficient:
-
-* unread counts;
-* read position;
-* synchronization;
-* multi-device propagation.
-
----
-
-# 24. MONOTONIC RECEIPTS
-
-Read and delivery state must not move backward.
-
-For example:
-
-```text
-READ(sequence 100)
-```
-
-must not later become:
-
-```text
-READ(sequence 80)
-```
-
-Use server-side comparison/atomicity.
-
-Do not trust client ordering.
-
----
-
-# 25. MULTI-DEVICE RECEIPTS
-
-The system supports multiple devices.
-
-Determine receipt semantics explicitly.
-
-A device-level receipt must not accidentally imply that every device has received the message unless the product's canonical delivery definition says so.
-
-The backend must be able to distinguish:
-
-* user-level state;
-* device-level state;
-
-where necessary.
-
-Do not collapse them prematurely if doing so would make later multi-device synchronization impossible.
-
----
-
-# 26. MESSAGE EDITING
-
-Implement message editing where supported.
-
-Rules must include:
-
-* only authorized sender may edit;
-* message must be editable;
-* appropriate time/content restrictions;
-* deleted messages cannot be edited;
-* edits must be persisted;
-* edit history/version information must be retained where required;
-* an edit must generate an appropriate domain event.
-
-Do not allow a client to modify:
-
-* sender;
-* conversation;
-* original message identity;
-* authoritative timestamps.
-
----
-
-# 27. EDIT HISTORY
-
-If the product requires edit history, preserve prior versions in a dedicated structure.
-
-Do not overwrite historical data if the product requires auditability.
-
-Each edit should have:
-
-* edit ID;
-* message ID;
-* editor;
-* prior/current version relationship;
-* timestamp;
-* appropriate content representation.
-
-Respect privacy and retention rules.
-
----
-
-# 28. MESSAGE DELETION
-
-Implement authorized message deletion.
-
-Support the product's intended semantics, such as:
-
-* delete for self;
-* delete for everyone.
-
-These must be modeled as different operations.
-
-Do not physically destroy authoritative message data immediately when doing so would break:
-
-* synchronization;
-* auditability;
-* receipts;
-* moderation;
-* legal retention requirements;
-* event propagation.
-
-Use explicit deletion state where appropriate.
-
----
-
-# 29. DELETE-FOR-EVERYONE AUTHORIZATION
-
-If supported:
-
-* only eligible senders or authorized roles may perform it;
-* enforce time/policy restrictions;
-* verify the message belongs to the conversation;
-* make the operation idempotent;
-* emit a domain event.
-
-Never trust the client to determine whether a message is deletable.
-
----
-
-# 30. REACTIONS
-
-Implement message reactions.
+Implement an object-storage abstraction.
 
 Support:
 
-* authenticated user;
-* message existence;
-* conversation membership;
-* valid reaction type;
-* one reaction per user per supported reaction type/semantic;
-* add/remove/update behavior.
+* Upload
+* Multipart upload where appropriate
+* Object existence verification
+* Object metadata
+* Signed URLs
+* Signed download access
+* Delete
+* Lifecycle metadata
+* Storage key generation
 
-Use database uniqueness constraints.
+Do not hard-code S3 implementation throughout domain services.
 
-Do not allow reactions to messages the user cannot access.
-
----
-
-# 31. REACTION CONCURRENCY
-
-Concurrent reaction operations must remain consistent.
-
-For example:
-
-* two requests to add the same reaction must not create duplicates;
-* removing an already removed reaction should be idempotent;
-* updating a reaction must not accidentally affect another user.
-
-Use database constraints and transactions where appropriate.
+Create a storage abstraction so compatible object storage can be used for testing and future infrastructure changes.
 
 ---
 
-# 32. REPLIES
+# 6. MEDIA PROCESSING PIPELINE
 
-Implement message replies.
+Implement asynchronous media processing.
 
-A reply must:
+Use BullMQ or the durable event infrastructure as appropriate.
 
-* reference a valid message;
-* reference a message in an authorized conversation;
-* preserve conversation consistency;
-* support deleted/original-unavailable messages gracefully.
+Processing must support:
 
-Do not permit cross-conversation message references.
+* Image transformation
+* Thumbnail generation
+* Video metadata extraction
+* Video transcoding
+* Audio metadata extraction
+* Audio normalization where required
+* Voice-message processing
+* Preview generation
 
-A user must not be able to infer or retrieve an inaccessible message through a reply reference.
+Jobs must be:
 
----
+* Idempotent
+* Retryable
+* Observable
+* Versioned
+* Recoverable
 
-# 33. FORWARDING
-
-Implement message forwarding where supported.
-
-A forwarded message must preserve appropriate provenance without exposing private/internal information that should not be shared.
-
-Determine whether forwarding creates:
-
-* a new message containing copied content/metadata;
-* a reference to the original;
-* a hybrid representation.
-
-The chosen model must remain compatible with:
-
-* deletion;
-* privacy;
-* search;
-* media;
-* synchronization.
-
-Do not make a forwarded message depend on the continued accessibility of the source conversation unless explicitly required.
+Do not perform CPU-intensive processing inside HTTP request handlers.
 
 ---
 
-# 34. SYSTEM MESSAGES
+# 7. IMAGE PROCESSING
 
-If the product uses system messages, implement them as an explicit message type.
+Implement secure image processing.
 
-Examples:
+Support:
 
-* group created;
-* member joined;
-* member left;
-* member removed;
-* role changed;
-* group metadata changed.
+* Dimension extraction
+* Orientation normalization
+* Thumbnail generation
+* Preview generation
+* Appropriate format conversion
+* Metadata stripping where privacy requires it
+* Size validation
 
-System messages must not be forgeable by ordinary clients.
+Protect against decompression bombs and pathological image dimensions.
 
-Only authorized domain operations may create them.
+Do not process untrusted images without resource limits.
 
----
-
-# 35. CONVERSATION ACTIVITY
-
-A successful message mutation must update the conversation's appropriate activity metadata atomically where required.
-
-For example:
-
-* last activity sequence;
-* last activity timestamp.
-
-Do not update activity before message persistence succeeds.
-
-Do not increment activity twice because of an idempotent retry.
+Do not allow arbitrary image-processing parameters to exhaust CPU or memory.
 
 ---
 
-# 36. TRANSACTIONS
+# 8. VIDEO PROCESSING
 
-Message creation must use transactions for all state that must change atomically.
+Implement a scalable video-processing foundation using FFmpeg or an equivalent production-grade media pipeline.
 
-A successful send may require atomic updates to:
+Support:
 
-* message row;
-* conversation sequence;
-* idempotency record;
-* conversation activity;
-* outbox event.
+* Metadata extraction
+* Duration extraction
+* Resolution detection
+* Thumbnail generation
+* Preview generation
+* Transcoding architecture
+* Processing status
+* Failure handling
 
-These must be coordinated so the system cannot report a message as successfully persisted while losing its canonical event/order state.
+Configure:
 
----
+* CPU limits
+* Memory limits
+* Execution timeouts
+* Input validation
+* Output validation
 
-# 37. OUTBOX INTEGRATION
+Never execute arbitrary shell commands constructed from user input.
 
-Use the repository's transactional outbox infrastructure.
-
-For message mutations that require downstream processing, create durable events in the same transaction as the authoritative database change.
-
-Potential events include:
-
-* message.created;
-* message.edited;
-* message.deleted;
-* message.reaction.added;
-* message.reaction.removed;
-* message.delivered;
-* message.read;
-* conversation.read-state.updated.
-
-Do not publish a critical event outside the transaction and assume it cannot be lost.
+Use safe process invocation.
 
 ---
 
-# 38. MESSAGE EVENT CONTRACT
+# 9. AUDIO AND VOICE MESSAGES
 
-Every event must use the repository's canonical event envelope.
+Implement audio processing foundations.
 
-Include appropriate:
+Support:
 
-* event ID;
-* event type;
-* version;
-* aggregate/message ID;
-* conversation ID;
-* producer;
-* occurred-at;
-* correlation ID;
-* causation ID where appropriate;
-* trace context;
-* versioned payload.
+* Audio metadata
+* Duration
+* MIME validation
+* Voice-message metadata
+* Transcoding where required
+* Normalization where appropriate
+* Preview metadata
 
-Payloads must contain only information required by consumers.
+Protect processing workers from malicious media.
 
-Do not include:
-
-* passwords;
-* tokens;
-* unnecessary personal data;
-* private infrastructure information.
+Ensure failed jobs do not leave media permanently marked as processing.
 
 ---
 
-# 39. EVENT VERSIONING
+# 10. MEDIA THUMBNAILS AND PREVIEWS
 
-Messages and events evolve over time.
+Generate thumbnails and previews asynchronously.
 
-Implement explicit event versions.
+Thumbnails must:
 
-Consumers must be able to identify the event schema version.
+* Have deterministic dimensions
+* Have validated formats
+* Use safe processing limits
+* Be stored independently
+* Have authorization-aware delivery
 
-Do not silently change the meaning of an existing event payload.
+Do not expose original media merely because a thumbnail exists.
 
-If the event contract changes incompatibly, create a new version.
-
----
-
-# 40. EVENT IDEMPOTENCY
-
-Assume at-least-once delivery.
-
-Downstream consumers must be able to process duplicate events safely.
-
-Use event IDs and/or aggregate versions where appropriate.
-
-Do not design the system around exactly-once event delivery.
+Do not assume a thumbnail grants access to the original object.
 
 ---
 
-# 41. REDIS USAGE
+# 11. MEDIA DOWNLOAD AUTHORIZATION
 
-Use Redis only for appropriate high-performance ephemeral state.
+Implement secure media access.
 
-Potential uses:
+Before issuing a signed download URL:
 
-* short-lived message request coordination;
-* rate limiting;
-* hot conversation metadata;
-* unread counters;
-* ephemeral synchronization state.
+1. Authenticate the requester.
+2. Resolve the media.
+3. Resolve its owning message.
+4. Resolve the conversation.
+5. Validate user authorization.
+6. Validate message/media visibility.
+7. Generate a short-lived signed URL.
 
-PostgreSQL remains authoritative.
+Do not allow users to retrieve arbitrary objects by storage key.
 
-Do not use Redis as the only durable message store.
-
----
-
-# 42. MESSAGE CACHE
-
-If message/conversation data is cached:
-
-* define exact cache keys;
-* define TTL;
-* define invalidation;
-* define stale behavior;
-* define failure behavior.
-
-Never allow stale cache state to grant access to unauthorized messages.
-
-Authorization must remain authoritative.
+Do not expose permanent public URLs for private media.
 
 ---
 
-# 43. UNREAD COUNTERS
+# 12. MEDIA LIFECYCLE
 
-If unread counts are implemented:
+Implement media states such as:
 
-* define canonical semantics;
-* avoid unbounded per-message calculations on every request;
-* support efficient incremental updates;
-* keep state consistent with read positions.
+* Uploading
+* Uploaded
+* Processing
+* Available
+* Failed
+* Deleted
+* Expired where applicable
 
-Unread counts may be derived or materialized, but the authoritative read state must remain recoverable.
+Ensure state transitions are validated.
 
-Do not let Redis-only counters become the sole source of truth.
+Media cleanup must be asynchronous and idempotent.
 
----
-
-# 44. MESSAGE SEARCH COMPATIBILITY
-
-The message model must support future indexing into Elasticsearch/OpenSearch.
-
-Provide stable:
-
-* message ID;
-* conversation ID;
-* sender ID;
-* type;
-* timestamps;
-* edit/delete state;
-* searchable content where policy permits.
-
-Do not implement the full search engine here.
-
-Do not index deleted/private content incorrectly.
+Deleted messages must not automatically imply immediate physical object deletion if retention, legal, or operational requirements require delayed cleanup.
 
 ---
 
-# 45. MEDIA COMPATIBILITY
+# 13. MEDIA DEDUPLICATION
 
-Media messages must be compatible with a later media subsystem.
+Implement media deduplication only where technically and privacy-wise appropriate.
 
-Use references to canonical media assets rather than embedding large binary data in PostgreSQL.
+If hashes are used:
 
-Do not accept arbitrary client-supplied S3 URLs as authoritative media ownership.
+* Generate them securely.
+* Avoid exposing whether another user has uploaded identical private content.
+* Do not create cross-user privacy leaks.
+* Preserve authorization boundaries.
 
-Media authorization must eventually verify:
-
-* asset ownership;
-* conversation access;
-* processing state;
-* deletion state.
+Do not use global content deduplication as an excuse to reveal media existence.
 
 ---
 
-# 46. MESSAGE SIZE LIMITS
+# 14. CDN DELIVERY
 
-Define configurable limits for:
+Integrate media delivery with a CDN.
 
-* text content;
-* metadata;
-* reply references;
-* reaction payloads;
-* forwarding metadata;
-* batch operations.
+Support:
 
-Do not allow unbounded JSON payloads.
+* Short-lived signed access
+* Cache-aware object delivery
+* Appropriate cache headers
+* Regional edge delivery
+* Origin protection
 
-Reject oversized requests before expensive database work where possible.
+Private media must not become publicly accessible through CDN configuration.
 
----
-
-# 47. BATCH OPERATIONS
-
-If implementing batch operations such as:
-
-* mark read through message X;
-* acknowledge delivery through message X;
-
-prefer compact state transitions over sending thousands of individual database mutations.
-
-Validate that the referenced sequence belongs to the requested conversation.
-
-Do not allow a client to use an arbitrary high sequence number to manipulate unrelated state.
+Do not cache personalized authorization responses incorrectly.
 
 ---
 
-# 48. MESSAGE ACCESS CONTROL
+# 15. PUSH NOTIFICATION DOMAIN
 
-Every message query must be scoped to an authorized conversation.
+Implement a notification domain supporting:
 
-Avoid patterns where the backend:
+* Notification creation
+* Notification preferences
+* Device registration
+* Push delivery
+* Notification status
+* Notification retries
+* Notification deduplication
+* Notification collapse/grouping where appropriate
 
-1. retrieves message by ID;
-2. returns it;
-3. checks conversation authorization later.
+Notifications must be generated asynchronously.
 
-Authorization must be part of the effective query/service boundary.
-
-This reduces IDOR risk.
-
----
-
-# 49. DELETED MESSAGE REPRESENTATION
-
-Define deterministic API behavior for deleted messages.
-
-Depending on product semantics, return:
-
-* deletion marker;
-* message metadata without private content;
-* restricted tombstone representation.
-
-Do not expose deleted content through:
-
-* normal retrieval;
-* replies;
-* search;
-* forwarded references;
-
-unless explicitly permitted.
+Do not block message creation waiting for push delivery.
 
 ---
 
-# 50. MESSAGE EDIT REPRESENTATION
+# 16. DEVICE PUSH REGISTRATION
 
-API clients must be able to distinguish:
+Support:
 
-* original message;
-* edited message;
-* deleted message;
-* forwarded message;
-* reply;
-* system message.
+* FCM tokens
+* APNs tokens
+* Platform
+* Device association
+* Token lifecycle
+* Token invalidation
+* Last-used timestamp
 
-Do not require clients to infer state from missing fields.
+Do not treat push tokens as permanent.
 
-Use explicit flags/types/version metadata.
+Handle provider responses indicating expired or invalid tokens.
 
----
-
-# 51. API ENDPOINTS
-
-Implement real endpoints appropriate to the product.
-
-At minimum support equivalents of:
-
-## Messages
-
-* create/send message;
-* retrieve message;
-* list messages;
-* edit message;
-* delete message.
-
-## Delivery/read state
-
-* acknowledge delivery;
-* mark read;
-* retrieve/read synchronization state where needed.
-
-## Reactions
-
-* add reaction;
-* remove/update reaction.
-
-## Replies
-
-* create reply through message creation;
-* retrieve reply metadata where required.
-
-## Forwarding
-
-* forward messages where supported.
-
-Do not implement redundant endpoint variants.
+Never expose push tokens through ordinary user APIs.
 
 ---
 
-# 52. MESSAGE SEND CONTRACT
+# 17. PUSH NOTIFICATION CONTENT
 
-The send request must contain only client-controlled fields that are genuinely required.
+Notification payloads must respect privacy settings.
 
-The server must derive:
+Support different notification visibility modes.
 
-* sender identity;
-* authenticated device;
-* authoritative timestamp;
-* conversation authorization;
-* message ordering.
+Avoid placing sensitive message content into push payloads when the user has disabled previews.
 
-The client must not control:
+Never include:
 
-* sender ID;
-* sequence number;
-* authoritative creation timestamp;
-* delivery state;
-* read state;
-* moderation state.
+* Authentication tokens
+* Private credentials
+* Internal database identifiers
+* Sensitive metadata unnecessary for notification display
+
+Design payloads for both Android and iOS constraints.
 
 ---
 
-# 53. RESPONSE CONTRACT
+# 18. NOTIFICATION FAN-OUT
 
-Successful message creation should return enough information for the sender to reconcile local optimistic state.
+Implement asynchronous notification fan-out.
 
-Include appropriate:
+A message notification workflow must:
 
-* canonical message ID;
-* conversation ID;
-* authoritative sequence;
-* server timestamp;
-* message state;
-* canonical content representation;
-* relevant version metadata.
+1. Confirm the message is durable.
+2. Resolve eligible recipients.
+3. Resolve eligible devices.
+4. Apply notification preferences.
+5. Apply mute settings.
+6. Apply privacy rules.
+7. Create notification jobs.
+8. Deliver through the correct provider.
+9. Process provider responses.
+10. Retry transient failures.
+11. Invalidate permanently invalid tokens.
 
-Do not return unnecessary internal database fields.
-
----
-
-# 54. ERROR CONTRACT
-
-Use stable machine-readable errors.
-
-Examples:
-
-* `MESSAGE_NOT_FOUND`
-* `MESSAGE_ACCESS_DENIED`
-* `CONVERSATION_ACCESS_DENIED`
-* `MESSAGE_ALREADY_EXISTS`
-* `IDEMPOTENCY_KEY_REUSED`
-* `MESSAGE_EDIT_NOT_ALLOWED`
-* `MESSAGE_DELETE_NOT_ALLOWED`
-* `MESSAGE_ALREADY_DELETED`
-* `INVALID_REPLY_TARGET`
-* `INVALID_FORWARD_TARGET`
-* `INVALID_REACTION`
-* `MESSAGE_CONTENT_TOO_LARGE`
-* `MESSAGE_TYPE_INVALID`
-
-Do not expose database internals.
+Do not create notification jobs for users who should not receive the notification.
 
 ---
 
-# 55. RATE LIMITING
+# 19. NOTIFICATION DEDUPLICATION
 
-Protect messaging operations against abuse.
+Prevent duplicate notifications caused by:
 
-Consider limits by:
+* Message retries
+* Worker retries
+* Provider retries
+* Multiple backend instances
+* Replayed events
 
-* user;
-* device;
-* conversation;
-* IP where appropriate;
-* endpoint;
-* account state.
+Use deterministic notification identities where appropriate.
 
-Protect against:
-
-* message floods;
-* reaction floods;
-* automated read-state manipulation;
-* repeated edits/deletions;
-* forwarding abuse;
-* expensive retrieval requests.
-
-Rate limiting must be configurable.
-
-Do not make the system unusable for legitimate high-volume conversations.
+Notification delivery must be idempotent.
 
 ---
 
-# 56. ABUSE PROTECTION
+# 20. NOTIFICATION RATE CONTROL
 
-The messaging engine must be resistant to:
+Protect users from notification floods.
 
-* spam;
-* message flooding;
-* oversized content;
-* malicious payloads;
-* repeated retries;
-* idempotency-key abuse;
-* authorization probing;
-* high-cardinality query abuse.
+Support:
 
-Security events should be observable without logging private message content unnecessarily.
+* Per-user throttling
+* Per-conversation grouping
+* Message burst collapsing
+* Provider rate limits
+* Retry backoff
+* Queue backpressure
 
----
-
-# 57. PRIVACY
-
-Respect conversation and account privacy.
-
-Do not expose:
-
-* private messages outside authorized conversations;
-* private sender metadata unnecessarily;
-* device information unnecessarily;
-* deleted content;
-* hidden moderation metadata.
-
-If end-to-end encryption is part of the product's eventual design, keep the backend contracts compatible with ciphertext-oriented message storage.
-
-Do not falsely claim that the current implementation provides end-to-end encryption unless the cryptographic system is actually implemented and validated.
+Do not allow a high-volume conversation to create unbounded notification work.
 
 ---
 
-# 58. ENCRYPTION COMPATIBILITY
+# 21. SEARCH DOMAIN
 
-If encrypted message payloads are part of the selected product architecture:
+Implement a production search domain.
 
-* do not invent cryptographic primitives;
-* do not implement custom cryptography;
-* use established cryptographic libraries/protocols;
-* separate encrypted payloads from server-readable metadata;
-* avoid storing plaintext unnecessarily.
+Support search for:
 
-If true end-to-end encryption is deferred, keep message APIs structurally capable of supporting encrypted payloads later without falsely advertising encryption guarantees.
+* Users
+* Conversations
+* Messages
+* Groups
+* Media metadata where appropriate
 
----
+Search must respect authorization.
 
-# 59. MULTI-DEVICE SYNCHRONIZATION FOUNDATION
+Never return a result solely because it exists in Elasticsearch/OpenSearch.
 
-The messaging domain must support synchronization across a user's devices.
-
-The backend must be able to represent:
-
-* message creation;
-* message updates;
-* message deletion;
-* reactions;
-* read state;
-* membership changes;
-* conversation changes.
-
-Later real-time infrastructure can consume these events.
-
-Do not implement device delivery by directly querying every WebSocket connection from the message service.
-
-Keep domain mutation separate from transport delivery.
+Always enforce application-level access rules.
 
 ---
 
-# 60. SYNCHRONIZATION CURSORS
+# 22. SEARCH INDEXING
 
-Design the message/event model so clients can eventually synchronize from a durable cursor.
+Implement derived search indexing.
 
-A synchronization cursor must be:
+Index data must contain only information necessary for supported search functionality.
 
-* monotonic within its defined scope;
-* opaque where exposed externally;
-* durable enough to recover after reconnect;
-* compatible with event ordering.
+Support:
 
-Do not rely solely on wall-clock timestamps for synchronization.
-
----
-
-# 61. REAL-TIME INTEGRATION
-
-The message service must publish canonical events.
-
-The future WebSocket layer can then:
-
-1. consume the domain event;
-2. identify eligible devices;
-3. deliver the event;
-4. track delivery;
-5. recover missed events.
-
-Do not make PostgreSQL writes dependent on a WebSocket client being online.
-
-A message must persist successfully even if all recipient clients are offline.
-
----
-
-# 62. OFFLINE-FIRST COMPATIBILITY
-
-Clients may send messages while experiencing unreliable connectivity.
-
-The backend must safely support:
-
-* retries;
-* duplicate requests;
-* delayed delivery;
-* reconnect;
-* out-of-order network arrival.
-
-The server must remain authoritative.
-
-Do not reject a valid retried request merely because the first response was lost.
-
----
-
-# 63. MESSAGE HISTORY CONSISTENCY
-
-A message must not appear in conversation history unless it has been durably accepted by the authoritative database.
-
-Do not emit a successful message-created event before the transaction is committed.
-
-Do not show a message as server-confirmed merely because it was accepted into an in-memory queue.
-
----
-
-# 64. CONCURRENCY
-
-Explicitly handle concurrent:
-
-* sends;
-* edits;
-* deletes;
-* reactions;
-* reads;
-* delivery acknowledgements.
-
-Use database constraints and transactions.
-
-For conflicting updates, define deterministic behavior.
-
-Do not silently overwrite newer state with older requests.
-
----
-
-# 65. OPTIMISTIC CONCURRENCY
-
-Where messages can be edited/deleted concurrently, use an appropriate version or state check.
-
-A stale client must not overwrite a newer message state.
-
-Return a deterministic conflict/error when necessary.
-
----
-
-# 66. DATABASE INDEXING
-
-Design indexes around real queries.
-
-At minimum consider:
-
-* messages by conversation and sequence;
-* messages by conversation and creation time;
-* messages by sender;
-* idempotency key lookup;
-* replies by target message;
-* reactions by message/user;
-* read state by user/conversation;
-* delivery state by user/device/message where required.
-
-Avoid creating excessive indexes that make high-volume inserts unnecessarily expensive.
-
----
-
-# 67. HIGH-VOLUME MESSAGE STORAGE
-
-Design the schema for very large message tables.
-
-Consider:
-
-* efficient composite indexes;
-* narrow rows where possible;
-* avoiding large repeated JSON;
-* partitioning readiness if required;
-* archival/retention readiness;
-* deletion/tombstone strategy.
-
-Do not prematurely introduce database sharding unless repository requirements justify it.
-
-The schema must not prevent future horizontal scaling.
-
----
-
-# 68. RETENTION COMPATIBILITY
-
-Message data may eventually require:
-
-* retention policies;
-* user deletion;
-* conversation deletion;
-* media lifecycle cleanup;
-* legal/compliance handling.
-
-Do not hardwire indefinite retention into application logic.
-
-Do not permanently delete records merely because the user interface no longer displays them.
-
----
-
-# 69. OBSERVABILITY
-
-Instrument:
-
-* message creation;
-* message retrieval;
-* edits;
-* deletes;
-* reactions;
-* delivery updates;
-* read updates;
-* idempotency conflicts;
-* authorization failures;
-* database conflicts;
-* event publication;
-* outbox processing.
-
-Capture:
-
-* latency;
-* error rates;
-* throughput;
-* dependency failures.
-
-Do not log message content by default.
-
-Do not log encrypted payloads unnecessarily.
-
----
-
-# 70. METRICS
-
-Expose useful low-cardinality metrics such as:
-
-* messages accepted/sec;
-* message creation latency;
-* message retrieval latency;
-* message mutation error rate;
-* authorization failure rate;
-* idempotency conflict rate;
-* receipt processing rate;
-* outbox publication latency;
-* event failure/retry counts.
-
-Never use:
-
-* message IDs;
-* user IDs;
-* conversation IDs;
-
-as unrestricted metric labels.
-
----
-
-# 71. TESTING — UNIT
-
-Create unit tests for:
-
-* message validation;
-* authorization;
-* message type rules;
-* idempotency;
-* ordering;
-* edit rules;
-* delete rules;
-* reaction rules;
-* reply validation;
-* forwarding;
-* receipt monotonicity;
-* unread/read state logic.
-
-Test failure paths as seriously as successful paths.
-
----
-
-# 72. TESTING — DATABASE/INTEGRATION
-
-Use realistic database integration tests.
-
-Test:
-
-* message persistence;
-* uniqueness constraints;
-* conversation sequence allocation;
-* concurrent sends;
-* idempotent retries;
-* edits;
-* deletes;
-* reactions;
-* replies;
-* forwarding;
-* receipt updates;
-* transaction rollback;
-* outbox atomicity.
-
-Do not rely exclusively on mocks.
-
----
-
-# 73. TESTING — API/E2E
-
-Test:
-
-* sending as authorized member;
-* sending as non-member;
-* sending after leaving;
-* duplicate send retry;
-* conflicting idempotency key;
-* message pagination;
-* editing own message;
-* editing another user's message;
-* deleting own message;
-* unauthorized deletion;
-* reaction add/remove;
-* invalid reply;
-* invalid forwarding;
-* delivery receipt authorization;
-* read receipt authorization;
-* rate limiting;
-* malformed input;
-* oversized input.
-
----
-
-# 74. CONCURRENCY TESTING
-
-Explicitly verify that simultaneous sends:
-
-* do not duplicate idempotent requests;
-* receive unique ordering positions;
-* preserve conversation sequence;
-* do not lose outbox events.
-
-Verify concurrent state mutations do not move receipts backward.
-
----
-
-# 75. FAILURE TESTING
-
-Test behavior when:
-
-* PostgreSQL becomes unavailable;
-* Redis becomes unavailable;
-* Kafka/Redpanda becomes unavailable;
-* outbox publishing fails;
-* transaction conflicts occur;
-* requests time out;
-* clients retry;
-* consumers process duplicate events.
-
-A database commit must remain authoritative even if downstream event delivery is temporarily unavailable.
-
----
-
-# 76. PERFORMANCE TESTING
-
-Where the repository has performance infrastructure, test:
-
-* message insertion throughput;
-* conversation history retrieval;
-* concurrent sends;
-* read-state updates;
-* reaction operations;
-* pagination under large datasets.
-
-Identify:
-
-* slow queries;
-* excessive database round trips;
-* N+1 queries;
-* lock contention;
-* unnecessary serialization.
-
-Fix real bottlenecks found during validation.
-
----
-
-# 77. API DOCUMENTATION
-
-Update OpenAPI documentation for:
-
-* message creation;
-* message retrieval;
-* pagination;
-* edit;
-* delete;
-* reactions;
-* delivery;
-* read state;
-* replies;
-* forwarding.
-
-Document:
-
-* authentication;
-* authorization;
-* request constraints;
-* response schemas;
-* errors;
-* cursor semantics.
-
-Documentation must reflect actual behavior.
-
----
-
-# 78. BACKWARD COMPATIBILITY
-
-If messaging functionality already exists:
-
-* preserve compatible APIs;
-* migrate schemas safely;
-* preserve existing clients where practical;
-* avoid deleting working endpoints without migration;
-* reconcile duplicate implementations.
-
-The actual repository remains the source of truth.
-
----
-
-# 79. FUTURE MEDIA COMPATIBILITY
-
-Message creation must be designed so a later media service can provide:
-
-* media asset IDs;
-* processing state;
-* secure download authorization;
-* thumbnails;
-* transcoded variants.
-
-Do not store media binaries in PostgreSQL.
-
-Do not generate permanent public media URLs from arbitrary client input.
-
----
-
-# 80. FUTURE NOTIFICATION COMPATIBILITY
-
-Message-created events must contain enough safe metadata for a future notification subsystem to determine:
-
-* conversation;
-* sender;
-* message type;
-* eligible recipients;
-* whether notification should be generated.
-
-Do not make push notification delivery part of the message database transaction.
-
-A push provider outage must not cause message creation to fail.
-
----
-
-# 81. FUTURE SEARCH COMPATIBILITY
+* Index creation
+* Index updates
+* Index deletion
+* Reindexing
+* Retry
+* Dead-letter handling
+* Versioning
+* Schema evolution
 
 Search indexing must be asynchronous.
 
-Message creation must not synchronously depend on Elasticsearch/OpenSearch availability.
-
-A search outage must not prevent valid messages from being stored.
-
-The message event/outbox architecture must permit later indexing and replay.
+Do not make search-index availability a prerequisite for storing a message.
 
 ---
 
-# 82. FUTURE MODERATION COMPATIBILITY
+# 23. SEARCH CONSISTENCY
 
-The message architecture must permit later moderation workflows without allowing moderation services to corrupt authoritative message ordering.
+Treat search as eventually consistent.
 
-Potential moderation state may include:
+A message may become searchable after durable message creation.
 
-* pending;
-* allowed;
-* restricted;
-* removed.
+Do not claim search results are transactionally synchronized with PostgreSQL.
 
-Do not invent a moderation engine in this volume.
+Provide mechanisms for:
 
----
+* Index lag monitoring
+* Failed indexing detection
+* Reindexing
+* Recovery after search cluster outages
 
-# 83. FUTURE REAL-TIME COMPATIBILITY
-
-The backend must remain transport-independent.
-
-Message persistence should not require:
-
-* a WebSocket;
-* a Socket.IO connection;
-* a particular frontend;
-* a mobile device being online.
-
-The domain service owns state.
-
-Transport services consume canonical events.
+If search is unavailable, message creation and retrieval must continue.
 
 ---
 
-# 84. NO CALLING IMPLEMENTATION
+# 24. MESSAGE SEARCH
 
-Do not implement:
+Implement message search with:
 
-* WebRTC signaling;
-* voice calls;
-* video calls;
-* TURN allocation;
-* call sessions.
+* Conversation scoping
+* User authorization
+* Pagination
+* Query validation
+* Search-term normalization
+* Result ranking
+* Highlighting where appropriate
 
-Only preserve identity/conversation contracts needed for future calling.
+Do not return messages from conversations the user can no longer access.
 
----
-
-# 85. NO FULL MEDIA IMPLEMENTATION
-
-Do not implement:
-
-* S3 upload pipeline;
-* FFmpeg processing;
-* thumbnails;
-* malware scanning;
-* media CDN.
-
-Only establish message references compatible with the later media subsystem.
+Do not rely on search index ACLs as the sole authorization mechanism.
 
 ---
 
-# 86. SECURITY REQUIREMENTS
+# 25. USER SEARCH
 
-Explicitly defend against:
+Implement privacy-aware user discovery.
 
-* IDOR;
-* privilege escalation;
-* mass assignment;
-* message enumeration;
-* unauthorized conversation access;
-* replayed requests;
-* idempotency abuse;
-* oversized payloads;
-* SQL injection;
-* malicious structured payloads;
-* XSS through message content;
-* rate-limit bypass.
+Support:
 
-All authorization must happen server-side.
+* Username/search identifier lookup
+* Optional display-name search
+* Search restrictions
+* Block filtering
+* Discoverability preferences
 
----
+Prevent mass account enumeration.
 
-# 87. PRIVACY REQUIREMENTS
+Apply rate limits.
 
-Do not expose message content through:
-
-* logs;
-* metrics;
-* error messages;
-* unauthorized APIs;
-* event payloads unnecessarily;
-* debugging endpoints.
-
-When errors occur, return safe machine-readable codes rather than private message content.
+Do not expose hidden users through search.
 
 ---
 
-# 88. NO PLACEHOLDERS
+# 26. GROUP FOUNDATION
 
-Do not leave:
+Implement group-management foundations.
 
-* TODO;
-* FIXME;
-* pseudocode;
-* fake message persistence;
-* fake events;
-* mock production behavior;
-* empty handlers;
-* incomplete authorization;
-* pretend transactions;
-* fake sequence allocation.
+Support:
 
-Every implemented path must be real.
+* Group creation
+* Group metadata
+* Group avatar metadata
+* Member listing
+* Member addition
+* Member removal
+* Role foundation
+* Group ownership
+* Group administrators
+* Group settings
 
----
+All membership changes must be transactional.
 
-# 89. REQUIRED VALIDATION
-
-Before considering this volume complete, actually run applicable validation:
-
-* TypeScript type checking;
-* linting;
-* formatting;
-* Prisma generation;
-* Prisma migration validation;
-* unit tests;
-* integration tests;
-* API/E2E tests;
-* concurrency tests where available;
-* application startup;
-* health/readiness checks;
-* relevant performance/query validation.
-
-Fix failures instead of merely reporting them.
-
-Do not claim tests passed unless they actually passed.
+All group operations must validate authorization.
 
 ---
 
-# 90. IMPLEMENTATION ORDER
+# 27. GROUP AUTHORIZATION
 
-Use this order unless the repository requires a different safe sequence:
+Implement explicit group permissions.
 
-1. inspect repository;
-2. inspect conversation/authorization contracts;
-3. inspect database/event infrastructure;
-4. design message persistence;
-5. implement message IDs;
-6. implement message types/content validation;
-7. implement idempotency;
-8. implement conversation ordering;
-9. implement message creation transaction;
-10. implement message retrieval;
-11. implement cursor pagination;
-12. implement delivery state;
-13. implement read state;
-14. implement edit/delete;
-15. implement reactions;
-16. implement replies;
-17. implement forwarding;
-18. implement conversation activity updates;
-19. integrate transactional outbox;
-20. integrate appropriate Redis state;
-21. implement APIs;
-22. implement tests;
-23. validate concurrency;
-24. validate performance;
-25. run complete project validation;
-26. fix all failures.
+Support permissions for:
+
+* Add members
+* Remove members
+* Edit group information
+* Manage administrators
+* Send messages
+* Restrict members
+* Delete messages where permitted
+
+Do not implement group permissions only on the client.
+
+Every operation must be authorized server-side.
 
 ---
 
-# 91. REPOSITORY INTEGRATION CONTRACT
+# 28. LARGE GROUP SCALABILITY
 
-This backend volume is part of a single coherent system.
+Design group operations for large memberships.
 
-Therefore:
+Avoid:
 
-* inspect actual repository state first;
-* use existing identity contracts;
-* use existing conversation authorization;
-* use existing error contracts;
-* use existing IDs;
-* use existing timestamps;
-* use existing event envelope;
-* use existing outbox if available;
-* use existing Redis conventions;
-* use existing observability;
-* use existing testing conventions.
+* Loading every member into memory unnecessarily
+* Synchronous notification fan-out
+* Synchronous presence broadcasting to every member
+* Full membership scans for every message
 
-If existing implementation differs:
-
-* analyze actual behavior;
-* preserve compatible functionality;
-* make the smallest safe change;
-* do not create competing implementations.
-
-Do not assume that another prompt or document is available to Claude.
+Use asynchronous processing and pagination where required.
 
 ---
 
-# 92. CROSS-SYSTEM CONTRACTS
+# 29. STICKER FOUNDATION
 
-The implementation must preserve stable contracts for:
+Implement a sticker domain foundation.
 
-* User ID;
-* Device ID;
-* Conversation ID;
-* Message ID;
-* message sequence;
-* timestamps;
-* idempotency keys;
-* API errors;
-* pagination;
-* authorization;
-* message state;
-* event envelopes;
-* event versions;
-* correlation IDs;
-* trace context.
+Support:
 
-These contracts will be consumed by:
+* Sticker packs
+* Stickers
+* Metadata
+* Ordering
+* Availability
+* Ownership or publisher metadata where applicable
 
-* WebSocket infrastructure;
-* multi-device synchronization;
-* push notifications;
-* search;
-* media;
-* frontend;
-* mobile;
-* infrastructure;
-* QA.
+Validate uploaded sticker assets.
 
-Do not introduce one-off conventions.
+Do not trust client-provided MIME types.
+
+Prepare the system for future sticker marketplace or catalog functionality without coupling it to messaging.
 
 ---
 
-# 93. FINAL ENGINEERING REQUIREMENT
+# 30. GIF INTEGRATION FOUNDATION
 
-The completed implementation must leave the repository with a real production-grade messaging engine.
+Implement a provider abstraction for GIF search.
 
-It must be:
+Do not hard-code one external GIF provider throughout the application.
 
-* durable;
-* transactional;
-* idempotent;
-* concurrency-safe;
-* ordered;
-* scalable;
-* privacy-aware;
-* secure;
-* observable;
-* testable;
-* multi-device compatible;
-* event-driven where appropriate;
-* ready for WebSocket delivery;
-* ready for push notifications;
-* ready for search indexing;
-* ready for media integration;
-* ready for later synchronization infrastructure.
+The abstraction should support:
 
-The backend must continue to function correctly when:
+* Search
+* Trending
+* Result metadata
+* Provider attribution
+* Provider failures
+* Rate limiting
+* Caching where appropriate
 
-* recipients are offline;
-* clients retry requests;
-* Redis is temporarily unavailable;
-* Kafka/Redpanda is temporarily unavailable;
-* WebSocket connections are unavailable;
-* downstream consumers fail;
-* messages arrive concurrently.
+Do not store external provider secrets in source code.
 
-The database must remain the authoritative source for durable message state.
+---
 
-Do not merely describe what should be implemented.
+# 31. LINK PREVIEW FOUNDATION
 
-**Inspect the actual repository and implement this backend volume completely.**
+Implement secure link-preview infrastructure.
+
+Support:
+
+* URL validation
+* Domain restrictions where appropriate
+* Fetch timeout
+* Redirect limits
+* Response-size limits
+* Content-type validation
+* Metadata extraction
+* Cache behavior
+
+Protect against:
+
+* SSRF
+* Internal network access
+* Cloud metadata access
+* DNS rebinding
+* Infinite redirects
+* Oversized responses
+* Malicious HTML
+
+Never allow arbitrary internal URLs to be fetched by backend infrastructure.
+
+---
+
+# 32. BACKGROUND JOB ARCHITECTURE
+
+Create queues for workloads belonging to this volume, such as:
+
+* Media processing
+* Thumbnail generation
+* Video processing
+* Notification delivery
+* Search indexing
+* Search cleanup
+* Media cleanup
+* Link preview processing
+
+Every queue must define:
+
+* Ownership
+* Job payload
+* Retry policy
+* Backoff
+* Timeout
+* Concurrency
+* Failure handling
+* Observability
+* Idempotency
+
+Do not create unbounded worker concurrency.
+
+---
+
+# 33. SECURITY AND PRIVACY REVIEW
+
+Review all new functionality for:
+
+* Unauthorized media access
+* Object enumeration
+* Search leakage
+* Group membership leakage
+* Notification leakage
+* Push-token exposure
+* SSRF
+* Malicious uploads
+* Resource exhaustion
+* Queue abuse
+* Search abuse
+* Provider credential exposure
+* CDN misconfiguration
+* Signed URL misuse
+* Cross-user data leakage
+
+Fix discovered issues before completion.
+
+---
+
+# 34. OBSERVABILITY AND PERFORMANCE
+
+Instrument:
+
+* Upload initialization
+* Upload completion
+* Media processing
+* Media processing latency
+* Media failures
+* Queue depth
+* Job latency
+* Push delivery
+* Push failures
+* Search latency
+* Search failures
+* Search indexing lag
+* Group operations
+* Link-preview processing
+* CDN-related operations where observable
+
+Create metrics and traces that allow operators to identify bottlenecks.
+
+Do not place private message contents into telemetry.
+
+---
+
+# 35. TESTING
+
+Implement tests for:
+
+### Media
+
+* Upload authorization
+* Invalid MIME types
+* Oversized uploads
+* Missing objects
+* Processing failures
+* Signed URL authorization
+* Deleted media
+* Unauthorized media access
+
+### Notifications
+
+* Device registration
+* Invalid tokens
+* Notification preferences
+* Mute behavior
+* Deduplication
+* Retry behavior
+* Provider failures
+
+### Search
+
+* Authorization
+* Pagination
+* Index lag
+* Failed indexing
+* Reindexing
+* Deleted content
+* Blocked users
+* Conversation access
+
+### Groups
+
+* Membership authorization
+* Role authorization
+* Member addition/removal
+* Large membership behavior
+
+### Link previews
+
+* SSRF protection
+* Redirect limits
+* Timeout
+* Oversized response
+* Invalid content
+* Private IP blocking
+
+Use integration and end-to-end tests where behavior crosses infrastructure boundaries.
+
+---
+
+# 36. DATABASE AND INDEX VALIDATION
+
+Review all schema changes.
+
+Verify:
+
+* Foreign keys
+* Unique constraints
+* Indexes
+* Query performance
+* Cascading behavior
+* Soft deletion behavior
+* Retention behavior
+
+Verify Elasticsearch/OpenSearch mappings.
+
+Ensure indexes support actual query patterns.
+
+Do not create mappings that expose unnecessary private information.
+
+---
+
+# 37. FAILURE AND RECOVERY
+
+Test failure scenarios including:
+
+* Object storage unavailable
+* Upload interrupted
+* Media worker crash
+* FFmpeg failure
+* Redis unavailable
+* Queue unavailable
+* Search unavailable
+* Search indexing failure
+* FCM failure
+* APNs failure
+* Provider throttling
+* Database transient failure
+* CDN failure
+* Link-preview target timeout
+
+The system must degrade safely.
+
+Message persistence must not depend on search availability.
+
+Message persistence must not depend on push-provider availability.
+
+Media upload must not require synchronous media processing.
+
+---
+
+# 38. REPOSITORY INTEGRATION
+
+Integrate all implementation into the existing repository.
+
+Update where necessary:
+
+* Source code
+* Prisma schema
+* Migrations
+* Queue configuration
+* Event configuration
+* Storage configuration
+* Search configuration
+* Notification configuration
+* Environment examples
+* Tests
+* API documentation
+* Backend documentation
+* Docker configuration
+* Package scripts
+
+Do not overwrite unrelated implementation.
+
+Do not regenerate unchanged files.
+
+Preserve existing API compatibility unless a migration is technically required and documented.
+
+---
+
+# 39. VALIDATION AND COMPLETION
+
+Before declaring completion:
+
+1. Run formatting checks.
+2. Run linting.
+3. Run TypeScript compilation/type checking.
+4. Validate Prisma schema.
+5. Validate migrations.
+6. Run unit tests.
+7. Run integration tests.
+8. Run relevant end-to-end tests.
+9. Verify object-storage integration or safe test equivalent.
+10. Verify media processing workers.
+11. Verify notification workers.
+12. Verify search indexing.
+13. Verify search authorization.
+14. Verify group authorization.
+15. Verify SSRF protection.
+16. Verify signed media access.
+17. Verify queue retry behavior.
+18. Verify failure recovery.
+19. Verify telemetry.
+20. Review security controls.
+21. Review database indexes.
+22. Review API documentation.
+23. Review repository changes for unrelated modifications.
+
+Do not declare successful validation if checks failed.
+
+---
+
+# 40. FINAL IMPLEMENTATION REPORT
+
+When implementation is complete, provide:
+
+1. **Implementation Summary**
+2. **Media Architecture**
+3. **Storage Changes**
+4. **Media Processing Pipeline**
+5. **CDN and Signed URL Implementation**
+6. **Notification Architecture**
+7. **FCM/APNs Integration**
+8. **Search Architecture**
+9. **Search Indexing**
+10. **Group Management Changes**
+11. **Sticker/GIF/Link Preview Changes**
+12. **Queues and Workers**
+13. **Database Changes**
+14. **Security and Privacy Controls**
+15. **Observability**
+16. **Tests Added**
+17. **Validation Commands**
+18. **Validation Results**
+19. **Known Limitations**
+20. **Configuration Changes**
+21. **Files and Directories Modified**
+
+Report actual implementation only.
+
+Do not claim that external services were successfully tested if credentials or infrastructure were unavailable.
+
+Clearly distinguish implemented functionality from infrastructure-dependent validation.
+
+---
+
+# BACKEND VOLUME 3 COMPLETION STANDARD
+
+This volume is complete only when the backend provides production-grade foundations for:
+
+* Secure media handling
+* Scalable media processing
+* CDN-based media delivery
+* Push notifications
+* Notification preferences
+* Search
+* Search indexing
+* Group administration
+* Stickers
+* GIF integration
+* Secure link previews
+
+The implementation must be:
+
+* Secure
+* Privacy-preserving
+* Horizontally scalable
+* Asynchronous where appropriate
+* Idempotent
+* Observable
+* Failure-aware
+* Testable
+* Production-ready
+
+Do not leave placeholders.
+
+Do not leave TODO/FIXME implementation gaps.
+
+Do not use pseudo-code.
+
+Do not omit required implementations.
+
+Do not say “implement similarly.”
+
+Do not say “remaining code omitted.”
+
+Do not replace implementation with explanations.
+
+Inspect the repository, implement the scope completely, integrate it, validate it, and report the exact result.
